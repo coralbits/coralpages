@@ -1,0 +1,13 @@
+elements:
+  - name: text
+    viewer: builtin://text/view.html
+    editor: builtin://text/editor.html
+  - name: header
+    viewer: builtin://header/view.html
+    editor: builtin://header/editor.html
+  - name: section
+    viewer: builtin://section/view.html
+    editor: builtin://section/editor.html
+  - name: tag-cloud
+    viewer: builtin://tag-cloud/view.html
+    editor: builtin://tag-cloud/editor.html
