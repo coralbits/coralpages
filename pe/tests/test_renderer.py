@@ -16,3 +16,4 @@ class RendererTestCase(TestCase):
         res = renderer.render()
         logger.debug("%s", res)
         self.assertTrue(res.startswith("<h1>Welcome to My Website</h1>"))
+        self.assertIn("have experience in developing", res)
