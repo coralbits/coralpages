@@ -11,3 +11,6 @@ elements:
   - name: tag-cloud
     viewer: builtin://tag-cloud/view.html
     editor: builtin://tag-cloud/editor.html
+  - name: paragraph
+    viewer: builtin://text/view.html
+    editor: builtin://text/editor.html
