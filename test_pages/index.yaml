@@ -4,10 +4,27 @@ data:
   - type: header
     data:
       text: "Welcome to Page Editor Server"
+    style:
+      background: blue
+      color: white
+      font-size: 20px
+      font-weight: bold
+      text-align: center
+      padding: 10px
+      margin: 10px
+      border-radius: 5px
   - type: section
     data:
       title: "About"
       text: "This is a hexagonal architecture server for serving pages."
+    style:
+      background: lightblue
+      color: black
+      font-size: 16px
+      font-weight: normal
+      text-align: left
+      padding: 10px
+      margin: 10px
     children:
       - type: paragraph
         data:
@@ -23,3 +40,12 @@ data:
         - "YAML"
         - "Python"
         - "Page Editor" 
+    style:
+      background: lightgray
+      color: black
+      font-size: 14px
+      font-weight: normal
+      text-align: left
+      padding: 10px
+      margin: 10px
+      border-radius: 5px

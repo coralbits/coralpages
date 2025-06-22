@@ -4,21 +4,42 @@ data:
   - type: header
     data:
       text: "About This Project"
+    style:
+      color: darkblue
+      font-size: 24px
+      text-align: center
+      margin-bottom: 20px
   - type: section
     data:
       title: "Architecture"
       text: "This project demonstrates hexagonal architecture in Python."
+    style:
+      background: lightyellow
+      padding: 15px
+      border-radius: 8px
+      margin: 10px
     children:
       - type: paragraph
         data:
           text: "The application is divided into ports (interfaces), adapters (implementations), and services (business logic)."
+        style:
+          color: darkgreen
+          font-weight: bold
       - type: paragraph
         data:
           text: "This allows for easy swapping of implementations, such as changing from file system storage to database storage."
+        style:
+          color: darkred
+          font-style: italic
   - type: tag-cloud
     data:
       tags:
         - "Clean Architecture"
         - "Dependency Inversion"
         - "Testability"
-        - "Maintainability" 
+        - "Maintainability"
+    style:
+      background: lightcyan
+      padding: 10px
+      border-radius: 5px
+      margin-top: 20px 
