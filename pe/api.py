@@ -1,8 +1,5 @@
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
-from pathlib import Path
-import uvicorn
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse
 
 from pe.services import PageService
 from pe.adapters import FileSystemPageRepository, PePageRenderer
@@ -69,14 +66,3 @@ def create_page_service(base_directory: str) -> PageService:
     page_repository = FileSystemPageRepository(base_directory)
     page_renderer = PePageRenderer()
     return PageService(page_repository, page_renderer)
-
-
-def run_server(base_directory: str, host: str = "0.0.0.0", port: int = 8000):
-    """Run the FastAPI server."""
-    page_service = create_page_service(base_directory)
-    app = create_app(page_service)
-
-    print(f"Starting server on {host}:{port}")
-    print(f"Serving pages from: {base_directory}")
-
-    uvicorn.run(app, host=host, port=port)

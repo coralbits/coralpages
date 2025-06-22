@@ -1,9 +1,9 @@
 #!/usr/bin/env -S uv run --script
 import argparse
 import sys
+import os
 from pathlib import Path
-
-from pe.api import run_server
+import uvicorn
 
 
 def parse_args():
@@ -16,6 +16,9 @@ def parse_args():
     )
     parser.add_argument(
         "--port", type=int, default=8000, help="Port to bind to (default: 8000)"
+    )
+    parser.add_argument(
+        "--reload", action="store_true", help="Enable auto-reload on file changes"
     )
     return parser.parse_args()
 
@@ -52,7 +55,16 @@ def main():
         sys.exit(1)
 
     try:
-        run_server(base_directory=args.directory, host=args.host, port=args.port)
+        # Set the base directory as an environment variable
+        os.environ["PAGE_EDITOR_BASE_DIR"] = args.directory
+
+        print(f"Starting server on {args.host}:{args.port}")
+        print(f"Serving pages from: {args.directory}")
+        if args.reload:
+            print("Auto-reload enabled - server will restart on file changes")
+
+        # Use the server module directly
+        uvicorn.run("pe.server:app", host=args.host, port=args.port, reload=args.reload)
     except KeyboardInterrupt:
         print("\nServer stopped by user")
     except Exception as e:
