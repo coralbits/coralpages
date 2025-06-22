@@ -1,0 +1,24 @@
+template: plain
+title: "About Page"
+data:
+  - type: header
+    data:
+      text: "About This Project"
+  - type: section
+    data:
+      title: "Architecture"
+      text: "This project demonstrates hexagonal architecture in Python."
+    children:
+      - type: paragraph
+        data:
+          text: "The application is divided into ports (interfaces), adapters (implementations), and services (business logic)."
+      - type: paragraph
+        data:
+          text: "This allows for easy swapping of implementations, such as changing from file system storage to database storage."
+  - type: tag-cloud
+    data:
+      tags:
+        - "Clean Architecture"
+        - "Dependency Inversion"
+        - "Testability"
+        - "Maintainability" 

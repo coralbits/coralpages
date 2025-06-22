@@ -1,7 +1,17 @@
 elements:
   - name: text
     viewer: builtin://text/view.html
-    editor: builtin://text/editor.html
+    editor:
+      - id: text
+        type: rich-text
+  - name: image
+    viewer: builtin://image/view.html
+    editor:
+      - id: image
+        type: image
+        accept: image/*
+        maxSize: 10240000
+        minSize: 1024
   - name: header
     viewer: builtin://header/view.html
     editor: builtin://header/editor.html

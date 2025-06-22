@@ -1,0 +1,23 @@
+template: plain
+title: "Documentation"
+data:
+  - type: header
+    data:
+      text: "Documentation"
+  - type: section
+    data:
+      title: "Getting Started"
+      text: "Welcome to the documentation section."
+    children:
+      - type: paragraph
+        data:
+          text: "This demonstrates how directories are served with index.yaml files."
+      - type: paragraph
+        data:
+          text: "You can access this page at /docs/ and it will automatically serve the index.yaml file."
+  - type: tag-cloud
+    data:
+      tags:
+        - "Documentation"
+        - "Getting Started"
+        - "Examples" 
