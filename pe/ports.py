@@ -30,3 +30,12 @@ class PageRenderer(ABC):
     def render_page(self, page: Page) -> str:
         """Render a page to HTML."""
         pass
+
+
+class CSSLoader(ABC):
+    """Port for CSS loading operations."""
+
+    @abstractmethod
+    def load_css(self, css_path: str) -> str:
+        """Load CSS content from the given path."""
+        pass

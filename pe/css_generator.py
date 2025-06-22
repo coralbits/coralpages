@@ -1,14 +1,32 @@
 from typing import Dict, List, Tuple
 from pe.types import PageElement
+from pe.config import element_definitions
+from pe.ports import CSSLoader
 
 
 class CSSGenerator:
     """Generates CSS classes and styles for page elements."""
 
-    def __init__(self):
+    def __init__(self, css_loader: CSSLoader):
         self.css_rules: Dict[str, Dict[str, str]] = {}
         self.element_paths: Dict[int, str] = {}
         self.element_counter = 0
+        self.element_css_cache: Dict[str, str] = {}
+        self.css_loader = css_loader
+
+    def load_element_css(self, element_type: str) -> str:
+        """Load CSS for a specific element type using the CSS loader."""
+        if element_type in self.element_css_cache:
+            return self.element_css_cache[element_type]
+
+        element_def = element_definitions.get(element_type)
+        if not element_def or not element_def.css:
+            self.element_css_cache[element_type] = ""
+            return ""
+
+        css_content = self.css_loader.load_css(element_def.css)
+        self.element_css_cache[element_type] = css_content
+        return css_content
 
     def generate_class_name(self, element_path: str) -> str:
         """Generate a CSS class name from the element path."""
@@ -28,6 +46,15 @@ class CSSGenerator:
     def get_css(self) -> str:
         """Generate the complete CSS string."""
         css_lines = []
+
+        # Add element-specific CSS first
+        for element_type, css_content in self.element_css_cache.items():
+            if css_content:
+                css_lines.append(f"/* CSS for {element_type} element */")
+                css_lines.append(css_content)
+                css_lines.append("")
+
+        # Add user-defined styles
         for class_name, styles in self.css_rules.items():
             css_lines.append(f".{class_name} {{")
             for property_name, value in styles.items():
@@ -35,6 +62,7 @@ class CSSGenerator:
                 # since they're already in the correct format from the YAML
                 css_lines.append(f"  {property_name}: {value};")
             css_lines.append("}")
+
         return "\n".join(css_lines)
 
     def process_element_tree(
@@ -46,6 +74,9 @@ class CSSGenerator:
         for i, element in enumerate(elements):
             # Generate element path
             element_path = f"{parent_path}.{element.type}{i+1}"
+
+            # Load element-specific CSS
+            self.load_element_css(element.type)
 
             # Add style if present and store CSS class on element
             if element.style:

@@ -40,7 +40,13 @@ class ElementDefinition:
     name: str
     viewer: str
     editor: str
+    css: Optional[str] = None
 
     @classmethod
     def __from_dict__(cls, data: dict):
-        return cls(name=data["name"], viewer=data["viewer"], editor=data["editor"])
+        return cls(
+            name=data["name"],
+            viewer=data["viewer"],
+            editor=data["editor"],
+            css=data.get("css"),
+        )

@@ -1,13 +1,16 @@
 from pe.types import Page
 from pe.loader import ElementLoader
 from pe.css_generator import CSSGenerator
+from pe.ports import CSSLoader
 
 
 class Renderer:
-    def __init__(self, page: Page, element_loader: ElementLoader):
+    def __init__(
+        self, page: Page, element_loader: ElementLoader, css_loader: CSSLoader
+    ):
         self.page = page
         self.element_loader = element_loader
-        self.css_generator = CSSGenerator()
+        self.css_generator = CSSGenerator(css_loader)
 
     def render(self) -> str:
         # Process elements and generate CSS classes

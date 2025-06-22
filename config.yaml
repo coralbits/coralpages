@@ -1,11 +1,13 @@
 elements:
   - name: text
     viewer: builtin://text/view.html
+    css: builtin://text/style.css
     editor:
       - id: text
         type: rich-text
   - name: image
     viewer: builtin://image/view.html
+    css: builtin://image/style.css
     editor:
       - id: image
         type: image
@@ -14,13 +16,17 @@ elements:
         minSize: 1024
   - name: header
     viewer: builtin://header/view.html
+    css: builtin://header/style.css
     editor: builtin://header/editor.html
   - name: section
     viewer: builtin://section/view.html
+    css: builtin://section/style.css
     editor: builtin://section/editor.html
   - name: tag-cloud
     viewer: builtin://tag-cloud/view.html
+    css: builtin://tag-cloud/style.css
     editor: builtin://tag-cloud/editor.html
   - name: paragraph
     viewer: builtin://text/view.html
+    css: builtin://text/style.css
     editor: builtin://text/editor.html

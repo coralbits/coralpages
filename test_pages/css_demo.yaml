@@ -1,0 +1,52 @@
+template: plain
+title: "CSS Management Demo"
+data:
+  - type: header
+    data:
+      text: "Modern CSS Management System"
+    style:
+      text-align: center
+      margin-bottom: 2rem
+  - type: section
+    data:
+      title: "Tag Cloud Example"
+      text: "Below is a beautifully styled tag cloud with custom CSS."
+    style:
+      margin-bottom: 2rem
+    children:
+      - type: paragraph
+        data:
+          text: "The tag cloud below demonstrates the new CSS system with hover effects and modern styling."
+  - type: tag-cloud
+    data:
+      tags:
+        - "CSS"
+        - "Modern Design"
+        - "Hover Effects"
+        - "Gradients"
+        - "Responsive"
+        - "Typography"
+    style:
+      margin: 2rem 0
+  - type: section
+    data:
+      title: "Rich Text Example"
+      text: "This section shows rich text formatting with custom styles."
+    style:
+      background: #f8f9fa
+      border-left: 4px solid #667eea
+      padding: 1.5rem
+    children:
+      - type: paragraph
+        data:
+          text: "This paragraph demonstrates the rich text styling with <strong>bold text</strong>, <em>italic text</em>, and <a href='#'>links</a>."
+  - type: section
+    data:
+      title: "Custom Styling"
+      text: "Each element can have its own custom CSS applied."
+    style:
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      color: white
+      padding: 2rem
+      border-radius: 12px
+      text-align: center 

@@ -56,7 +56,7 @@ class ElementLoader:
 
         # Replace @@class@@ marker with actual CSS class
         if css_class:
-            rendered = rendered.replace("@@class@@", f'class="{css_class}"')
+            rendered = rendered.replace("@@class@@", css_class)
         else:
             rendered = rendered.replace("@@class@@", "")
 
