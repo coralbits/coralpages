@@ -1,13 +1,26 @@
 from pathlib import Path
 
 import jinja2
+import markdown
 
 from pe.config import element_definitions
 from pe.types import PageElement
 
+# Create Jinja2 environment with markdown filter
 jinja2_loader = jinja2.Environment(
     loader=jinja2.FileSystemLoader(Path(__file__).parent.parent / "templates")
 )
+
+
+# Add markdown filter to Jinja2 environment
+def markdown_filter(text):
+    """Convert markdown text to HTML"""
+    if not text:
+        return ""
+    return markdown.markdown(text, extensions=["extra", "codehilite", "tables"])
+
+
+jinja2_loader.filters["markdown"] = markdown_filter
 
 
 class PEList(list):

@@ -34,3 +34,7 @@ elements:
     viewer: builtin://menu/view.html
     css: builtin://menu/style.css
     editor: builtin://menu/editor.html
+  - name: markdown
+    viewer: builtin://markdown/view.html
+    css: builtin://markdown/style.css
+    editor: builtin://markdown/editor.html

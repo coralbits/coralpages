@@ -81,6 +81,12 @@ The system generates unique CSS classes for user-defined styles based on the ele
 - **Features**: Responsive design, hover effects, caption support
 - **File**: `templates/image/style.css`
 
+### Markdown (`markdown`)
+- **Base class**: `.markdown-content`
+- **Features**: Full markdown support, syntax highlighting, table styling, responsive design
+- **File**: `templates/markdown/style.css`
+- **Supports**: Headings, lists, links, code blocks, tables, blockquotes, and more
+
 ## Example Usage
 
 ```yaml
@@ -93,6 +99,24 @@ data:
     style:
       text-align: center
       color: #2c3e50
+  
+  - type: markdown
+    data:
+      markdown: |
+        # Welcome to My Site
+        
+        This is **markdown content** with *rich formatting*.
+        
+        - Feature 1
+        - Feature 2
+        - Feature 3
+    style:
+      max-width: 800px
+      margin: 2rem auto
+      padding: 2rem
+      background: white
+      border-radius: 12px
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
   
   - type: tag-cloud
     data:

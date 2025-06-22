@@ -8,14 +8,19 @@ HTML on an API endpoint.
 The generated HTML can be from the builtin elements (section, block, image, button, rich text,
 video...), or from another external microservice via REST API.
 
-## Builtint Elements
+## Builtin Elements
 
 - Section
 - Block
 - Image
 - Button
 - Rich Text
+- Markdown
 - Video
+- Header
+- Tag Cloud
+- Menu
+- Paragraph
 
 ## External Elements
 
