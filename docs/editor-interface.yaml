@@ -1,0 +1,427 @@
+# Editor Interface Documentation
+
+data:
+  - type: header
+    data:
+      text: "Editor Interface"
+    style:
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      color: white
+      font-size: 28px
+      font-weight: bold
+      text-align: center
+      padding: 25px
+      margin: 0
+      border-radius: 0
+  - type: section
+    data:
+      title: "Visual Page Editor"
+      text: |
+        The Coralbits Page Editor provides a powerful visual interface for creating and editing pages. 
+        The editor is designed as an embedded Single Page Application (SPA) that can be integrated 
+        into any web application.
+        
+        ## Key Features
+        
+        - **Visual Editing**: Drag-and-drop interface for component management
+        - **Live Preview**: Real-time preview of changes
+        - **Component Library**: Easy access to all available components
+        - **Style Editor**: Visual CSS property editing
+        - **Responsive Design**: Preview on different screen sizes
+        - **Version Control**: Track changes and revert if needed
+        - **Collaboration**: Multiple users can edit simultaneously
+        
+        ## Editor Architecture
+        
+        The editor follows a component-based architecture where each component has its own editor interface:
+        
+        - **Component Editors**: Individual editors for each component type
+        - **Layout Manager**: Drag-and-drop layout management
+        - **Style Panel**: CSS property editing
+        - **Preview Pane**: Live preview of the page
+        - **Component Library**: Available components sidebar
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Getting Started with the Editor"
+      text: |
+        ## Accessing the Editor
+        
+        ### Via API
+        ```bash
+        # Get the editor interface for a page
+        curl http://localhost:8000/api/editor/my-page
+        ```
+        
+        ### Via Web Interface
+        Navigate to `http://localhost:8000/editor/my-page` in your browser.
+        
+        ## Editor Interface Layout
+        
+        The editor interface is divided into several panels:
+        
+        ```
+        +----------------+------------------+----------------+
+        | Component      | Main Editor      | Preview        |
+        | Library        | Area             | Pane           |
+        |                |                  |                |
+        | - Header       | + Component      | Live preview   |
+        | - Text         |   Editor         | of the page    |
+        | - Image        | + Style Panel    |                |
+        | - Menu         | + Layout Tools   |                |
+        +----------------+------------------+----------------+
+        ```
+        
+        ## Basic Workflow
+        
+        1. **Select a Component**: Choose from the component library
+        2. **Add to Page**: Drag and drop or click to add
+        3. **Configure**: Use the component editor to set content and properties
+        4. **Style**: Use the style panel to customize appearance
+        5. **Preview**: See changes in real-time
+        6. **Save**: Save your changes to the page
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Component Editors"
+      text: |
+        ## Text Component Editor
+        
+        The text component editor provides rich text editing capabilities:
+        
+        **Features:**
+        - Rich text formatting (bold, italic, underline)
+        - Headings and paragraphs
+        - Lists and links
+        - HTML source editing
+        - Spell checking
+        
+        **Interface:**
+        ```
+        +------------------------+
+        | [B] [I] [U] [Link]     |
+        | [H1] [H2] [H3] [List]  |
+        +------------------------+
+        |                        |
+        | Rich text editor area  |
+        |                        |
+        +------------------------+
+        ```
+        
+        ## Image Component Editor
+        
+        The image component editor handles image upload and configuration:
+        
+        **Features:**
+        - Drag-and-drop image upload
+        - Image cropping and resizing
+        - Alt text and title editing
+        - Responsive image settings
+        - Image optimization
+        
+        **Interface:**
+        ```
+        +------------------------+
+        | [Upload Image]         |
+        |                        |
+        | [Image Preview]        |
+        |                        |
+        | Alt Text: [_________]  |
+        | Title: [___________]   |
+        +------------------------+
+        ```
+        
+        ## Menu Component Editor
+        
+        The menu component editor manages navigation items:
+        
+        **Features:**
+        - Add/remove menu items
+        - Edit labels and links
+        - Reorder items
+        - Menu styling options
+        
+        **Interface:**
+        ```
+        +------------------------+
+        | Menu Items:            |
+        | [Home] [Edit] [Delete] |
+        | [About] [Edit] [Delete]|
+        |                        |
+        | [+ Add Menu Item]      |
+        +------------------------+
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Style Editor"
+      text: |
+        ## Visual CSS Editing
+        
+        The style editor provides a visual interface for CSS properties:
+        
+        ### Layout Properties
+        - **Width/Height**: Numeric inputs with unit selection
+        - **Margin/Padding**: Visual spacing controls
+        - **Position**: Absolute, relative, fixed positioning
+        - **Display**: Block, inline, flex, grid options
+        
+        ### Typography Properties
+        - **Font Family**: Dropdown with web-safe fonts
+        - **Font Size**: Numeric input with unit selection
+        - **Font Weight**: Bold, normal, light options
+        - **Text Align**: Left, center, right, justify
+        - **Line Height**: Numeric input for spacing
+        
+        ### Color and Background
+        - **Color Picker**: Visual color selection
+        - **Background**: Color, gradient, or image
+        - **Opacity**: Slider for transparency
+        - **Border**: Style, width, and color
+        
+        ### Effects
+        - **Box Shadow**: Visual shadow controls
+        - **Border Radius**: Corner rounding
+        - **Transform**: Scale, rotate, translate
+        - **Transition**: Animation timing
+        
+        ## Responsive Design
+        
+        The editor includes responsive design tools:
+        
+        - **Breakpoint Preview**: Test different screen sizes
+        - **Mobile-First**: Design for mobile, enhance for desktop
+        - **Media Queries**: Conditional styling for different screens
+        - **Touch-Friendly**: Optimize for touch interfaces
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Layout Management"
+      text: |
+        ## Drag and Drop Interface
+        
+        The layout manager provides intuitive drag-and-drop functionality:
+        
+        ### Adding Components
+        1. **Drag from Library**: Drag components from the library to the page
+        2. **Click to Add**: Click a component in the library to add it
+        3. **Keyboard Shortcuts**: Use keyboard shortcuts for quick access
+        
+        ### Moving Components
+        - **Drag to Reposition**: Drag components to new positions
+        - **Drop Zones**: Visual indicators show valid drop areas
+        - **Nesting**: Drop components inside containers
+        
+        ### Resizing Components
+        - **Resize Handles**: Drag handles to resize components
+        - **Aspect Ratio**: Hold Shift to maintain aspect ratio
+        - **Snap to Grid**: Components snap to alignment guides
+        
+        ## Container Management
+        
+        ### Section Components
+        - **Add Children**: Drop components inside sections
+        - **Expand/Collapse**: Toggle section visibility
+        - **Section Settings**: Configure section properties
+        
+        ### Grid Layout
+        - **Grid Editor**: Visual grid layout editor
+        - **Column Management**: Add/remove columns
+        - **Responsive Grid**: Configure grid for different screen sizes
+        
+        ## Alignment Tools
+        
+        - **Alignment Guides**: Visual guides for positioning
+        - **Snap to Grid**: Align components to grid
+        - **Distribute**: Evenly space multiple components
+        - **Group/Ungroup**: Group related components
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Preview and Testing"
+      text: |
+        ## Live Preview
+        
+        The preview pane shows real-time updates as you edit:
+        
+        ### Preview Modes
+        - **Desktop**: Full desktop view
+        - **Tablet**: Tablet-sized preview
+        - **Mobile**: Mobile phone preview
+        - **Custom**: Custom viewport size
+        
+        ### Preview Features
+        - **Real-time Updates**: Changes appear instantly
+        - **Interactive Elements**: Test links and interactions
+        - **Performance Metrics**: Load time and optimization tips
+        - **Accessibility Check**: WCAG compliance warnings
+        
+        ## Testing Tools
+        
+        ### Cross-browser Testing
+        - **Browser Preview**: Test in different browsers
+        - **Device Testing**: Test on various devices
+        - **Performance Testing**: Measure load times
+        
+        ### Validation
+        - **HTML Validation**: Check for HTML errors
+        - **CSS Validation**: Validate CSS syntax
+        - **Accessibility**: Check accessibility compliance
+        - **SEO**: SEO optimization suggestions
+        
+        ## Export Options
+        
+        - **HTML Export**: Export as static HTML
+        - **CSS Export**: Export component styles
+        - **JSON Export**: Export page data
+        - **PDF Export**: Generate PDF version
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Advanced Features"
+      text: |
+        ## Version Control
+        
+        The editor includes built-in version control:
+        
+        ### Change Tracking
+        - **Auto-save**: Automatic saving of changes
+        - **Change History**: Track all modifications
+        - **Revert Changes**: Undo to previous versions
+        - **Compare Versions**: Side-by-side comparison
+        
+        ### Collaboration
+        - **Multi-user Editing**: Multiple users can edit simultaneously
+        - **Conflict Resolution**: Handle editing conflicts
+        - **User Permissions**: Control who can edit what
+        - **Comments**: Add comments to specific components
+        
+        ## Custom Components
+        
+        ### Adding Custom Components
+        1. **Define Component**: Create component definition
+        2. **Build Editor**: Create editor interface
+        3. **Register Component**: Add to component library
+        4. **Test Integration**: Test in editor
+        
+        ### Component API
+        ```javascript
+        // Example custom component editor
+        class CustomComponentEditor {
+          constructor(data, onUpdate) {
+            this.data = data;
+            this.onUpdate = onUpdate;
+          }
+          
+          render() {
+            // Return editor HTML
+          }
+          
+          getData() {
+            // Return component data
+          }
+        }
+        ```
+        
+        ## Keyboard Shortcuts
+        
+        | Shortcut | Action |
+        |----------|--------|
+        | `Ctrl+S` | Save page |
+        | `Ctrl+Z` | Undo |
+        | `Ctrl+Y` | Redo |
+        | `Delete` | Delete selected component |
+        | `Ctrl+C` | Copy component |
+        | `Ctrl+V` | Paste component |
+        | `Ctrl+D` | Duplicate component |
+        | `F12` | Toggle developer tools |
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: menu
+    data:
+      items:
+        - label: "← Back to Documentation"
+          link: "./index"
+        - label: "Getting Started"
+          link: "./getting-started"
+        - label: "Components"
+          link: "./components"
+        - label: "API Reference"
+          link: "./api-reference"
+        - label: "Local Development"
+          link: "./local-development"
+        - label: "Examples"
+          link: "./examples"
+    style:
+      background: #f8f9fa
+      border-radius: 8px
+      margin: 20px auto
+      max-width: 1200px
+      padding: 20px
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) 

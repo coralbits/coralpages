@@ -1,0 +1,816 @@
+# Examples Documentation
+
+data:
+  - type: header
+    data:
+      text: "Examples"
+    style:
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      color: white
+      font-size: 28px
+      font-weight: bold
+      text-align: center
+      padding: 25px
+      margin: 0
+      border-radius: 0
+  - type: section
+    data:
+      title: "Example Pages"
+      text: |
+        This section provides practical examples of how to use the Coralbits Page Editor. 
+        Each example demonstrates different features and use cases to help you get started.
+        
+        ## Example Categories
+        
+        - **Basic Pages**: Simple pages with common components
+        - **Complex Layouts**: Advanced layouts with nested components
+        - **Interactive Elements**: Pages with dynamic content
+        - **Responsive Design**: Mobile-first responsive layouts
+        - **Custom Components**: Examples of custom component usage
+        
+        ## How to Use Examples
+        
+        1. **Copy the YAML**: Copy the example YAML code
+        2. **Create a file**: Save as a `.yaml` file in your pages directory
+        3. **Render the page**: Use `python render.py filename.yaml`
+        4. **Customize**: Modify the example to fit your needs
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Basic Examples"
+      text: |
+        ## Simple Landing Page
+        
+        A basic landing page with header, navigation, and content sections.
+        
+        ```yaml
+        data:
+          - type: header
+            data:
+              text: "Welcome to Our Company"
+            style:
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+              color: white
+              font-size: 32px
+              font-weight: bold
+              text-align: center
+              padding: 40px
+              margin: 0
+        
+          - type: menu
+            data:
+              items:
+                - label: "Home"
+                  link: "/"
+                - label: "About"
+                  link: "/about"
+                - label: "Services"
+                  link: "/services"
+                - label: "Contact"
+                  link: "/contact"
+            style:
+              background: #333
+              padding: 15px
+              text-align: center
+        
+          - type: section
+            data:
+              title: "About Us"
+              text: "Learn more about our company and mission"
+            style:
+              max-width: 1200px
+              margin: 0 auto
+              padding: 40px 20px
+            children:
+              - type: text
+                data:
+                  text: |
+                    <h2>Our Story</h2>
+                    <p>We are a passionate team dedicated to creating amazing experiences for our customers. 
+                    Our mission is to deliver innovative solutions that make a difference.</p>
+                    
+                    <h2>Our Values</h2>
+                    <ul>
+                      <li>Innovation and creativity</li>
+                      <li>Customer satisfaction</li>
+                      <li>Quality and excellence</li>
+                      <li>Continuous improvement</li>
+                    </ul>
+                style:
+                  line-height: 1.6
+                  color: #333
+        ```
+        
+        ## Blog Post Template
+        
+        A blog post template with title, content, and metadata.
+        
+        ```yaml
+        data:
+          - type: header
+            data:
+              text: "Getting Started with Coralbits Page Editor"
+            style:
+              background: #2c3e50
+              color: white
+              font-size: 28px
+              font-weight: bold
+              text-align: center
+              padding: 30px
+              margin: 0
+        
+          - type: section
+            data:
+              title: ""
+              text: ""
+            style:
+              max-width: 800px
+              margin: 0 auto
+              padding: 40px 20px
+            children:
+              - type: text
+                data:
+                  text: |
+                    <div class="blog-meta">
+                      <span class="date">January 15, 2024</span>
+                      <span class="author">by John Doe</span>
+                      <span class="category">Tutorial</span>
+                    </div>
+                    
+                    <div class="blog-content">
+                      <p>In this tutorial, we'll explore how to get started with the Coralbits Page Editor...</p>
+                      
+                      <h2>Installation</h2>
+                      <p>First, let's install the Coralbits Page Editor...</p>
+                      
+                      <h2>Creating Your First Page</h2>
+                      <p>Now that we have it installed, let's create our first page...</p>
+                      
+                      <h2>Conclusion</h2>
+                      <p>Congratulations! You've successfully created your first page...</p>
+                    </div>
+                style:
+                  line-height: 1.8
+                  color: #333
+                  
+              - type: tag-cloud
+                data:
+                  tags:
+                    - text: "Page Editor"
+                      count: 5
+                      link: "/tags/page-editor"
+                    - text: "Tutorial"
+                      count: 3
+                      link: "/tags/tutorial"
+                    - text: "Getting Started"
+                      count: 2
+                      link: "/tags/getting-started"
+                style:
+                  margin-top: 40px
+                  padding: 20px
+                  background: #f8f9fa
+                  border-radius: 8px
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Advanced Layouts"
+      text: |
+        ## Portfolio Page
+        
+        A portfolio page with multiple sections and complex layout.
+        
+        ```yaml
+        data:
+          - type: header
+            data:
+              text: "John Doe - Creative Developer"
+            style:
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+              color: white
+              font-size: 36px
+              font-weight: bold
+              text-align: center
+              padding: 50px
+              margin: 0
+        
+          - type: menu
+            data:
+              items:
+                - label: "Home"
+                  link: "#home"
+                - label: "About"
+                  link: "#about"
+                - label: "Portfolio"
+                  link: "#portfolio"
+                - label: "Contact"
+                  link: "#contact"
+            style:
+              background: rgba(0,0,0,0.8)
+              padding: 20px
+              text-align: center
+              position: sticky
+              top: 0
+              z-index: 100
+        
+          - type: section
+            data:
+              title: "About Me"
+              text: "Passionate developer creating amazing digital experiences"
+            style:
+              max-width: 1200px
+              margin: 0 auto
+              padding: 60px 20px
+              background: #f8f9fa
+            children:
+              - type: text
+                data:
+                  text: |
+                    <div class="about-content">
+                      <div class="about-text">
+                        <h2>Hello, I'm John</h2>
+                        <p>I'm a full-stack developer with over 5 years of experience creating 
+                        beautiful and functional web applications. I specialize in modern web 
+                        technologies and user experience design.</p>
+                        
+                        <h3>Skills</h3>
+                        <ul>
+                          <li>Frontend: React, Vue.js, HTML5, CSS3, JavaScript</li>
+                          <li>Backend: Node.js, Python, Django, Express</li>
+                          <li>Database: PostgreSQL, MongoDB, Redis</li>
+                          <li>Tools: Git, Docker, AWS, CI/CD</li>
+                        </ul>
+                      </div>
+                    </div>
+                style:
+                  line-height: 1.6
+                  color: #333
+        
+          - type: section
+            data:
+              title: "Portfolio"
+              text: "Some of my recent work"
+            style:
+              max-width: 1200px
+              margin: 0 auto
+              padding: 60px 20px
+            children:
+              - type: text
+                data:
+                  text: |
+                    <div class="portfolio-grid">
+                      <div class="portfolio-item">
+                        <h3>E-commerce Platform</h3>
+                        <p>A modern e-commerce solution built with React and Node.js</p>
+                        <div class="tech-stack">
+                          <span class="tech">React</span>
+                          <span class="tech">Node.js</span>
+                          <span class="tech">MongoDB</span>
+                        </div>
+                      </div>
+                      
+                      <div class="portfolio-item">
+                        <h3>Task Management App</h3>
+                        <p>Collaborative task management with real-time updates</p>
+                        <div class="tech-stack">
+                          <span class="tech">Vue.js</span>
+                          <span class="tech">Python</span>
+                          <span class="tech">PostgreSQL</span>
+                        </div>
+                      </div>
+                      
+                      <div class="portfolio-item">
+                        <h3>Weather Dashboard</h3>
+                        <p>Real-time weather information with beautiful visualizations</p>
+                        <div class="tech-stack">
+                          <span class="tech">JavaScript</span>
+                          <span class="tech">D3.js</span>
+                          <span class="tech">Weather API</span>
+                        </div>
+                      </div>
+                    </div>
+                style:
+                  line-height: 1.6
+                  color: #333
+        ```
+        
+        ## Dashboard Layout
+        
+        A dashboard layout with sidebar navigation and content areas.
+        
+        ```yaml
+        data:
+          - type: header
+            data:
+              text: "Admin Dashboard"
+            style:
+              background: #2c3e50
+              color: white
+              font-size: 24px
+              font-weight: bold
+              padding: 20px
+              margin: 0
+        
+          - type: section
+            data:
+              title: ""
+              text: ""
+            style:
+              display: flex
+              min-height: calc(100vh - 80px)
+            children:
+              - type: text
+                data:
+                  text: |
+                    <div class="dashboard-container">
+                      <aside class="sidebar">
+                        <nav class="sidebar-nav">
+                          <ul>
+                            <li><a href="#overview">Overview</a></li>
+                            <li><a href="#users">Users</a></li>
+                            <li><a href="#analytics">Analytics</a></li>
+                            <li><a href="#settings">Settings</a></li>
+                          </ul>
+                        </nav>
+                      </aside>
+                      
+                      <main class="main-content">
+                        <div class="dashboard-header">
+                          <h1>Dashboard Overview</h1>
+                          <p>Welcome back, Admin!</p>
+                        </div>
+                        
+                        <div class="dashboard-grid">
+                          <div class="dashboard-card">
+                            <h3>Total Users</h3>
+                            <div class="card-value">1,234</div>
+                            <div class="card-change positive">+12%</div>
+                          </div>
+                          
+                          <div class="dashboard-card">
+                            <h3>Active Sessions</h3>
+                            <div class="card-value">567</div>
+                            <div class="card-change positive">+8%</div>
+                          </div>
+                          
+                          <div class="dashboard-card">
+                            <h3>Revenue</h3>
+                            <div class="card-value">$45,678</div>
+                            <div class="card-change positive">+15%</div>
+                          </div>
+                          
+                          <div class="dashboard-card">
+                            <h3>Errors</h3>
+                            <div class="card-value">23</div>
+                            <div class="card-change negative">-5%</div>
+                          </div>
+                        </div>
+                      </main>
+                    </div>
+                style:
+                  width: 100%
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Interactive Examples"
+      text: |
+        ## Contact Form Page
+        
+        A contact page with form elements and interactive features.
+        
+        ```yaml
+        data:
+          - type: header
+            data:
+              text: "Contact Us"
+            style:
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+              color: white
+              font-size: 32px
+              font-weight: bold
+              text-align: center
+              padding: 40px
+              margin: 0
+        
+          - type: section
+            data:
+              title: "Get in Touch"
+              text: "We'd love to hear from you"
+            style:
+              max-width: 800px
+              margin: 0 auto
+              padding: 40px 20px
+            children:
+              - type: text
+                data:
+                  text: |
+                    <div class="contact-container">
+                      <div class="contact-info">
+                        <h3>Contact Information</h3>
+                        <div class="contact-item">
+                          <strong>Email:</strong> hello@example.com
+                        </div>
+                        <div class="contact-item">
+                          <strong>Phone:</strong> +1 (555) 123-4567
+                        </div>
+                        <div class="contact-item">
+                          <strong>Address:</strong> 123 Main St, City, State 12345
+                        </div>
+                      </div>
+                      
+                      <div class="contact-form">
+                        <h3>Send us a Message</h3>
+                        <form class="contact-form-element">
+                          <div class="form-group">
+                            <label for="name">Name:</label>
+                            <input type="text" id="name" name="name" required>
+                          </div>
+                          
+                          <div class="form-group">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" required>
+                          </div>
+                          
+                          <div class="form-group">
+                            <label for="subject">Subject:</label>
+                            <select id="subject" name="subject">
+                              <option value="">Select a subject</option>
+                              <option value="general">General Inquiry</option>
+                              <option value="support">Technical Support</option>
+                              <option value="sales">Sales Question</option>
+                              <option value="other">Other</option>
+                            </select>
+                          </div>
+                          
+                          <div class="form-group">
+                            <label for="message">Message:</label>
+                            <textarea id="message" name="message" rows="5" required></textarea>
+                          </div>
+                          
+                          <button type="submit" class="submit-btn">Send Message</button>
+                        </form>
+                      </div>
+                    </div>
+                style:
+                  line-height: 1.6
+                  color: #333
+        ```
+        
+        ## FAQ Page with Accordion
+        
+        A FAQ page with expandable sections.
+        
+        ```yaml
+        data:
+          - type: header
+            data:
+              text: "Frequently Asked Questions"
+            style:
+              background: #2c3e50
+              color: white
+              font-size: 32px
+              font-weight: bold
+              text-align: center
+              padding: 40px
+              margin: 0
+        
+          - type: section
+            data:
+              title: "Common Questions"
+              text: "Find answers to the most frequently asked questions"
+            style:
+              max-width: 800px
+              margin: 0 auto
+              padding: 40px 20px
+            children:
+              - type: text
+                data:
+                  text: |
+                    <div class="faq-container">
+                      <div class="faq-item">
+                        <div class="faq-question">
+                          <h3>How do I get started with Coralbits Page Editor?</h3>
+                          <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                          <p>Getting started is easy! Simply install the package, create a YAML file 
+                          with your page content, and use the render command to generate HTML.</p>
+                        </div>
+                      </div>
+                      
+                      <div class="faq-item">
+                        <div class="faq-question">
+                          <h3>Can I create custom components?</h3>
+                          <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                          <p>Yes! You can create custom components by defining them in the config.yaml 
+                          file and creating the corresponding HTML templates.</p>
+                        </div>
+                      </div>
+                      
+                      <div class="faq-item">
+                        <div class="faq-question">
+                          <h3>Is the editor responsive?</h3>
+                          <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                          <p>Absolutely! All components are designed to be responsive and work 
+                          well on desktop, tablet, and mobile devices.</p>
+                        </div>
+                      </div>
+                      
+                      <div class="faq-item">
+                        <div class="faq-question">
+                          <h3>How do I deploy my pages?</h3>
+                          <span class="faq-toggle">+</span>
+                        </div>
+                        <div class="faq-answer">
+                          <p>You can deploy your rendered HTML pages to any web server, CDN, or 
+                          static hosting service like Netlify, Vercel, or GitHub Pages.</p>
+                        </div>
+                      </div>
+                    </div>
+                style:
+                  line-height: 1.6
+                  color: #333
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Responsive Design Examples"
+      text: |
+        ## Mobile-First Landing Page
+        
+        A responsive landing page designed for mobile devices first.
+        
+        ```yaml
+        data:
+          - type: header
+            data:
+              text: "Mobile App"
+            style:
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+              color: white
+              font-size: 24px
+              font-weight: bold
+              text-align: center
+              padding: 30px 20px
+              margin: 0
+              @media (min-width: 768px):
+                font-size: 32px
+                padding: 40px
+        
+          - type: section
+            data:
+              title: "Download Our App"
+              text: "Available on iOS and Android"
+            style:
+              max-width: 1200px
+              margin: 0 auto
+              padding: 20px
+              @media (min-width: 768px):
+                padding: 40px 20px
+            children:
+              - type: text
+                data:
+                  text: |
+                    <div class="app-hero">
+                      <div class="app-content">
+                        <h2>Transform Your Experience</h2>
+                        <p>Our mobile app provides a seamless experience across all your devices. 
+                        Download now and discover what makes us different.</p>
+                        
+                        <div class="app-features">
+                          <div class="feature">
+                            <h3>🚀 Fast Performance</h3>
+                            <p>Lightning-fast loading times and smooth animations</p>
+                          </div>
+                          
+                          <div class="feature">
+                            <h3>🔒 Secure</h3>
+                            <p>Enterprise-grade security to protect your data</p>
+                          </div>
+                          
+                          <div class="feature">
+                            <h3>📱 Cross-Platform</h3>
+                            <p>Works seamlessly on iOS, Android, and web</p>
+                          </div>
+                        </div>
+                        
+                        <div class="download-buttons">
+                          <a href="#" class="download-btn ios">Download for iOS</a>
+                          <a href="#" class="download-btn android">Download for Android</a>
+                        </div>
+                      </div>
+                      
+                      <div class="app-preview">
+                        <img src="/images/app-preview.png" alt="App Preview" class="app-screenshot">
+                      </div>
+                    </div>
+                style:
+                  line-height: 1.6
+                  color: #333
+        ```
+        
+        ## Responsive Navigation
+        
+        A responsive navigation menu that adapts to different screen sizes.
+        
+        ```yaml
+        data:
+          - type: header
+            data:
+              text: "Responsive Website"
+            style:
+              background: #2c3e50
+              color: white
+              font-size: 24px
+              font-weight: bold
+              text-align: center
+              padding: 20px
+              margin: 0
+        
+          - type: text
+            data:
+              text: |
+                <nav class="responsive-nav">
+                  <div class="nav-brand">
+                    <a href="/">My Website</a>
+                  </div>
+                  
+                  <div class="nav-toggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                  
+                  <ul class="nav-menu">
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/about">About</a></li>
+                    <li><a href="/services">Services</a></li>
+                    <li><a href="/portfolio">Portfolio</a></li>
+                    <li><a href="/contact">Contact</a></li>
+                  </ul>
+                </nav>
+            style:
+              background: #333
+              padding: 0
+              margin: 0
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Custom Component Examples"
+      text: |
+        ## Custom Widget Example
+        
+        Example of how to create and use a custom component.
+        
+        ```yaml
+        data:
+          - type: header
+            data:
+              text: "Custom Components Demo"
+            style:
+              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+              color: white
+              font-size: 32px
+              font-weight: bold
+              text-align: center
+              padding: 40px
+              margin: 0
+        
+          - type: section
+            data:
+              title: "Custom Widgets"
+              text: "Examples of custom components"
+            style:
+              max-width: 1200px
+              margin: 0 auto
+              padding: 40px 20px
+            children:
+              - type: text
+                data:
+                  text: |
+                    <div class="custom-widgets">
+                      <div class="widget weather-widget">
+                        <h3>Weather Widget</h3>
+                        <div class="weather-info">
+                          <div class="temperature">72°F</div>
+                          <div class="location">San Francisco, CA</div>
+                          <div class="description">Partly Cloudy</div>
+                        </div>
+                      </div>
+                      
+                      <div class="widget social-widget">
+                        <h3>Social Media Feed</h3>
+                        <div class="social-feed">
+                          <div class="social-post">
+                            <div class="post-header">
+                              <img src="/images/avatar1.jpg" alt="User" class="avatar">
+                              <span class="username">@johndoe</span>
+                            </div>
+                            <div class="post-content">
+                              Just launched our new website! 🚀
+                            </div>
+                            <div class="post-meta">
+                              <span class="likes">❤️ 42</span>
+                              <span class="comments">💬 12</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="widget chart-widget">
+                        <h3>Analytics Chart</h3>
+                        <div class="chart-container">
+                          <canvas id="analytics-chart" width="300" height="200"></canvas>
+                        </div>
+                      </div>
+                    </div>
+                style:
+                  line-height: 1.6
+                  color: #333
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: menu
+    data:
+      items:
+        - label: "← Back to Documentation"
+          link: "./index"
+        - label: "Getting Started"
+          link: "./getting-started"
+        - label: "Components"
+          link: "./components"
+        - label: "Local Development"
+          link: "./local-development"
+        - label: "API Reference"
+          link: "./api-reference"
+        - label: "Configuration"
+          link: "./configuration"
+    style:
+      background: #f8f9fa
+      border-radius: 8px
+      margin: 20px auto
+      max-width: 1200px
+      padding: 20px
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) 

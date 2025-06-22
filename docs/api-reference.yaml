@@ -1,0 +1,579 @@
+# API Reference Documentation
+
+data:
+  - type: header
+    data:
+      text: "API Reference"
+    style:
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      color: white
+      font-size: 28px
+      font-weight: bold
+      text-align: center
+      padding: 25px
+      margin: 0
+      border-radius: 0
+  - type: section
+    data:
+      title: "API Overview"
+      text: |
+        The Coralbits Page Editor provides a RESTful API for page rendering, editing, and management. 
+        The API is designed to be stateless, cacheable, and easily integrable with any web application.
+        
+        ## Base URL
+        
+        ```
+        http://localhost:8000/api
+        ```
+        
+        ## Authentication
+        
+        Currently, the API does not require authentication for basic operations. 
+        Future versions will support JWT tokens and API keys for secure access.
+        
+        ## Response Format
+        
+        All API responses follow this structure:
+        
+        ```json
+        {
+          "success": true,
+          "data": { ... },
+          "message": "Operation completed successfully",
+          "timestamp": "2024-01-01T00:00:00Z"
+        }
+        ```
+        
+        ## Error Responses
+        
+        ```json
+        {
+          "success": false,
+          "error": "Error description",
+          "code": "ERROR_CODE",
+          "timestamp": "2024-01-01T00:00:00Z"
+        }
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Page Rendering API"
+      text: |
+        ## Render Page
+        
+        Renders a page from YAML data to HTML.
+        
+        **Endpoint:** `POST /api/render`
+        
+        **Request Body:**
+        ```json
+        {
+          "data": [
+            {
+              "type": "header",
+              "data": {
+                "text": "Page Title"
+              },
+              "style": {
+                "background": "blue",
+                "color": "white"
+              }
+            }
+          ]
+        }
+        ```
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "html": "<!DOCTYPE html>...",
+            "css": "/* Component styles */",
+            "metadata": {
+              "components_used": ["header", "text"],
+              "render_time": "0.123s"
+            }
+          }
+        }
+        ```
+        
+        ## Render Page from File
+        
+        Renders a page from a YAML file.
+        
+        **Endpoint:** `GET /api/render/{page_name}`
+        
+        **Parameters:**
+        - `page_name`: Name of the YAML file (without extension)
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "html": "<!DOCTYPE html>...",
+            "css": "/* Component styles */",
+            "page_name": "my-page"
+          }
+        }
+        ```
+        
+        ## Batch Render
+        
+        Renders multiple pages at once.
+        
+        **Endpoint:** `POST /api/render/batch`
+        
+        **Request Body:**
+        ```json
+        {
+          "pages": [
+            {
+              "name": "page1",
+              "data": { ... }
+            },
+            {
+              "name": "page2", 
+              "data": { ... }
+            }
+          ]
+        }
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Page Management API"
+      text: |
+        ## List Pages
+        
+        Get a list of all available pages.
+        
+        **Endpoint:** `GET /api/pages`
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "pages": [
+              {
+                "name": "index",
+                "path": "docs/index.yaml",
+                "last_modified": "2024-01-01T00:00:00Z",
+                "size": 1024
+              }
+            ],
+            "total": 1
+          }
+        }
+        ```
+        
+        ## Get Page Data
+        
+        Retrieve the YAML data for a specific page.
+        
+        **Endpoint:** `GET /api/pages/{page_name}`
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "name": "index",
+            "yaml": "data:\n  - type: header\n    data:\n      text: \"...\"",
+            "last_modified": "2024-01-01T00:00:00Z"
+          }
+        }
+        ```
+        
+        ## Create/Update Page
+        
+        Create a new page or update an existing one.
+        
+        **Endpoint:** `PUT /api/pages/{page_name}`
+        
+        **Request Body:**
+        ```json
+        {
+          "data": [
+            {
+              "type": "header",
+              "data": {
+                "text": "New Page"
+              }
+            }
+          ]
+        }
+        ```
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "name": "new-page",
+            "message": "Page created successfully"
+          }
+        }
+        ```
+        
+        ## Delete Page
+        
+        Delete a page.
+        
+        **Endpoint:** `DELETE /api/pages/{page_name}`
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "message": "Page deleted successfully"
+          }
+        }
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Component API"
+      text: |
+        ## List Components
+        
+        Get information about all available components.
+        
+        **Endpoint:** `GET /api/components`
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "components": [
+              {
+                "name": "text",
+                "type": "builtin",
+                "viewer": "builtin://text/view.html",
+                "css": "builtin://text/style.css",
+                "editor": [
+                  {
+                    "id": "text",
+                    "type": "rich-text"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+        ```
+        
+        ## Get Component Template
+        
+        Get the HTML template for a component.
+        
+        **Endpoint:** `GET /api/components/{component_name}/template`
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "html": "<div class=\"text-component\">...</div>",
+            "css": "/* Component styles */"
+          }
+        }
+        ```
+        
+        ## Get Component Editor
+        
+        Get the editor interface for a component.
+        
+        **Endpoint:** `GET /api/components/{component_name}/editor`
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "html": "<form class=\"editor\">...</form>",
+            "javascript": "// Editor logic",
+            "css": "/* Editor styles */"
+          }
+        }
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Editor API"
+      text: |
+        ## Get Editor Interface
+        
+        Get the full editor interface for a page.
+        
+        **Endpoint:** `GET /api/editor/{page_name}`
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "html": "<!DOCTYPE html>...",
+            "javascript": "// Editor initialization",
+            "css": "/* Editor styles */",
+            "page_data": { ... }
+          }
+        }
+        ```
+        
+        ## Save Page Changes
+        
+        Save changes made in the editor.
+        
+        **Endpoint:** `POST /api/editor/{page_name}/save`
+        
+        **Request Body:**
+        ```json
+        {
+          "data": [
+            {
+              "type": "header",
+              "data": {
+                "text": "Updated Title"
+              }
+            }
+          ],
+          "metadata": {
+            "user": "editor@example.com",
+            "timestamp": "2024-01-01T00:00:00Z"
+          }
+        }
+        ```
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "message": "Page saved successfully",
+            "preview_url": "/api/render/index"
+          }
+        }
+        ```
+        
+        ## Preview Page
+        
+        Get a live preview of page changes.
+        
+        **Endpoint:** `POST /api/editor/{page_name}/preview`
+        
+        **Request Body:**
+        ```json
+        {
+          "data": [
+            {
+              "type": "header",
+              "data": {
+                "text": "Preview Title"
+              }
+            }
+          ]
+        }
+        ```
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "html": "<!DOCTYPE html>...",
+            "css": "/* Component styles */"
+          }
+        }
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Utility API"
+      text: |
+        ## Health Check
+        
+        Check if the API is running and healthy.
+        
+        **Endpoint:** `GET /api/health`
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "status": "healthy",
+            "version": "1.0.0",
+            "uptime": "2h 30m 15s",
+            "components_loaded": 8
+          }
+        }
+        ```
+        
+        ## Configuration
+        
+        Get current configuration.
+        
+        **Endpoint:** `GET /api/config`
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "elements": [ ... ],
+            "server": {
+              "host": "127.0.0.1",
+              "port": 8000,
+              "debug": false
+            }
+          }
+        }
+        ```
+        
+        ## Upload File
+        
+        Upload a file (e.g., image) for use in pages.
+        
+        **Endpoint:** `POST /api/upload`
+        
+        **Request:** `multipart/form-data`
+        
+        **Response:**
+        ```json
+        {
+          "success": true,
+          "data": {
+            "filename": "image.jpg",
+            "url": "/uploads/image.jpg",
+            "size": 1024000,
+            "type": "image/jpeg"
+          }
+        }
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Error Codes"
+      text: |
+        ## Common Error Codes
+        
+        | Code | Description | HTTP Status |
+        |------|-------------|-------------|
+        | `PAGE_NOT_FOUND` | Page does not exist | 404 |
+        | `INVALID_YAML` | Invalid YAML format | 400 |
+        | `COMPONENT_NOT_FOUND` | Component not found | 404 |
+        | `RENDER_ERROR` | Error during rendering | 500 |
+        | `VALIDATION_ERROR` | Invalid data format | 400 |
+        | `PERMISSION_DENIED` | Insufficient permissions | 403 |
+        | `SERVER_ERROR` | Internal server error | 500 |
+        
+        ## Rate Limiting
+        
+        API requests are rate-limited to prevent abuse:
+        
+        - **Anonymous users**: 100 requests per hour
+        - **Authenticated users**: 1000 requests per hour
+        - **API keys**: 10000 requests per hour
+        
+        Rate limit headers are included in responses:
+        
+        ```
+        X-RateLimit-Limit: 100
+        X-RateLimit-Remaining: 95
+        X-RateLimit-Reset: 1640995200
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: menu
+    data:
+      items:
+        - label: "← Back to Documentation"
+          link: "./index"
+        - label: "Getting Started"
+          link: "./getting-started"
+        - label: "Components"
+          link: "./components"
+        - label: "Local Development"
+          link: "./local-development"
+        - label: "Editor Interface"
+          link: "./editor-interface"
+        - label: "Examples"
+          link: "./examples"
+    style:
+      background: #f8f9fa
+      border-radius: 8px
+      margin: 20px auto
+      max-width: 1200px
+      padding: 20px
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) 

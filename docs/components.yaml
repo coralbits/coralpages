@@ -1,0 +1,375 @@
+# Built-in Components Documentation
+
+data:
+  - type: header
+    data:
+      text: "Built-in Components"
+    style:
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      color: white
+      font-size: 28px
+      font-weight: bold
+      text-align: center
+      padding: 25px
+      margin: 0
+      border-radius: 0
+  - type: section
+    data:
+      title: "Component Overview"
+      text: |
+        The Coralbits Page Editor comes with a comprehensive set of built-in components that cover most common web page needs. 
+        Each component is designed to be flexible, customizable, and easy to use.
+        
+        ## Component Categories
+        
+        ### Layout Components
+        - **Section**: Container for organizing content
+        - **Header**: Page headers and navigation elements
+        
+        ### Content Components
+        - **Text**: Rich text content with formatting
+        - **Paragraph**: Simple text paragraphs
+        - **Markdown**: Markdown-formatted content
+        - **Image**: Image display with upload support
+        
+        ### Navigation Components
+        - **Menu**: Navigation menus and links
+        
+        ### Interactive Components
+        - **Tag Cloud**: Interactive tag visualization
+        
+        ## Component Structure
+        
+        Every component follows this structure:
+        
+        ```yaml
+        - type: component_name
+          data:
+            # Component-specific data
+          style:
+            # CSS styling properties
+          children:
+            # Nested components (if supported)
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Layout Components"
+      text: |
+        ## Section Component
+        
+        The section component is the primary container for organizing page content.
+        
+        **Properties:**
+        - `title`: Section title (optional)
+        - `text`: Section description (optional)
+        - `children`: Nested components
+        
+        **Example:**
+        ```yaml
+        - type: section
+          data:
+            title: "About Us"
+            text: "Learn more about our company"
+          style:
+            max-width: 1200px
+            margin: 0 auto
+            padding: 20px
+            background: #f9f9f9
+            border-radius: 8px
+          children:
+            - type: text
+              data:
+                text: "Content goes here"
+        ```
+        
+        ## Header Component
+        
+        Used for page headers, titles, and navigation elements.
+        
+        **Properties:**
+        - `text`: Header text content
+        
+        **Example:**
+        ```yaml
+        - type: header
+          data:
+            text: "Welcome to Our Website"
+          style:
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+            color: white
+            font-size: 32px
+            font-weight: bold
+            text-align: center
+            padding: 30px
+            margin: 0
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Content Components"
+      text: |
+        ## Text Component
+        
+        Rich text component with formatting support.
+        
+        **Properties:**
+        - `text`: Text content (supports HTML)
+        
+        **Example:**
+        ```yaml
+        - type: text
+          data:
+            text: "<h2>Rich Text Content</h2><p>This supports <strong>HTML formatting</strong> and <em>styling</em>.</p>"
+          style:
+            padding: 20px
+            line-height: 1.6
+            color: #333
+        ```
+        
+        ## Paragraph Component
+        
+        Simple paragraph text component.
+        
+        **Properties:**
+        - `text`: Paragraph text content
+        
+        **Example:**
+        ```yaml
+        - type: paragraph
+          data:
+            text: "This is a simple paragraph of text."
+          style:
+            margin: 10px 0
+            line-height: 1.5
+        ```
+        
+        ## Markdown Component
+        
+        Markdown-formatted content with full markdown support.
+        
+        **Properties:**
+        - `text`: Markdown content
+        
+        **Example:**
+        ```yaml
+        - type: markdown
+          data:
+            text: |
+              # Markdown Title
+              
+              This is **bold text** and *italic text*.
+              
+              - List item 1
+              - List item 2
+              
+              [Link text](https://example.com)
+          style:
+            padding: 20px
+            background: #f9f9f9
+            border-radius: 4px
+        ```
+        
+        ## Image Component
+        
+        Image display with upload support and responsive design.
+        
+        **Properties:**
+        - `src`: Image source URL
+        - `alt`: Alt text for accessibility
+        - `title`: Image title (optional)
+        
+        **Example:**
+        ```yaml
+        - type: image
+          data:
+            src: "https://example.com/image.jpg"
+            alt: "Description of the image"
+            title: "Image Title"
+          style:
+            max-width: 100%
+            height: auto
+            border-radius: 8px
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1)
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Navigation Components"
+      text: |
+        ## Menu Component
+        
+        Navigation menu with links and customizable styling.
+        
+        **Properties:**
+        - `items`: Array of menu items
+          - `label`: Display text
+          - `link`: URL or relative path
+        
+        **Example:**
+        ```yaml
+        - type: menu
+          data:
+            items:
+              - label: "Home"
+                link: "/"
+              - label: "About"
+                link: "./about"
+              - label: "Contact"
+                link: "./contact"
+          style:
+            background: #333
+            padding: 15px
+            border-radius: 4px
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Interactive Components"
+      text: |
+        ## Tag Cloud Component
+        
+        Interactive tag cloud for displaying and organizing tags.
+        
+        **Properties:**
+        - `tags`: Array of tag objects
+          - `text`: Tag text
+          - `count`: Tag frequency/weight
+          - `link`: Optional link for tag
+        
+        **Example:**
+        ```yaml
+        - type: tag-cloud
+          data:
+            tags:
+              - text: "Technology"
+                count: 15
+                link: "/tags/technology"
+              - text: "Design"
+                count: 8
+                link: "/tags/design"
+              - text: "Development"
+                count: 12
+                link: "/tags/development"
+          style:
+            padding: 20px
+            background: #f9f9f9
+            border-radius: 8px
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Styling Components"
+      text: |
+        ## CSS Styling
+        
+        All components support CSS styling through the `style` property. You can use any valid CSS property:
+        
+        **Common Style Properties:**
+        - `background`: Background color or gradient
+        - `color`: Text color
+        - `font-size`: Font size
+        - `font-weight`: Font weight
+        - `padding`: Internal spacing
+        - `margin`: External spacing
+        - `border-radius`: Corner rounding
+        - `box-shadow`: Shadow effects
+        - `text-align`: Text alignment
+        - `max-width`: Maximum width
+        - `width`: Width
+        - `height`: Height
+        
+        **Example with Advanced Styling:**
+        ```yaml
+        - type: section
+          data:
+            title: "Styled Section"
+          style:
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+            color: white
+            padding: 30px
+            border-radius: 12px
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1)
+            margin: 20px 0
+            text-align: center
+        ```
+        
+        ## Responsive Design
+        
+        Components automatically adapt to different screen sizes. Use CSS media queries in your styles for advanced responsive behavior.
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: menu
+    data:
+      items:
+        - label: "← Back to Documentation"
+          link: "./index"
+        - label: "Getting Started"
+          link: "./getting-started"
+        - label: "Examples"
+          link: "./examples"
+        - label: "Configuration"
+          link: "./configuration"
+    style:
+      background: #f8f9fa
+      border-radius: 8px
+      margin: 20px auto
+      max-width: 1200px
+      padding: 20px
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) 

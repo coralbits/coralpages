@@ -1,0 +1,619 @@
+# Configuration Documentation
+
+data:
+  - type: header
+    data:
+      text: "Configuration"
+    style:
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      color: white
+      font-size: 28px
+      font-weight: bold
+      text-align: center
+      padding: 25px
+      margin: 0
+      border-radius: 0
+  - type: section
+    data:
+      title: "Configuration Overview"
+      text: |
+        The Coralbits Page Editor is highly configurable through YAML configuration files and environment variables. 
+        This allows you to customize the behavior, appearance, and functionality to match your specific needs.
+        
+        ## Configuration Files
+        
+        - **`config.yaml`**: Main configuration file for components and settings
+        - **Environment Variables**: Runtime configuration for server behavior
+        - **Component Templates**: HTML templates for each component
+        - **CSS Files**: Styling for components and editor interface
+        
+        ## Configuration Philosophy
+        
+        The configuration system follows these principles:
+        
+        - **Declarative**: Configuration is defined in YAML, not code
+        - **Hierarchical**: Settings can be overridden at different levels
+        - **Environment-aware**: Different settings for development and production
+        - **Extensible**: Easy to add new components and settings
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Main Configuration File"
+      text: |
+        ## config.yaml Structure
+        
+        The main configuration file defines components, server settings, and global options:
+        
+        ```yaml
+        # Server configuration
+        server:
+          host: "127.0.0.1"
+          port: 8000
+          debug: false
+          reload: true
+        
+        # Component definitions
+        elements:
+          - name: text
+            viewer: builtin://text/view.html
+            css: builtin://text/style.css
+            editor:
+              - id: text
+                type: rich-text
+        
+        # External components
+        external:
+          - name: custom-component
+            renderer: http://localhost:8080/api/custom-renderer
+            editor: http://localhost:8080/api/custom-editor
+        
+        # Global settings
+        settings:
+          default_template: "default.html"
+          cache_enabled: true
+          cache_ttl: 3600
+          upload_path: "./uploads"
+          max_upload_size: 10485760
+        ```
+        
+        ## Component Configuration
+        
+        Each component in the `elements` section defines:
+        
+        - **`name`**: Unique identifier for the component
+        - **`viewer`**: URL to the component's HTML template
+        - **`css`**: URL to the component's CSS file
+        - **`editor`**: Editor configuration (built-in or external)
+        
+        ### Built-in Components
+        
+        ```yaml
+        - name: header
+          viewer: builtin://header/view.html
+          css: builtin://header/style.css
+          editor: builtin://header/editor.html
+        ```
+        
+        ### External Components
+        
+        ```yaml
+        - name: login-form
+          viewer: http://auth-service:8080/api/login-form/view
+          css: http://auth-service:8080/api/login-form/css
+          editor: http://auth-service:8080/api/login-form/editor
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Environment Variables"
+      text: |
+        ## Server Configuration
+        
+        ### Basic Settings
+        ```bash
+        # Server host and port
+        export HOST=0.0.0.0
+        export PORT=8000
+        
+        # Debug mode
+        export DEBUG=true
+        
+        # Auto-reload for development
+        export RELOAD=true
+        ```
+        
+        ### Logging Configuration
+        ```bash
+        # Log level
+        export LOG_LEVEL=INFO  # DEBUG, INFO, WARNING, ERROR
+        
+        # Log format
+        export LOG_FORMAT=json  # text, json
+        
+        # Log file
+        export LOG_FILE=./logs/app.log
+        ```
+        
+        ### Performance Settings
+        ```bash
+        # Enable caching
+        export CACHE_ENABLED=true
+        
+        # Cache TTL (seconds)
+        export CACHE_TTL=3600
+        
+        # Template cache
+        export TEMPLATE_CACHE=true
+        
+        # Static file serving
+        export STATIC_PATH=./static
+        ```
+        
+        ### Security Settings
+        ```bash
+        # CORS settings
+        export CORS_ORIGINS=http://localhost:3000,https://example.com
+        
+        # Rate limiting
+        export RATE_LIMIT=100  # requests per hour
+        
+        # Upload settings
+        export MAX_UPLOAD_SIZE=10485760  # 10MB
+        export ALLOWED_UPLOAD_TYPES=image/*,text/*
+        ```
+        
+        ### Development Settings
+        ```bash
+        # Development mode
+        export ENV=development
+        
+        # Hot reload
+        export HOT_RELOAD=true
+        
+        # Mock external services
+        export MOCK_EXTERNAL=true
+        
+        # Test mode
+        export TEST_MODE=true
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Component Templates"
+      text: |
+        ## Template Structure
+        
+        Component templates are HTML files that define how components are rendered:
+        
+        ```
+        templates/
+        ├── header/
+        │   ├── view.html      # Component display template
+        │   ├── editor.html    # Component editor template
+        │   └── style.css      # Component styles
+        ├── text/
+        │   ├── view.html
+        │   ├── editor.html
+        │   └── style.css
+        └── image/
+            ├── view.html
+            ├── editor.html
+            └── style.css
+        ```
+        
+        ## View Templates
+        
+        View templates define how components are displayed:
+        
+        ```html
+        <!-- templates/text/view.html -->
+        <div class="text-component" data-component="text">
+          <div class="text-content">
+            {{ data.text | safe }}
+          </div>
+        </div>
+        ```
+        
+        ### Template Variables
+        
+        - **`data`**: Component data object
+        - **`style`**: Component style object
+        - **`children`**: Nested components
+        - **`context`**: Page context (user, page info, etc.)
+        
+        ## Editor Templates
+        
+        Editor templates define the editing interface:
+        
+        ```html
+        <!-- templates/text/editor.html -->
+        <div class="text-editor" data-component="text">
+          <label for="text-content">Text Content:</label>
+          <textarea 
+            id="text-content" 
+            name="text" 
+            class="rich-text-editor"
+            data-component-field="text">
+            {{ data.text }}
+          </textarea>
+        </div>
+        ```
+        
+        ### Editor Features
+        
+        - **Form Fields**: Input fields for component data
+        - **Validation**: Client-side validation rules
+        - **Live Preview**: Real-time preview of changes
+        - **Style Controls**: Visual style editing
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Custom Components"
+      text: |
+        ## Creating Custom Components
+        
+        ### 1. Define Component Configuration
+        
+        Add to `config.yaml`:
+        
+        ```yaml
+        elements:
+          - name: custom-widget
+            viewer: builtin://custom-widget/view.html
+            css: builtin://custom-widget/style.css
+            editor: builtin://custom-widget/editor.html
+        ```
+        
+        ### 2. Create Template Files
+        
+        **View Template:**
+        ```html
+        <!-- templates/custom-widget/view.html -->
+        <div class="custom-widget" data-component="custom-widget">
+          <h3>{{ data.title }}</h3>
+          <div class="widget-content">
+            {{ data.content }}
+          </div>
+          <div class="widget-footer">
+            <span class="widget-meta">{{ data.meta }}</span>
+          </div>
+        </div>
+        ```
+        
+        **Editor Template:**
+        ```html
+        <!-- templates/custom-widget/editor.html -->
+        <div class="custom-widget-editor">
+          <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" value="{{ data.title }}">
+          </div>
+          <div class="form-group">
+            <label for="content">Content:</label>
+            <textarea id="content" name="content">{{ data.content }}</textarea>
+          </div>
+          <div class="form-group">
+            <label for="meta">Meta:</label>
+            <input type="text" id="meta" name="meta" value="{{ data.meta }}">
+          </div>
+        </div>
+        ```
+        
+        **CSS Styles:**
+        ```css
+        /* templates/custom-widget/style.css */
+        .custom-widget {
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 10px 0;
+        }
+        
+        .custom-widget h3 {
+          margin: 0 0 15px 0;
+          color: #333;
+        }
+        
+        .widget-content {
+          line-height: 1.6;
+        }
+        
+        .widget-footer {
+          margin-top: 15px;
+          padding-top: 10px;
+          border-top: 1px solid #eee;
+        }
+        
+        .widget-meta {
+          font-size: 0.9em;
+          color: #666;
+        }
+        ```
+        
+        ### 3. External Component API
+        
+        For external components, implement these endpoints:
+        
+        **Renderer Endpoint:**
+        ```python
+        @app.route('/api/custom-widget/render', methods=['POST'])
+        def render_custom_widget():
+            data = request.json
+            return {
+                'html': render_template('custom_widget.html', data=data),
+                'css': get_custom_widget_css()
+            }
+        ```
+        
+        **Editor Endpoint:**
+        ```python
+        @app.route('/api/custom-widget/editor', methods=['GET'])
+        def get_custom_widget_editor():
+            return {
+                'html': render_template('custom_widget_editor.html'),
+                'javascript': get_custom_widget_js(),
+                'css': get_custom_widget_editor_css()
+            }
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Advanced Configuration"
+      text: |
+        ## Multi-Environment Configuration
+        
+        ### Environment-Specific Configs
+        
+        Create separate config files for different environments:
+        
+        ```yaml
+        # config/development.yaml
+        server:
+          host: "127.0.0.1"
+          port: 8000
+          debug: true
+        
+        # config/production.yaml
+        server:
+          host: "0.0.0.0"
+          port: 80
+          debug: false
+        ```
+        
+        Load based on environment:
+        
+        ```bash
+        export CONFIG_FILE=config/production.yaml
+        python serve.py
+        ```
+        
+        ## Plugin System
+        
+        ### Plugin Configuration
+        
+        ```yaml
+        plugins:
+          - name: analytics
+            enabled: true
+            config:
+              tracking_id: "UA-123456789-1"
+          
+          - name: seo
+            enabled: true
+            config:
+              default_title: "My Website"
+              default_description: "Welcome to my website"
+        ```
+        
+        ### Plugin Development
+        
+        ```python
+        # plugins/analytics.py
+        class AnalyticsPlugin:
+            def __init__(self, config):
+                self.tracking_id = config['tracking_id']
+            
+            def inject_head(self, page_data):
+                return f'<script>gtag("config", "{self.tracking_id}");</script>'
+        ```
+        
+        ## Caching Configuration
+        
+        ### Cache Settings
+        
+        ```yaml
+        cache:
+          enabled: true
+          backend: redis  # memory, redis, memcached
+          ttl: 3600
+          key_prefix: "page_editor:"
+          
+          redis:
+            host: "localhost"
+            port: 6379
+            db: 0
+            password: null
+        ```
+        
+        ### Cache Invalidation
+        
+        ```python
+        # Invalidate cache when pages change
+        def invalidate_page_cache(page_name):
+            cache.delete(f"page:{page_name}")
+            cache.delete(f"render:{page_name}")
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Configuration Best Practices"
+      text: |
+        ## Security Considerations
+        
+        ### Environment Variables
+        
+        - **Never commit secrets**: Use environment variables for sensitive data
+        - **Use strong defaults**: Provide secure default configurations
+        - **Validate inputs**: Validate all configuration values
+        
+        ```bash
+        # Good: Use environment variables
+        export DATABASE_PASSWORD=secure_password_123
+        
+        # Bad: Hardcode in config
+        database:
+          password: "secure_password_123"  # Don't do this!
+        ```
+        
+        ### Component Security
+        
+        - **Validate component data**: Ensure component data is safe
+        - **Sanitize HTML**: Prevent XSS attacks
+        - **Limit file uploads**: Restrict file types and sizes
+        
+        ## Performance Optimization
+        
+        ### Caching Strategy
+        
+        ```yaml
+        cache:
+          # Cache rendered pages
+          pages:
+            enabled: true
+            ttl: 3600
+        
+          # Cache component templates
+          templates:
+            enabled: true
+            ttl: 86400
+        
+          # Cache external API responses
+          external:
+            enabled: true
+            ttl: 300
+        ```
+        
+        ### Resource Optimization
+        
+        - **Minify CSS/JS**: Compress static assets
+        - **Optimize images**: Use appropriate image formats
+        - **CDN integration**: Serve static files from CDN
+        
+        ## Monitoring and Logging
+        
+        ### Logging Configuration
+        
+        ```yaml
+        logging:
+          level: INFO
+          format: json
+          handlers:
+            - type: file
+              filename: logs/app.log
+              max_bytes: 10485760
+              backup_count: 5
+            
+            - type: console
+              level: DEBUG
+        ```
+        
+        ### Metrics Collection
+        
+        ```yaml
+        metrics:
+          enabled: true
+          backend: prometheus
+          endpoints:
+            - /metrics
+            - /health
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: menu
+    data:
+      items:
+        - label: "← Back to Documentation"
+          link: "./index"
+        - label: "Getting Started"
+          link: "./getting-started"
+        - label: "Components"
+          link: "./components"
+        - label: "Local Development"
+          link: "./local-development"
+        - label: "API Reference"
+          link: "./api-reference"
+        - label: "Examples"
+          link: "./examples"
+    style:
+      background: #f8f9fa
+      border-radius: 8px
+      margin: 20px auto
+      max-width: 1200px
+      padding: 20px
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) 

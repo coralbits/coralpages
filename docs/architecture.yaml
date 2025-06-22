@@ -1,0 +1,597 @@
+# Architecture Documentation
+
+data:
+  - type: header
+    data:
+      text: "Architecture"
+    style:
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      color: white
+      font-size: 28px
+      font-weight: bold
+      text-align: center
+      padding: 25px
+      margin: 0
+      border-radius: 0
+  - type: section
+    data:
+      title: "System Architecture Overview"
+      text: |
+        The Coralbits Page Editor follows a **microservices-first** architecture designed for scalability, 
+        maintainability, and flexibility. The system is built around the principle that each component 
+        should be independent and replaceable.
+        
+        ## Core Principles
+        
+        - **Component Independence**: Each component is self-contained and can be developed/deployed independently
+        - **API-First Design**: All interactions happen through well-defined APIs
+        - **Stateless Operations**: The system maintains no server-side state
+        - **Caching Strategy**: Intelligent caching for performance optimization
+        - **Extensibility**: Easy to add new components and features
+        
+        ## High-Level Architecture
+        
+        ```
+        ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+        │   Web Browser   │    │   Mobile App    │    │   API Client    │
+        └─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+                  │                      │                      │
+                  └──────────────────────┼──────────────────────┘
+                                         │
+                    ┌────────────────────┼────────────────────┐
+                    │                    │                    │
+                    ▼                    ▼                    ▼
+        ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+        │   Page Editor   │    │   Page Renderer │    │   Component API │
+        │     Server      │    │     Service     │    │     Gateway     │
+        └─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+                  │                      │                      │
+                  └──────────────────────┼──────────────────────┘
+                                         │
+                    ┌────────────────────┼────────────────────┐
+                    │                    │                    │
+                    ▼                    ▼                    ▼
+        ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+        │   Built-in      │    │   External      │    │   Custom        │
+        │   Components    │    │   Components    │    │   Components    │
+        └─────────────────┘    └─────────────────┘    └─────────────────┘
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Core Components"
+      text: |
+        ## Page Editor Server
+        
+        The main server that handles page editing, rendering, and management.
+        
+        **Responsibilities:**
+        - Serve the editor interface
+        - Handle page CRUD operations
+        - Manage component configurations
+        - Provide API endpoints
+        - Handle file uploads
+        
+        **Key Features:**
+        - RESTful API design
+        - WebSocket support for real-time updates
+        - File system integration
+        - Caching layer
+        - Authentication and authorization
+        
+        ## Page Renderer Service
+        
+        Dedicated service for rendering pages to HTML.
+        
+        **Responsibilities:**
+        - Convert YAML page definitions to HTML
+        - Apply component templates
+        - Generate CSS styles
+        - Optimize output for performance
+        - Handle component dependencies
+        
+        **Rendering Pipeline:**
+        1. **Parse YAML**: Load and validate page structure
+        2. **Resolve Components**: Load component templates and styles
+        3. **Apply Templates**: Render each component with its data
+        4. **Generate CSS**: Compile component styles
+        5. **Optimize**: Minify and optimize output
+        6. **Cache**: Store rendered result for future requests
+        
+        ## Component API Gateway
+        
+        Manages communication with external component services.
+        
+        **Responsibilities:**
+        - Route requests to external components
+        - Handle component discovery
+        - Manage component health checks
+        - Provide fallback mechanisms
+        - Load balancing across component instances
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Component Architecture"
+      text: |
+        ## Component Types
+        
+        ### Built-in Components
+        
+        Components that are part of the core system:
+        
+        - **Location**: `templates/` directory
+        - **Implementation**: HTML templates + CSS + JavaScript
+        - **Configuration**: Defined in `config.yaml`
+        - **Deployment**: Bundled with the main application
+        
+        **Advantages:**
+        - Fast rendering (no network calls)
+        - Guaranteed availability
+        - Consistent behavior
+        - Easy debugging
+        
+        ### External Components
+        
+        Components hosted as separate microservices:
+        
+        - **Location**: External services
+        - **Implementation**: Independent applications
+        - **Communication**: HTTP/REST APIs
+        - **Deployment**: Separate deployment pipeline
+        
+        **Advantages:**
+        - Independent scaling
+        - Technology flexibility
+        - Team autonomy
+        - Isolated failures
+        
+        ### Custom Components
+        
+        User-defined components:
+        
+        - **Location**: User's project directory
+        - **Implementation**: User's choice of technology
+        - **Integration**: Via configuration
+        - **Deployment**: User's responsibility
+        
+        ## Component Interface
+        
+        All components follow a standard interface:
+        
+        ```yaml
+        # Component Definition
+        name: component-name
+        viewer: url-to-view-template
+        css: url-to-css-file
+        editor: url-to-editor-interface
+        ```
+        
+        **Required Endpoints:**
+        
+        - **Viewer**: Returns HTML for displaying the component
+        - **CSS**: Returns styles for the component
+        - **Editor**: Returns HTML for editing the component
+        
+        **Optional Endpoints:**
+        
+        - **JavaScript**: Returns client-side logic
+        - **Validation**: Returns validation rules
+        - **Preview**: Returns preview data
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Data Flow"
+      text: |
+        ## Page Rendering Flow
+        
+        ```
+        1. Client Request
+           ┌─────────────┐
+           │   Browser   │
+           └──────┬──────┘
+                  │ HTTP Request
+                  ▼
+        2. Page Loader
+           ┌─────────────┐
+           │ Page Loader │
+           └──────┬──────┘
+                  │ YAML Data
+                  ▼
+        3. Component Resolver
+           ┌─────────────┐
+           │ Component   │
+           │ Resolver    │
+           └──────┬──────┘
+                  │ Component Templates
+                  ▼
+        4. Template Engine
+           ┌─────────────┐
+           │ Template    │
+           │ Engine      │
+           └──────┬──────┘
+                  │ Rendered HTML
+                  ▼
+        5. CSS Compiler
+           ┌─────────────┐
+           │ CSS         │
+           │ Compiler    │
+           └──────┬──────┘
+                  │ Compiled CSS
+                  ▼
+        6. Response
+           ┌─────────────┐
+           │   Browser   │
+           └─────────────┘
+        ```
+        
+        ## Editor Data Flow
+        
+        ```
+        1. Editor Load
+           ┌─────────────┐
+           │   Editor    │
+           └──────┬──────┘
+                  │ Load Page Data
+                  ▼
+        2. Component Library
+           ┌─────────────┐
+           │ Component   │
+           │ Library     │
+           └──────┬──────┘
+                  │ Available Components
+                  ▼
+        3. Component Editors
+           ┌─────────────┐
+           │ Component   │
+           │ Editors     │
+           └──────┬──────┘
+                  │ Editor Interfaces
+                  ▼
+        4. Live Preview
+           ┌─────────────┐
+           │ Live        │
+           │ Preview     │
+           └──────┬──────┘
+                  │ Preview Updates
+                  ▼
+        5. Save Changes
+           ┌─────────────┐
+           │   Editor    │
+           └─────────────┘
+        ```
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Caching Strategy"
+      text: |
+        ## Multi-Level Caching
+        
+        The system implements a sophisticated caching strategy to optimize performance:
+        
+        ### 1. Component Template Cache
+        
+        **Purpose**: Cache component templates to avoid repeated file I/O
+        
+        **Storage**: In-memory cache
+        **TTL**: 1 hour (configurable)
+        **Invalidation**: On template file changes
+        
+        ```python
+        # Example cache key
+        cache_key = f"template:{component_name}:{template_type}"
+        ```
+        
+        ### 2. Rendered Page Cache
+        
+        **Purpose**: Cache fully rendered pages for fast delivery
+        
+        **Storage**: Redis (production) / Memory (development)
+        **TTL**: 30 minutes (configurable)
+        **Invalidation**: On page content changes
+        
+        ```python
+        # Example cache key
+        cache_key = f"page:{page_name}:{content_hash}"
+        ```
+        
+        ### 3. Component Data Cache
+        
+        **Purpose**: Cache external component responses
+        
+        **Storage**: Redis
+        **TTL**: 5 minutes (configurable)
+        **Invalidation**: Based on component's cache headers
+        
+        ```python
+        # Example cache key
+        cache_key = f"component:{component_name}:{data_hash}"
+        ```
+        
+        ## Cache Invalidation Strategy
+        
+        ### Automatic Invalidation
+        
+        - **File Changes**: Monitor file system for changes
+        - **Content Changes**: Hash-based content detection
+        - **Time-based**: TTL expiration
+        - **Manual**: API endpoints for manual invalidation
+        
+        ### Cache Warming
+        
+        - **Pre-render**: Render popular pages on startup
+        - **Background**: Periodic re-rendering of cached pages
+        - **Predictive**: Cache pages based on usage patterns
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Security Architecture"
+      text: |
+        ## Security Layers
+        
+        ### 1. Input Validation
+        
+        **YAML Validation**: Validate page structure and content
+        **Component Data**: Validate component input data
+        **File Uploads**: Validate file types and sizes
+        **API Requests**: Validate request format and content
+        
+        ```python
+        # Example validation
+        def validate_component_data(data):
+            required_fields = ['type', 'data']
+            for field in required_fields:
+                if field not in data:
+                    raise ValidationError(f"Missing required field: {field}")
+        ```
+        
+        ### 2. Output Sanitization
+        
+        **HTML Sanitization**: Clean HTML output to prevent XSS
+        **CSS Sanitization**: Validate CSS properties
+        **JavaScript Sanitization**: Validate and sanitize JS code
+        
+        ```python
+        # Example HTML sanitization
+        from bleach import clean
+        
+        def sanitize_html(html_content):
+            allowed_tags = ['p', 'h1', 'h2', 'h3', 'strong', 'em', 'a']
+            allowed_attrs = {'a': ['href']}
+            return clean(html_content, tags=allowed_tags, attributes=allowed_attrs)
+        ```
+        
+        ### 3. Access Control
+        
+        **Authentication**: JWT-based authentication
+        **Authorization**: Role-based access control
+        **Rate Limiting**: Prevent abuse and DoS attacks
+        **CORS**: Control cross-origin requests
+        
+        ### 4. Data Protection
+        
+        **Encryption**: Encrypt sensitive data at rest
+        **TLS**: Secure communication channels
+        **Secrets Management**: Secure handling of API keys and secrets
+        **Audit Logging**: Track all system activities
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data
+      title: "Scalability Design"
+      text: |
+        ## Horizontal Scaling
+        
+        The architecture supports horizontal scaling through:
+        
+        ### Load Balancing
+        
+        - **Multiple Instances**: Run multiple server instances
+        - **Load Balancer**: Distribute requests across instances
+        - **Health Checks**: Monitor instance health
+        - **Auto-scaling**: Scale based on demand
+        
+        ### Stateless Design
+        
+        - **No Server State**: Each request is independent
+        - **Shared Storage**: Use external storage for shared data
+        - **Session Management**: External session storage
+        - **Configuration**: External configuration management
+        
+        ## Performance Optimization
+        
+        ### 1. Rendering Optimization
+        
+        - **Parallel Processing**: Render components in parallel
+        - **Lazy Loading**: Load components on demand
+        - **Streaming**: Stream large responses
+        - **Compression**: Compress responses
+        
+        ### 2. Database Optimization
+        
+        - **Connection Pooling**: Reuse database connections
+        - **Query Optimization**: Optimize database queries
+        - **Indexing**: Proper database indexing
+        - **Read Replicas**: Use read replicas for scaling
+        
+        ### 3. CDN Integration
+        
+        - **Static Assets**: Serve static files via CDN
+        - **Global Distribution**: Distribute content globally
+        - **Edge Caching**: Cache at edge locations
+        - **Compression**: Compress assets
+        
+        ## Monitoring and Observability
+        
+        ### Metrics Collection
+        
+        - **Application Metrics**: Request rates, response times, error rates
+        - **System Metrics**: CPU, memory, disk usage
+        - **Business Metrics**: Page views, user engagement
+        - **Custom Metrics**: Component usage, rendering times
+        
+        ### Logging Strategy
+        
+        - **Structured Logging**: JSON-formatted logs
+        - **Log Levels**: DEBUG, INFO, WARNING, ERROR
+        - **Log Aggregation**: Centralized log collection
+        - **Log Retention**: Configurable retention policies
+        
+        ### Health Checks
+        
+        - **Liveness Probes**: Check if service is running
+        - **Readiness Probes**: Check if service is ready to serve
+        - **Component Health**: Check external component health
+        - **Dependency Health**: Check database, cache, etc.
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: section
+    data:
+      title: "Deployment Architecture"
+      text: |
+        ## Container-Based Deployment
+        
+        ### Docker Containers
+        
+        - **Application Container**: Main application server
+        - **Component Containers**: Individual component services
+        - **Database Container**: Database service
+        - **Cache Container**: Redis cache service
+        
+        ### Container Orchestration
+        
+        - **Kubernetes**: Container orchestration platform
+        - **Service Discovery**: Automatic service discovery
+        - **Load Balancing**: Built-in load balancing
+        - **Auto-scaling**: Automatic scaling based on demand
+        
+        ## Environment Management
+        
+        ### Development Environment
+        
+        - **Local Development**: Docker Compose for local development
+        - **Hot Reloading**: Automatic code reloading
+        - **Debug Tools**: Integrated debugging tools
+        - **Mock Services**: Mock external services
+        
+        ### Production Environment
+        
+        - **High Availability**: Multiple availability zones
+        - **Backup Strategy**: Automated backups
+        - **Disaster Recovery**: Disaster recovery procedures
+        - **Monitoring**: Comprehensive monitoring
+        
+        ## CI/CD Pipeline
+        
+        ### Continuous Integration
+        
+        - **Code Quality**: Automated code quality checks
+        - **Testing**: Automated testing suite
+        - **Security Scanning**: Security vulnerability scanning
+        - **Build Process**: Automated build process
+        
+        ### Continuous Deployment
+        
+        - **Automated Deployment**: Automated deployment to production
+        - **Blue-Green Deployment**: Zero-downtime deployments
+        - **Rollback Strategy**: Quick rollback capabilities
+        - **Feature Flags**: Feature flag management
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 40px 20px
+      line-height: 1.6
+      color: #333
+      background: #f8f9fa
+      border-radius: 8px
+      margin-top: 20px
+    children:
+      - type: children
+  - type: menu
+    data:
+      items:
+        - label: "← Back to Documentation"
+          link: "./index"
+        - label: "Getting Started"
+          link: "./getting-started"
+        - label: "Components"
+          link: "./components"
+        - label: "Local Development"
+          link: "./local-development"
+        - label: "API Reference"
+          link: "./api-reference"
+        - label: "Configuration"
+          link: "./configuration"
+        - label: "Examples"
+          link: "./examples"
+    style:
+      background: #f8f9fa
+      border-radius: 8px
+      margin: 20px auto
+      max-width: 1200px
+      padding: 20px
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) 
