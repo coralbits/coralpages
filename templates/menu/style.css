@@ -1,7 +1,7 @@
 /* Menu Element Styles */
 .menu {
     display: flex;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
     padding: 16px;
     margin: 0;
