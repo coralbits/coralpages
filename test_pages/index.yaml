@@ -1,29 +1,6 @@
 template: plain
 title: "Welcome to Page Editor"
 data:
-  - type: header
-    data:
-      text: "Welcome to Page Editor Server"
-    style:
-      background: blue
-      color: white
-      font-size: 20px
-      font-weight: bold
-      text-align: center
-      padding: 10px
-      margin: 10px
-      border-radius: 5px
-  - type: menu
-    data:
-      items:
-        - label: "About"
-          link: "./about"
-        - label: "CSS Demo"
-          link: "./css_demo"
-        - label: "Documentation"
-          link: "./docs"
-    style:
-      margin: 20px 10px
   - type: section
     data:
       title: "About"

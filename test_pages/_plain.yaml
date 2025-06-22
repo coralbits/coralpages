@@ -1,1 +1,39 @@
 # this is page template, which is basically the top level page template
+
+# Plain template - provides a basic container for page content
+data:
+  - type: header
+    data:
+      text: "Welcome to Page Editor Server"
+    style:
+      background: blue
+      color: white
+      font-size: 20px
+      font-weight: bold
+      text-align: center
+      padding: 10px
+      margin: 10px
+      border-radius: 5px
+  - type: menu
+    data:
+      items:
+        - label: "Home"
+          link: "/"
+        - label: "About"
+          link: "./about"
+        - label: "CSS Demo"
+          link: "./css_demo"
+        - label: "Documentation"
+          link: "./docs"
+    style:
+      margin: 20px 10px
+  - type: section
+    data:
+      title: ""
+      text: ""
+    style:
+      max-width: 1200px
+      margin: 0 auto
+      padding: 20px
+    children:
+      - type: children

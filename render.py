@@ -4,6 +4,7 @@ from pe.page import YamlLoader
 from pe.renderer import Renderer
 from pe.loader import ElementLoader
 from pe.adapters import BuiltinCSSLoader
+from pe.template_loader import TemplateLoader
 
 
 def parse_args():
@@ -19,7 +20,12 @@ def main():
     element_loader = ElementLoader()
     css_loader = BuiltinCSSLoader()
 
-    html = Renderer(page, element_loader, css_loader).render()
+    # Create template loader with the same directory as the input file
+    import os
+
+    template_loader = TemplateLoader(os.path.dirname(args.input_yaml))
+
+    html = Renderer(page, element_loader, css_loader, template_loader).render()
     if args.output_yaml == "-":
         print(html)
     else:

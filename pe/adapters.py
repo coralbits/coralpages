@@ -6,6 +6,7 @@ from pe.types import Page
 from pe.page import YamlLoader
 from pe.renderer import Renderer
 from pe.loader import ElementLoader
+from pe.template_loader import TemplateLoader
 import jinja2
 
 
@@ -50,20 +51,19 @@ class FileSystemPageRepository(PageRepository):
 
     def list_pages(self, directory: str = "") -> list[str]:
         """List all pages in a directory."""
-        pages = []
         dir_path = self.base_path / directory
+        if not dir_path.exists() or not dir_path.is_dir():
+            return []
 
-        if not dir_path.exists():
-            return pages
-
+        pages = []
         for item in dir_path.iterdir():
             if item.is_file() and item.suffix == ".yaml":
                 # Remove .yaml extension and base path
                 relative_path = str(item.relative_to(self.base_path))[:-5]
                 pages.append(relative_path)
             elif item.is_dir() and (item / "index.yaml").exists():
-                # Add directory name for index.yaml files
-                relative_path = str(item.relative_to(self.base_path))
+                # Add directory with trailing slash
+                relative_path = str(item.relative_to(self.base_path)) + "/"
                 pages.append(relative_path)
 
         return sorted(pages)
@@ -72,13 +72,16 @@ class FileSystemPageRepository(PageRepository):
 class PePageRenderer(PageRenderer):
     """PE renderer implementation of PageRenderer."""
 
-    def __init__(self, css_loader: CSSLoader):
+    def __init__(self, css_loader: CSSLoader, template_loader: TemplateLoader):
         self.element_loader = ElementLoader()
         self.css_loader = css_loader
+        self.template_loader = template_loader
 
     def render_page(self, page: Page) -> str:
         """Render a page using the PE renderer."""
-        renderer = Renderer(page, self.element_loader, self.css_loader)
+        renderer = Renderer(
+            page, self.element_loader, self.css_loader, self.template_loader
+        )
         return renderer.render()
 
 
@@ -89,12 +92,12 @@ class BuiltinCSSLoader(CSSLoader):
         self.jinja2_env = jinja2.Environment(
             loader=jinja2.FileSystemLoader(Path(__file__).parent.parent / "templates")
         )
-        self.css_cache: dict[str, str] = {}
+        # self.css_cache: dict[str, str] = {}  # Disabled for development
 
     def load_css(self, css_path: str) -> str:
         """Load CSS content from a builtin path."""
-        if css_path in self.css_cache:
-            return self.css_cache[css_path]
+        # if css_path in self.css_cache:  # Disabled for development
+        #     return self.css_cache[css_path]  # Disabled for development
 
         if not css_path.startswith("builtin://"):
             return ""
@@ -105,8 +108,8 @@ class BuiltinCSSLoader(CSSLoader):
         try:
             template = self.jinja2_env.get_template(template_path)
             css_content = template.render()
-            self.css_cache[css_path] = css_content
+            # self.css_cache[css_path] = css_content  # Disabled for development
             return css_content
         except Exception:
-            self.css_cache[css_path] = ""
+            # self.css_cache[css_path] = ""  # Disabled for development
             return ""

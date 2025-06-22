@@ -12,7 +12,12 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 from pe.services import PageService
-from pe.adapters import FileSystemPageRepository, PePageRenderer, BuiltinCSSLoader
+from pe.adapters import (
+    FileSystemPageRepository,
+    PePageRenderer,
+    BuiltinCSSLoader,
+    TemplateLoader,
+)
 from pe.api import create_app
 
 
@@ -20,7 +25,8 @@ def create_page_service(base_directory: str) -> PageService:
     """Create a page service with file system storage."""
     page_repository = FileSystemPageRepository(base_directory)
     css_loader = BuiltinCSSLoader()
-    page_renderer = PePageRenderer(css_loader)
+    template_loader = TemplateLoader(base_directory)
+    page_renderer = PePageRenderer(css_loader, template_loader)
     return PageService(page_repository, page_renderer)
 
 

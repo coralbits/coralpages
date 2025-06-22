@@ -11,21 +11,16 @@ class CSSGenerator:
         self.css_rules: Dict[str, Dict[str, str]] = {}
         self.element_paths: Dict[int, str] = {}
         self.element_counter = 0
-        self.element_css_cache: Dict[str, str] = {}
+        self.used_element_types: set[str] = set()  # Track used element types
         self.css_loader = css_loader
 
     def load_element_css(self, element_type: str) -> str:
         """Load CSS for a specific element type using the CSS loader."""
-        if element_type in self.element_css_cache:
-            return self.element_css_cache[element_type]
-
         element_def = element_definitions.get(element_type)
         if not element_def or not element_def.css:
-            self.element_css_cache[element_type] = ""
             return ""
 
         css_content = self.css_loader.load_css(element_def.css)
-        self.element_css_cache[element_type] = css_content
         return css_content
 
     def generate_class_name(self, element_path: str) -> str:
@@ -47,8 +42,9 @@ class CSSGenerator:
         """Generate the complete CSS string."""
         css_lines = []
 
-        # Add element-specific CSS first
-        for element_type, css_content in self.element_css_cache.items():
+        # Add element-specific CSS for all used element types
+        for element_type in self.used_element_types:
+            css_content = self.load_element_css(element_type)
             if css_content:
                 css_lines.append(f"/* CSS for {element_type} element */")
                 css_lines.append(css_content)
@@ -75,8 +71,8 @@ class CSSGenerator:
             # Generate element path
             element_path = f"{parent_path}.{element.type}{i+1}"
 
-            # Load element-specific CSS
-            self.load_element_css(element.type)
+            # Track used element types
+            self.used_element_types.add(element.type)
 
             # Add style if present and store CSS class on element
             if element.style:
