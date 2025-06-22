@@ -1,5 +1,5 @@
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 import uvicorn
@@ -45,15 +45,11 @@ def create_app(page_service: PageService) -> FastAPI:
             "data": page_data.data,
         }
 
-    @app.get("/", response_class=HTMLResponse)
+    @app.get("/")
     async def serve_root():
-        """Serve the root page (index.html)."""
-        html_content = page_service.get_page_html("")
-        if html_content is None:
-            raise HTTPException(status_code=404, detail="Root page not found")
-        return HTMLResponse(content=html_content)
+        return RedirectResponse(url="/view/")
 
-    @app.get("/{path:path}", response_class=HTMLResponse)
+    @app.get("/view/{path:path}", response_class=HTMLResponse)
     async def serve_page(path: str):
         """Serve a page by its path."""
         # Remove trailing slash for consistency
