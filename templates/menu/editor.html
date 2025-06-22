@@ -1,0 +1,12 @@
+<div class="menu-editor">
+    <h3>Menu Editor</h3>
+    <p>Menu items are configured in the YAML file with label and link pairs.</p>
+    <div class="menu-preview">
+        <h4>Current Menu Items:</h4>
+        <ul>
+            {% for item in data.items %}
+            <li><strong>{{ item.label }}</strong> → {{ item.link }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

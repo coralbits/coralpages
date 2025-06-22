@@ -30,3 +30,7 @@ elements:
     viewer: builtin://text/view.html
     css: builtin://text/style.css
     editor: builtin://text/editor.html
+  - name: menu
+    viewer: builtin://menu/view.html
+    css: builtin://menu/style.css
+    editor: builtin://menu/editor.html
