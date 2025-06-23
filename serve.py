@@ -1,12 +1,102 @@
 #!/usr/bin/env -S uv run --script
+
 import argparse
-import sys
-import os
+import json
 from pathlib import Path
+from typing import Any
+import yaml
+from pe.renderer.renderer import Renderer
+from pe.types import BlockDefinition, ElementDefinition
 import uvicorn
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse, Response
+from fastapi.requests import Request
+
+
+def create_app(args: argparse.Namespace):
+    """
+    Create the FastAPI app.
+    """
+    app = FastAPI()  # type: ignore
+
+    def prepare_config() -> dict[str, Any]:
+        """
+        Prepare the config for the renderer.
+        """
+        with open("config.yaml", "rt", encoding="utf-8") as fd:
+            config_dict = yaml.safe_load(fd)
+
+        return {
+            "page_path": Path(args.directory),
+            "elements": {
+                element["name"]: ElementDefinition.from_dict(element)
+                for element in config_dict["elements"]
+            },
+        }
+
+    config = prepare_config()
+
+    @app.get("/api/v1/view/{page_name}")
+    async def read_root(page_name: str):
+        if page_name == "index":
+            page_name = "builtin://index.yaml"
+        else:
+            page_name = f"builtin://{page_name}.yaml"
+
+        renderer = Renderer(config)
+        page = await renderer.render_page(page_name)
+        return Response(content=str(page), media_type="text/html")
+
+    @app.get("/api/v1/element/")
+    def list_known_elements():
+        elements_dict = {
+            name: element.to_dict() for name, element in config["elements"].items()
+        }
+        return Response(
+            content=json.dumps(elements_dict), media_type="application/json"
+        )
+
+    @app.get("/api/v1/element/{element_name}/html")
+    async def read_element_html(request: Request, element_name: str):
+        data = request.query_params
+
+        block = BlockDefinition(
+            type=element_name,
+            data=data,
+            children=[],
+            style={},
+        )
+        renderer = Renderer(config)
+        page = renderer.new_page()
+        html, _ = await renderer.render_block(page, block)
+        return Response(content=html, media_type="text/html")
+
+    @app.get("/api/v1/element/{element_name}/css")
+    async def read_element_css(request: Request, element_name: str):
+        data = request.query_params
+
+        block = BlockDefinition(
+            type=element_name,
+            data=data,
+            children=[],
+            style={},
+        )
+        renderer = Renderer(config)
+        page = renderer.new_page()
+        _, css = await renderer.render_block(page, block)
+        return Response(content=css, media_type="text/css")
+
+    @app.get("/")
+    def redirect_to_index():
+        return RedirectResponse(url="/api/v1/view/index")
+
+    return app
 
 
 def parse_args():
+    """
+    Parse the arguments.
+    """
     parser = argparse.ArgumentParser(
         description="Serve pages using FastAPI with hexagonal architecture."
     )
@@ -23,53 +113,12 @@ def parse_args():
     return parser.parse_args()
 
 
-def validate_directory(directory: str) -> bool:
-    """Validate that the directory exists and contains YAML files."""
-    dir_path = Path(directory)
-
-    if not dir_path.exists():
-        print(f"Error: Directory '{directory}' does not exist", file=sys.stderr)
-        return False
-
-    if not dir_path.is_dir():
-        print(f"Error: '{directory}' is not a directory", file=sys.stderr)
-        return False
-
-    # Check if there are any YAML files or index.yaml files
-    yaml_files = list(dir_path.glob("*.yaml"))
-    index_files = list(dir_path.glob("*/index.yaml"))
-
-    if not yaml_files and not index_files:
-        print(
-            f"Warning: Directory '{directory}' contains no YAML files", file=sys.stderr
-        )
-        print("Expected files: *.yaml or */index.yaml", file=sys.stderr)
-
-    return True
+app = create_app(parse_args())
 
 
 def main():
-    args = parse_args()
-
-    if not validate_directory(args.directory):
-        sys.exit(1)
-
-    try:
-        # Set the base directory as an environment variable
-        os.environ["PAGE_EDITOR_BASE_DIR"] = args.directory
-
-        print(f"Starting server on {args.host}:{args.port}")
-        print(f"Serving pages from: {args.directory}")
-        if args.reload:
-            print("Auto-reload enabled - server will restart on file changes")
-
-        # Use the server module directly
-        uvicorn.run("pe.server:app", host=args.host, port=args.port, reload=args.reload)
-    except KeyboardInterrupt:
-        print("\nServer stopped by user")
-    except Exception as e:
-        print(f"Error starting server: {e}", file=sys.stderr)
-        sys.exit(1)
+    opts = parse_args()
+    uvicorn.run("serve2:app", host=opts.host, port=opts.port, reload=opts.reload)
 
 
 if __name__ == "__main__":

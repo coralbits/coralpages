@@ -2,9 +2,9 @@ from dataclasses import dataclass, field
 from functools import lru_cache
 from typing import Any
 
-from pe2.loader import LoaderFactory
-from pe2.renderer.types import ElementRendererBase
-from pe2.types import BlockDefinition, PageDefinition
+from pe.loader import LoaderFactory
+from pe.renderer.types import ElementRendererBase
+from pe.types import BlockDefinition, PageDefinition
 
 
 @dataclass
@@ -160,12 +160,12 @@ class Renderer:
         block = self.loader.load_element_definition(type_name)
 
         if block.viewer.startswith("builtin://"):
-            from pe2.renderer.builtin import ElementRendererBuiltin
+            from pe.renderer.builtin import ElementRendererBuiltin
 
             return ElementRendererBuiltin(block=block)
 
         if block.viewer.startswith("https://") or block.viewer.startswith("http://"):
-            from pe2.renderer.http import ElementRendererHttp
+            from pe.renderer.http import ElementRendererHttp
 
             return ElementRendererHttp(block=block)
 

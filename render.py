@@ -1,35 +1,80 @@
 #!/usr/bin/env -S uv run --script
+
 import argparse
-from pe.page import YamlLoader
-from pe.renderer import Renderer, TemplateLoader
-from pe.loader import ElementLoader
-from pe.adapters import BuiltinCSSLoader
+from pathlib import Path
+import sys
+from contextlib import contextmanager
+from typing import TextIO
+
+import yaml
+
+from pe.renderer.renderer import Renderer
+from pe.types import ElementDefinition, PageDefinition
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Process some integers.")
-    parser.add_argument("input_yaml", help="Path to the YAML file")
-    parser.add_argument("output_yaml", help="Path to the output HTML file")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input", type=str)
+    parser.add_argument("output", type=str, default="-")
     return parser.parse_args()
 
 
 def main():
     args = parse_args()
-    page = YamlLoader().open(args.input_yaml)
-    element_loader = ElementLoader()
-    css_loader = BuiltinCSSLoader()
 
-    # Create template loader with the same directory as the input file
-    import os
+    with open_input(args.input) as finput, open_output(args.output) as foutput:
+        render(args, finput, foutput)
 
-    template_loader = TemplateLoader(os.path.dirname(args.input_yaml))
 
-    html = Renderer(page, element_loader, css_loader, template_loader).render()
-    if args.output_yaml == "-":
-        print(html)
+@contextmanager
+def open_input(path: str) -> TextIO:
+    """
+    Open the input file.
+    """
+    if path == "-":
+        yield sys.stdin
     else:
-        with open(args.output_yaml, "wt", encoding="utf-8") as fd:
-            fd.write(html)
+        with open(path, "rt", encoding="utf-8") as fd:
+            yield fd
+
+
+@contextmanager
+def open_output(path: str) -> TextIO:
+    """
+    Open the output file.
+    """
+    if path == "-":
+        yield sys.stdout
+    else:
+        with open(path, "wt", encoding="utf-8") as fd:
+            yield fd
+
+
+def prepare_config(input_path: str) -> dict[str, str]:
+    """
+    Prepare the config for the renderer.
+    """
+    with open("config.yaml", "rt", encoding="utf-8") as fd:
+        config_dict = yaml.safe_load(fd)
+
+    return {
+        "page_path": Path(input_path).parent,
+        "elements": {
+            element["name"]: ElementDefinition.from_dict(element)
+            for element in config_dict["elements"]
+        },
+    }
+
+
+def render(args, finput: TextIO, foutput: TextIO):
+    """
+    Render the input file to the output file.
+    """
+    renderer = Renderer(prepare_config(args.input))
+
+    page = PageDefinition.from_dict(yaml.safe_load(finput))
+    output = renderer.render(page)
+    foutput.write(str(output))
 
 
 if __name__ == "__main__":

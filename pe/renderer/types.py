@@ -1,5 +1,5 @@
 from typing import Any
-from pe2.types import BlockDefinition, ElementDefinition
+from pe.types import BlockDefinition
 
 
 class ElementRendererBase:

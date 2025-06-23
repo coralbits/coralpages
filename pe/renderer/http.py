@@ -1,6 +1,6 @@
 from typing import Any
 import httpx
-from pe2.renderer.types import ElementRendererBase
+from pe.renderer.types import ElementRendererBase
 
 
 class ElementRendererHttp(ElementRendererBase):

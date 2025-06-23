@@ -4,8 +4,8 @@ from typing import Any
 import jinja2
 import markdown
 
-from pe2.renderer.types import ElementRendererBase
-from pe2.types import BlockDefinition
+from pe.renderer.types import ElementRendererBase
+from pe.types import BlockDefinition
 
 
 jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader("templates"))

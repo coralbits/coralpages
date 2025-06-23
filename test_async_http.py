@@ -8,8 +8,8 @@ import asyncio
 from pathlib import Path
 
 import yaml
-from pe2.renderer.renderer import Renderer
-from pe2.types import ElementDefinition
+from pe.renderer.renderer import Renderer
+from pe.types import ElementDefinition
 
 
 async def test_async_http_renderer():
