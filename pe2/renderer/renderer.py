@@ -70,6 +70,13 @@ class Renderer:
         self.loader = LoaderFactory(config=config)
         self.page = None
 
+    def render_page(self, page_name: str) -> str:
+        """
+        Render a page.
+        """
+        page = self.loader.load_page(page_name)
+        return self.render(page)
+
     def render(self, page: PageDefinition) -> str:
         """
         Render a page.

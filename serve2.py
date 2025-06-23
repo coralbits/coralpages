@@ -1,0 +1,84 @@
+#!/usr/bin/env -S uv run --script
+
+import argparse
+from pathlib import Path
+from typing import Any
+import yaml
+from pe2.renderer.renderer import Renderer
+from pe2.types import ElementDefinition
+import uvicorn
+from fastapi import FastAPI
+from fastapi.responses import RedirectResponse, Response
+
+
+def create_app(args: argparse.Namespace):
+    """
+    Create the FastAPI app.
+    """
+    app = FastAPI()  # type: ignore
+
+    def prepare_config() -> dict[str, Any]:
+        """
+        Prepare the config for the renderer.
+        """
+        with open("config.yaml", "rt", encoding="utf-8") as fd:
+            config_dict = yaml.safe_load(fd)
+
+        return {
+            "page_path": Path(args.directory),
+            "elements": {
+                element["name"]: ElementDefinition.from_dict(element)
+                for element in config_dict["elements"]
+            },
+        }
+
+    config = prepare_config()
+
+    @app.get("/api/v1/view/{page_name}")
+    def read_root(page_name: str):
+        if page_name == "index":
+            page_name = "builtin://index.yaml"
+        else:
+            page_name = f"builtin://{page_name}.yaml"
+
+        renderer = Renderer(config)
+        page = renderer.render_page(page_name)
+        return Response(content=str(page), media_type="text/html")
+
+    @app.get("/")
+    def redirect_to_index():
+        return RedirectResponse(url="/api/v1/view/index")
+
+    return app
+
+
+def parse_args():
+    """
+    Parse the arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Serve pages using FastAPI with hexagonal architecture."
+    )
+    parser.add_argument("directory", help="Directory containing YAML pages to serve")
+    parser.add_argument(
+        "--host", default="0.0.0.0", help="Host to bind to (default: 0.0.0.0)"
+    )
+    parser.add_argument(
+        "--port", type=int, default=8000, help="Port to bind to (default: 8000)"
+    )
+    parser.add_argument(
+        "--reload", action="store_true", help="Enable auto-reload on file changes"
+    )
+    return parser.parse_args()
+
+
+app = create_app(parse_args())
+
+
+def main():
+    opts = parse_args()
+    uvicorn.run("serve2:app", host=opts.host, port=opts.port, reload=opts.reload)
+
+
+if __name__ == "__main__":
+    main()

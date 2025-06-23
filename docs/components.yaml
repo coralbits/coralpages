@@ -1,14 +1,14 @@
 # Built-in Components Documentation
 
 title: "Components"
-template: "default"
+template: "builtin://_default.yaml"
 
 data:
   - type: header
     data:
       text: "Built-in Components"
     style:
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
       color: white
       font-size: 28px
       font-weight: bold
@@ -16,35 +16,35 @@ data:
       padding: 25px
       margin: 0
       border-radius: 0
-  - type: section
+  - type: markdown
     data:
       title: "Component Overview"
       text: |
         The Coralbits Page Editor comes with a comprehensive set of built-in components that cover most common web page needs. 
         Each component is designed to be flexible, customizable, and easy to use.
-        
+
         ## Component Categories
-        
+
         ### Layout Components
         - **Section**: Container for organizing content
         - **Header**: Page headers and navigation elements
-        
+
         ### Content Components
         - **Text**: Rich text content with formatting
         - **Paragraph**: Simple text paragraphs
         - **Markdown**: Markdown-formatted content
         - **Image**: Image display with upload support
-        
+
         ### Navigation Components
         - **Menu**: Navigation menus and links
-        
+
         ### Interactive Components
         - **Tag Cloud**: Interactive tag visualization
-        
+
         ## Component Structure
-        
+
         Every component follows this structure:
-        
+
         ```yaml
         - type: component_name
           data:
@@ -60,21 +60,19 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-    children:
-      - type: children
-  - type: section
+  - type: markdown
     data:
       title: "Layout Components"
       text: |
         ## Section Component
-        
+
         The section component is the primary container for organizing page content.
-        
+
         **Properties:**
         - `title`: Section title (optional)
         - `text`: Section description (optional)
         - `children`: Nested components
-        
+
         **Example:**
         ```yaml
         - type: section
@@ -92,14 +90,14 @@ data:
               data:
                 text: "Content goes here"
         ```
-        
+
         ## Header Component
-        
+
         Used for page headers, titles, and navigation elements.
-        
+
         **Properties:**
         - `text`: Header text content
-        
+
         **Example:**
         ```yaml
         - type: header
@@ -123,19 +121,17 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-    children:
-      - type: children
-  - type: section
+  - type: markdown
     data:
       title: "Content Components"
       text: |
         ## Text Component
-        
+
         Rich text component with formatting support.
-        
+
         **Properties:**
         - `text`: Text content (supports HTML)
-        
+
         **Example:**
         ```yaml
         - type: text
@@ -146,14 +142,14 @@ data:
             line-height: 1.6
             color: #333
         ```
-        
+
         ## Paragraph Component
-        
+
         Simple paragraph text component.
-        
+
         **Properties:**
         - `text`: Paragraph text content
-        
+
         **Example:**
         ```yaml
         - type: paragraph

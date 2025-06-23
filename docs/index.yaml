@@ -2,14 +2,14 @@
 # Main documentation index page
 
 title: "Coralbits Page Editor Documentation"
-template: "default"
+template: "builtin://_default.yaml"
 
 data:
   - type: header
     data:
       text: "Coralbits Page Editor Documentation"
     style:
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
       color: white
       font-size: 32px
       font-weight: bold
@@ -18,32 +18,32 @@ data:
       margin: 0
       border-radius: 0
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
-  - type: section
+  - type: markdown
     data:
       title: "Welcome to Coralbits Page Editor"
       text: |
         The Coralbits Page Editor is a powerful, API-first page editor and renderer designed for modern web development. 
         It provides a flexible, component-based approach to creating dynamic web pages with an embedded Single Page Application (SPA) interface.
-        
+
         ## Key Features
-        
+
         - **Component-Based Architecture**: Built-in and extensible components
         - **API-First Design**: RESTful API for page generation and editing
         - **Embedded SPA Editor**: Rich editing experience within your applications
         - **Flexible Rendering**: Generate HTML from built-in elements or external microservices
         - **Caching Support**: Intelligent caching for optimal performance
         - **Extensible**: Easy integration with external components via REST APIs
-        
+
         ## Philosophy
-        
+
         The Coralbits Page Editor follows a **microservices-first** approach, where each component is treated as an independent service. 
         This design philosophy enables:
-        
+
         - **Scalability**: Components can be scaled independently
         - **Maintainability**: Clear separation of concerns
         - **Flexibility**: Easy to add, remove, or modify components
         - **Reusability**: Components can be shared across different projects
-        
+
         Whether you're building a simple landing page or a complex web application, the Coralbits Page Editor provides the tools and flexibility you need.
     style:
       max-width: 1200px
@@ -51,31 +51,3 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-    children:
-      - type: children
-  - type: menu
-    data:
-      items:
-        - label: "Getting Started"
-          link: "./getting-started"
-        - label: "Components"
-          link: "./components"
-        - label: "Local Development"
-          link: "./local-development"
-        - label: "API Reference"
-          link: "./api-reference"
-        - label: "Editor Interface"
-          link: "./editor-interface"
-        - label: "Configuration"
-          link: "./configuration"
-        - label: "Examples"
-          link: "./examples"
-        - label: "Architecture"
-          link: "./architecture"
-    style:
-      background: #f8f9fa
-      border-radius: 8px
-      margin: 20px auto
-      max-width: 1200px
-      padding: 20px
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) 

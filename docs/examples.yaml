@@ -1,14 +1,14 @@
 # Examples Documentation
 
 title: "Examples"
-template: "default"
+template: "builtin://_default.yaml"
 
 data:
   - type: header
     data:
       text: "Examples"
     style:
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
       color: white
       font-size: 28px
       font-weight: bold
@@ -16,23 +16,23 @@ data:
       padding: 25px
       margin: 0
       border-radius: 0
-  - type: section
+  - type: markdown
     data:
       title: "Example Pages"
       text: |
         This section provides practical examples of how to use the Coralbits Page Editor. 
         Each example demonstrates different features and use cases to help you get started.
-        
+
         ## Example Categories
-        
+
         - **Basic Pages**: Simple pages with common components
         - **Complex Layouts**: Advanced layouts with nested components
         - **Interactive Elements**: Pages with dynamic content
         - **Responsive Design**: Mobile-first responsive layouts
         - **Custom Components**: Examples of custom component usage
-        
+
         ## How to Use Examples
-        
+
         1. **Copy the YAML**: Copy the example YAML code
         2. **Create a file**: Save as a `.yaml` file in your pages directory
         3. **Render the page**: Use `python render.py filename.yaml`
@@ -43,16 +43,14 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-    children:
-      - type: children
-  - type: section
+  - type: markdown
     data:
       title: "Basic Examples"
       text: |
         ## Simple Landing Page
-        
+
         A basic landing page with header, navigation, and content sections.
-        
+
         ```yaml
         data:
           - type: header
@@ -66,7 +64,7 @@ data:
               text-align: center
               padding: 40px
               margin: 0
-        
+
           - type: menu
             data:
               items:
@@ -82,7 +80,7 @@ data:
               background: #333
               padding: 15px
               text-align: center
-        
+
           - type: section
             data:
               title: "About Us"
@@ -110,11 +108,11 @@ data:
                   line-height: 1.6
                   color: #333
         ```
-        
+
         ## Blog Post Template
-        
+
         A blog post template with title, content, and metadata.
-        
+
         ```yaml
         data:
           - type: header
@@ -128,7 +126,7 @@ data:
               text-align: center
               padding: 30px
               margin: 0
-        
+
           - type: section
             data:
               title: ""
@@ -190,16 +188,14 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-    children:
-      - type: children
-  - type: section
+  - type: markdown
     data:
       title: "Advanced Layouts"
       text: |
         ## Portfolio Page
-        
+
         A portfolio page with multiple sections and complex layout.
-        
+
         ```yaml
         data:
           - type: header
@@ -213,7 +209,7 @@ data:
               text-align: center
               padding: 50px
               margin: 0
-        
+
           - type: menu
             data:
               items:
@@ -232,7 +228,7 @@ data:
               position: sticky
               top: 0
               z-index: 100
-        
+
           - type: section
             data:
               title: "About Me"
@@ -265,7 +261,7 @@ data:
                 style:
                   line-height: 1.6
                   color: #333
-        
+
           - type: section
             data:
               title: "Portfolio"
@@ -313,11 +309,11 @@ data:
                   line-height: 1.6
                   color: #333
         ```
-        
+
         ## Dashboard Layout
-        
+
         A dashboard layout with sidebar navigation and content areas.
-        
+
         ```yaml
         data:
           - type: header
@@ -330,7 +326,7 @@ data:
               font-weight: bold
               padding: 20px
               margin: 0
-        
+
           - type: section
             data:
               title: ""
@@ -399,16 +395,14 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-    children:
-      - type: children
-  - type: section
+  - type: markdown
     data:
       title: "Interactive Examples"
       text: |
         ## Contact Form Page
-        
+
         A contact page with form elements and interactive features.
-        
+
         ```yaml
         data:
           - type: header
@@ -422,7 +416,7 @@ data:
               text-align: center
               padding: 40px
               margin: 0
-        
+
           - type: section
             data:
               title: "Get in Touch"
@@ -486,11 +480,11 @@ data:
                   line-height: 1.6
                   color: #333
         ```
-        
+
         ## FAQ Page with Accordion
-        
+
         A FAQ page with expandable sections.
-        
+
         ```yaml
         data:
           - type: header
@@ -504,7 +498,7 @@ data:
               text-align: center
               padding: 40px
               margin: 0
-        
+
           - type: section
             data:
               title: "Common Questions"
@@ -575,16 +569,14 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-    children:
-      - type: children
-  - type: section
+  - type: markdown
     data:
       title: "Responsive Design Examples"
       text: |
         ## Mobile-First Landing Page
-        
+
         A responsive landing page designed for mobile devices first.
-        
+
         ```yaml
         data:
           - type: header
@@ -601,7 +593,7 @@ data:
               @media (min-width: 768px):
                 font-size: 32px
                 padding: 40px
-        
+
           - type: section
             data:
               title: "Download Our App"
@@ -653,11 +645,11 @@ data:
                   line-height: 1.6
                   color: #333
         ```
-        
+
         ## Responsive Navigation
-        
+
         A responsive navigation menu that adapts to different screen sizes.
-        
+
         ```yaml
         data:
           - type: header
@@ -671,7 +663,7 @@ data:
               text-align: center
               padding: 20px
               margin: 0
-        
+
           - type: text
             data:
               text: |
@@ -708,16 +700,14 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-    children:
-      - type: children
   - type: section
     data:
       title: "Custom Component Examples"
       text: |
         ## Custom Widget Example
-        
+
         Example of how to create and use a custom component.
-        
+
         ```yaml
         data:
           - type: header
@@ -731,7 +721,7 @@ data:
               text-align: center
               padding: 40px
               margin: 0
-        
+
           - type: section
             data:
               title: "Custom Widgets"
@@ -793,27 +783,3 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-    children:
-      - type: children
-  - type: menu
-    data:
-      items:
-        - label: "← Back to Documentation"
-          link: "./index"
-        - label: "Getting Started"
-          link: "./getting-started"
-        - label: "Components"
-          link: "./components"
-        - label: "Local Development"
-          link: "./local-development"
-        - label: "API Reference"
-          link: "./api-reference"
-        - label: "Configuration"
-          link: "./configuration"
-    style:
-      background: #f8f9fa
-      border-radius: 8px
-      margin: 20px auto
-      max-width: 1200px
-      padding: 20px
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) 
