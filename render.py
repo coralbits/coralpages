@@ -8,6 +8,7 @@ from typing import TextIO
 
 import yaml
 
+from pe.config import Config
 from pe.renderer.renderer import Renderer
 from pe.types import ElementDefinition, PageDefinition
 
@@ -19,11 +20,11 @@ def parse_args():
     return parser.parse_args()
 
 
-def main():
+async def main():
     args = parse_args()
 
     with open_input(args.input) as finput, open_output(args.output) as foutput:
-        render(args, finput, foutput)
+        await render(args, finput, foutput)
 
 
 @contextmanager
@@ -50,32 +51,27 @@ def open_output(path: str) -> TextIO:
             yield fd
 
 
-def prepare_config(input_path: str) -> dict[str, str]:
+def prepare_config(input_path: str) -> Config:
     """
     Prepare the config for the renderer.
     """
-    with open("config.yaml", "rt", encoding="utf-8") as fd:
-        config_dict = yaml.safe_load(fd)
-
-    return {
-        "page_path": Path(input_path).parent,
-        "elements": {
-            element["name"]: ElementDefinition.from_dict(element)
-            for element in config_dict["elements"]
-        },
-    }
+    config = Config.read("config.yaml")
+    config.page_path = Path(input_path).parent
+    return config
 
 
-def render(args, finput: TextIO, foutput: TextIO):
+async def render(args, finput: TextIO, foutput: TextIO):
     """
     Render the input file to the output file.
     """
     renderer = Renderer(prepare_config(args.input))
 
     page = PageDefinition.from_dict(yaml.safe_load(finput))
-    output = renderer.render(page)
+    output = await renderer.render(page)
     foutput.write(str(output))
 
 
 if __name__ == "__main__":
-    main()
+    import asyncio
+
+    asyncio.run(main())
