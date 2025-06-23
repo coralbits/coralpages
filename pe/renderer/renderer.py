@@ -105,11 +105,29 @@ class Renderer:
                 page.headers["ETag"] = old_etag
                 page.response_code = 304
                 return page
+        if "last-modified" in page_definition.cache:
+            old_last_modified = headers.get("If-Modified-Since")
+            new_last_modified = self.calculate_last_modified(page_definition)
+            if old_last_modified == new_last_modified:
+                page = self.new_page()
+                page.headers["Last-Modified"] = new_last_modified
+                page.response_code = 304
+                return page
 
         page = await self.render(page_definition)
         if new_etag:
             page.headers["ETag"] = new_etag
+        if new_last_modified:
+            page.headers["Last-Modified"] = new_last_modified
         return page
+
+    def calculate_last_modified(self, page_definition: PageDefinition) -> str:
+        """
+        Calculate the last modified for a page definition.
+
+        Looks at the last modified data of the page definition and the blocks.
+        """
+        return page_definition.last_modified.isoformat()
 
     def calculate_etag(self, page_definition: PageDefinition) -> str:
         """

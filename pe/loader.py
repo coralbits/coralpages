@@ -2,6 +2,7 @@
 Loaders for the page editor.
 """
 
+import datetime
 from pathlib import Path
 
 import yaml
@@ -55,6 +56,12 @@ class FileLoader(LoaderBase):
 
     def load(self, path: str) -> PageDefinition:
         path = f"{path}.yaml"
-        with open(self.base_path / path, "r", encoding="utf-8") as file:
+        filepath = self.base_path / path
+        with open(filepath, "r", encoding="utf-8") as file:
             data = yaml.safe_load(file)
-            return PageDefinition.from_dict(data)
+            page_def = PageDefinition.from_dict(data)
+            if not page_def.last_modified:
+                page_def.last_modified = datetime.datetime.fromtimestamp(
+                    filepath.stat().st_mtime
+                )
+            return page_def

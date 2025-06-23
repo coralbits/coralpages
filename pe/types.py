@@ -2,6 +2,7 @@
 Types for the page editor.
 """
 
+import datetime
 from typing import Any, Self
 from dataclasses import dataclass, field
 
@@ -53,17 +54,23 @@ class PageDefinition:
     template: str
     data: list[BlockDefinition]
     cache: list[str] = field(default_factory=list)
+    last_modified: str = ""
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
         """
         Load a page definition from a dictionary.
         """
+        last_modified = data.get("last_modified", None)
+        if last_modified:
+            last_modified = datetime.datetime.fromisoformat(last_modified)
+
         return cls(
             title=data["title"],
             template=data["template"],
             data=[BlockDefinition.from_dict(block) for block in data["data"]],
             cache=data.get("cache", []),
+            last_modified=last_modified,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -75,6 +82,9 @@ class PageDefinition:
             "template": self.template,
             "cache": self.cache,
             "data": [block.to_dict() for block in self.data],
+            "last_modified": (
+                self.last_modified.isoformat() if self.last_modified else None
+            ),
         }
 
 
