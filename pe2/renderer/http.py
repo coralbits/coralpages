@@ -20,7 +20,7 @@ class ElementRendererHttp(ElementRendererBase):
         """
         url = self.block.viewer
         async with httpx.AsyncClient() as client:
-            response = await client.get(url)
+            response = await client.get(url, params=data)
             response.raise_for_status()
             return response.text
 

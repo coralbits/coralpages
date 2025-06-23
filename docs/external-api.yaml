@@ -1,0 +1,14 @@
+title: "API get example"
+template: "builtin://_default.yaml"
+
+data:
+  - type: markdown
+    data:
+      text: |
+        # next is data directly from OSM
+
+  - type: text-api
+    data:
+      text: |
+        This data is sent to another server, which renders the component and then is included into the
+        generated page.

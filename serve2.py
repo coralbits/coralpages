@@ -6,10 +6,11 @@ from pathlib import Path
 from typing import Any
 import yaml
 from pe2.renderer.renderer import Renderer
-from pe2.types import ElementDefinition
+from pe2.types import BlockDefinition, ElementDefinition
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import RedirectResponse, Response
+from fastapi.requests import Request
 
 
 def create_app(args: argparse.Namespace):
@@ -54,6 +55,36 @@ def create_app(args: argparse.Namespace):
         return Response(
             content=json.dumps(elements_dict), media_type="application/json"
         )
+
+    @app.get("/api/v1/element/{element_name}/html")
+    async def read_element_html(request: Request, element_name: str):
+        data = request.query_params
+
+        block = BlockDefinition(
+            type=element_name,
+            data=data,
+            children=[],
+            style={},
+        )
+        renderer = Renderer(config)
+        page = renderer.new_page()
+        html, _ = await renderer.render_block(page, block)
+        return Response(content=html, media_type="text/html")
+
+    @app.get("/api/v1/element/{element_name}/css")
+    async def read_element_css(request: Request, element_name: str):
+        data = request.query_params
+
+        block = BlockDefinition(
+            type=element_name,
+            data=data,
+            children=[],
+            style={},
+        )
+        renderer = Renderer(config)
+        page = renderer.new_page()
+        _, css = await renderer.render_block(page, block)
+        return Response(content=css, media_type="text/css")
 
     @app.get("/")
     def redirect_to_index():

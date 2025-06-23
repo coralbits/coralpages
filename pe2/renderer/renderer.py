@@ -70,6 +70,12 @@ class Renderer:
         self.loader = LoaderFactory(config=config)
         self.page = None
 
+    def new_page(self) -> RenderedPage:
+        """
+        Create a new page.
+        """
+        return RenderedPage(title="")
+
     async def render_page(self, page_name: str) -> str:
         """
         Render a page asynchronously.
@@ -77,41 +83,42 @@ class Renderer:
         page = self.loader.load_page(page_name)
         return await self.render(page)
 
-    async def render(self, page: PageDefinition) -> str:
+    async def render(self, page_def: PageDefinition) -> str:
         """
         Render a page asynchronously.
         """
-        self.page = RenderedPage(title=page.title)
+        page = self.new_page()
+        page.title = page_def.title
 
-        await self.render_page_data(page)
-        if page.template:
-            await self.render_in_template(page.template)
+        await self.render_page_data(page, page_def)
+        if page_def.template:
+            await self.render_in_template(page, page_def.template)
 
-        page = self.page
-        self.page = None
         return page
 
-    async def render_page_data(self, page: PageDefinition) -> str:
+    async def render_page_data(
+        self, page: RenderedPage, page_def: PageDefinition
+    ) -> str:
         """
         Render the page data asynchronously.
         """
-        for block in page.data:
-            html, css = await self.render_block(block)
-            cid = self.page.get_current_id(block.type)
+        for block in page_def.data:
+            html, css = await self.render_block(page, block)
+            cid = page.get_current_id(block.type)
 
             if block.style:
                 css_id = f"#{cid}"
-                self.page.classes.update(
+                page.classes.update(
                     {css_id: f"{css_id} {{\n{css_dict_to_cs_text(block.style)} \n}}"}
                 )
             html = html.replace("@@class@@", cid)
             html = html.replace("@@id@@", cid)
 
             # add the css to the page and content
-            self.page.classes.update({block.type: css})
-            self.page.append_content(html)
+            page.classes.update({block.type: css})
+            page.append_content(html)
 
-    async def render_in_template(self, template_name: str) -> str:
+    async def render_in_template(self, page: RenderedPage, template_name: str) -> str:
         """
         Render the template asynchronously.
 
@@ -120,27 +127,25 @@ class Renderer:
         It is like rendering a page, but the previour content is set at the "children" elements.
         """
         template = self.loader.load_page(template_name)
-        self.page.context = {
-            **self.page.context,
-            "children": self.page.content,
+        page.context = {
+            **page.context,
+            "children": page.content,
         }
-        self.page.content = ""
-        await self.render_page_data(template)
+        page.content = ""
+        await self.render_page_data(page, template)
         if template.template:
-            await self.render_in_template(template.template)
+            await self.render_in_template(page, template.template)
 
-    async def render_block(self, block: BlockDefinition) -> tuple[str, dict[str, str]]:
+    async def render_block(
+        self, page: RenderedPage, block: BlockDefinition
+    ) -> tuple[str, dict[str, str]]:
         """
         Render a block asynchronously.
         """
         element_renderer = self.get_element_renderer(block.type)
 
-        html = await element_renderer.render_html(
-            data=block.data, context=self.page.context
-        )
-        css = await element_renderer.render_css(
-            data=block.data, context=self.page.context
-        )
+        html = await element_renderer.render_html(data=block.data, context=page.context)
+        css = await element_renderer.render_css(data=block.data, context=page.context)
 
         return html, css
 
@@ -156,14 +161,12 @@ class Renderer:
 
             return ElementRendererBuiltin(block=block)
 
-        if block.viewer.startswith("https://"):
+        if block.viewer.startswith("https://") or block.viewer.startswith("http://"):
             from pe2.renderer.http import ElementRendererHttp
 
             return ElementRendererHttp(block=block)
 
-        raise ValueError(
-            f"Unknown element type: {type_name}, known elements: {self.config['elements'].keys()}"
-        )
+        raise ValueError(f"Unknown element renderer type: {type_name}, {block.viewer}")
 
 
 def css_dict_to_cs_text(css: dict[str, str]) -> str:

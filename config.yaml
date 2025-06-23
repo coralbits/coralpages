@@ -44,5 +44,9 @@ elements:
     editor: builtin://children/editor.html
 
   # Examples,
-  - name: ipinfo
-    viewer: https://ipinfo.io/json
+  - name: text-api
+    description: |
+      Uses the API to render the text element. Noemally just use the builtin, but this proves
+      how to use the API to get an element from another server and render it.
+    viewer: http://localhost:8000/api/v1/element/text/html
+    css: http://localhost:8000/api/v1/element/text/css
