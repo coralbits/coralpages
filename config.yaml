@@ -1,13 +1,31 @@
+server:
+  port: 8000
+  host: 0.0.0.0
+  reload: true
+  directory:
+    - docs
+templates:
+  paths:
+    - ./templates/
+
+debug: true
+
 elements:
   - name: text
-    viewer: builtin://text/view.html
-    css: builtin://text/style.css
+    type: builtin
+    templating: jinja2 # this is the default, but it can be overridden for each element
+    viewer: text/view.html
+    css: text/style.css
     editor:
-      - id: text
-        type: rich-text
+      type: form
+      fields:
+        - id: text
+          type: rich-text
+
   - name: image
-    viewer: builtin://image/view.html
-    css: builtin://image/style.css
+    type: builtin
+    viewer: image/view.html
+    css: image/style.css
     editor:
       - id: image
         type: image
@@ -15,38 +33,48 @@ elements:
         maxSize: 10240000
         minSize: 1024
   - name: header
-    viewer: builtin://header/view.html
-    css: builtin://header/style.css
-    editor: builtin://header/editor.html
+    type: builtin
+    viewer: header/view.html
+    css: header/style.css
+    editor: header/editor.html
   - name: section
-    viewer: builtin://section/view.html
-    css: builtin://section/style.css
-    editor: builtin://section/editor.html
+    type: builtin
+    viewer: section/view.html
+    css: section/style.css
+    editor: section/editor.html
   - name: tag-cloud
-    viewer: builtin://tag-cloud/view.html
-    css: builtin://tag-cloud/style.css
-    editor: builtin://tag-cloud/editor.html
+    type: builtin
+    viewer: tag-cloud/view.html
+    css: tag-cloud/style.css
+    editor: tag-cloud/editor.html
   - name: paragraph
-    viewer: builtin://text/view.html
-    css: builtin://text/style.css
-    editor: builtin://text/editor.html
+    type: builtin
+    viewer: text/view.html
+    css: text/style.css
+    editor: text/editor.html
   - name: menu
-    viewer: builtin://menu/view.html
-    css: builtin://menu/style.css
-    editor: builtin://menu/editor.html
+    type: builtin
+    viewer: menu/view.html
+    css: menu/style.css
+    editor: menu/editor.html
   - name: markdown
-    viewer: builtin://markdown/view.html
-    css: builtin://markdown/style.css
-    editor: builtin://markdown/editor.html
+    type: builtin
+    viewer: markdown/view.html
+    css: markdown/style.css
+    editor: markdown/editor.html
   - name: children
-    viewer: builtin://children/view.html
-    css: builtin://children/style.css
-    editor: builtin://children/editor.html
+    type: builtin
+    viewer: children/view.html
+    css: children/style.css
+    editor: children/editor.html
 
   # Examples,
   - name: text-api
+    type: http
+    templating: none # no templating is used, just the raw HTML and CSS. But could be jinja2. Be sure you trust the source!
     description: |
       Uses the API to render the text element. Noemally just use the builtin, but this proves
       how to use the API to get an element from another server and render it.
+    method: GET
     viewer: http://localhost:8000/api/v1/element/text/html
     css: http://localhost:8000/api/v1/element/text/css

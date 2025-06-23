@@ -2,9 +2,9 @@ from typing import Any
 from pe.types import BlockDefinition
 
 
-class ElementRendererBase:
+class BlockRendererBase:
     """
-    Renderer for an element.
+    Renderer for a block.
 
     Specific renderers have other implementations.
     """
@@ -16,12 +16,12 @@ class ElementRendererBase:
         self, *, data: dict[str, Any], context: dict[str, Any]
     ) -> str:
         """
-        Render an element asynchronously.
+        Render a block.
         """
         raise NotImplementedError("Not implemented")
 
     async def render_css(self, *, data: dict[str, Any], context: dict[str, Any]) -> str:
         """
-        Render the CSS for an element asynchronously.
+        Render the CSS for a block.
         """
         raise NotImplementedError("Not implemented")

@@ -3,6 +3,7 @@
 import argparse
 import json
 from pathlib import Path
+import traceback
 from typing import Any
 import yaml
 from pe.renderer.renderer import Renderer
@@ -37,15 +38,29 @@ def create_app(args: argparse.Namespace):
     config = prepare_config()
 
     @app.get("/api/v1/view/{page_name}")
-    async def read_root(page_name: str):
-        if page_name == "index":
-            page_name = "builtin://index.yaml"
-        else:
-            page_name = f"builtin://{page_name}.yaml"
+    async def read_page(page_name: str):
+        if page_name.startswith("_") or ".." in page_name:
+            return Response(content="Forbidden", status_code=403)
 
-        renderer = Renderer(config)
-        page = await renderer.render_page(page_name)
-        return Response(content=str(page), media_type="text/html")
+        if page_name == "index":
+            page_name = "page://index"
+        else:
+            page_name = f"page://{page_name}"
+
+        try:
+            renderer = Renderer(config)
+            page = await renderer.render_page(page_name)
+            return Response(content=str(page), media_type="text/html")
+        except Exception:  # pylint: disable=broad-exception-caught
+            traceback.print_exc()
+            if config.get("debug", False):
+                exception_str = traceback.format_exc()
+                return Response(
+                    content=f"Internal Server Error: {exception_str}",
+                    status_code=500,
+                )
+            else:
+                return Response(content="Internal Server Error", status_code=500)
 
     @app.get("/api/v1/element/")
     def list_known_elements():
@@ -118,7 +133,7 @@ app = create_app(parse_args())
 
 def main():
     opts = parse_args()
-    uvicorn.run("serve2:app", host=opts.host, port=opts.port, reload=opts.reload)
+    uvicorn.run("serve:app", host=opts.host, port=opts.port, reload=opts.reload)
 
 
 if __name__ == "__main__":

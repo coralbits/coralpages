@@ -1,11 +1,11 @@
 title: "API get example"
-template: "builtin://_default.yaml"
+template: "page://_default"
 
 data:
   - type: markdown
     data:
       text: |
-        # next is data directly from OSM
+        # next is data directly from an external API
 
   - type: text-api
     data:

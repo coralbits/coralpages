@@ -31,11 +31,9 @@ class ElementRendererBuiltin(BlockRendererBase):
         """
         Render a built-in element asynchronously using jinja2.
 
-        The component is defined in the config as "block/block.html".
-
-        The templating system already takes care of the base dir.
+        The component is defined in the config as "builtin://templates/block/block.html"
         """
-        template = jinja_env.get_template(self.block.viewer)
+        template = jinja_env.get_template(self.block.viewer[10:])
         return template.render(
             block=self.block,
             data=data,
@@ -46,7 +44,7 @@ class ElementRendererBuiltin(BlockRendererBase):
         """
         Render the CSS for a built-in element asynchronously.
         """
-        template = jinja_env.get_template(self.block.css)
+        template = jinja_env.get_template(self.block.css[10:])
         css = template.render(
             block=self.block,
             data=data,

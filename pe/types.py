@@ -72,9 +72,10 @@ class ElementDefinition:
     """
 
     name: str
-    viewer: str
-    editor: str | list[FieldDefinition]
-    css: str
+    type: str
+    viewer: str | None
+    editor: str | list[FieldDefinition] | None
+    css: str | None
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -83,7 +84,8 @@ class ElementDefinition:
         """
         return cls(
             name=data["name"],
-            viewer=data["viewer"],
+            type=data["type"],
+            viewer=data.get("viewer", None),
             editor=None,  # TODO: add editor
             css=data.get("css", None),
         )
@@ -102,6 +104,7 @@ class ElementDefinition:
 
         return {
             "name": self.name,
+            "type": self.type,
             "viewer": self.viewer,
             "editor": editor_data,
             "css": self.css,

@@ -3,7 +3,7 @@ from functools import lru_cache
 from typing import Any
 
 from pe.loader import LoaderFactory
-from pe.renderer.types import ElementRendererBase
+from pe.renderer.types import BlockRendererBase
 from pe.types import BlockDefinition, PageDefinition
 
 
@@ -79,7 +79,7 @@ class Renderer:
         """
         Render a page asynchronously.
         """
-        page = self.loader.load_page(page_name)
+        page = self.loader.load(page_name)
         return await self.render(page)
 
     async def render(self, page_def: PageDefinition) -> str:
@@ -126,8 +126,16 @@ class Renderer:
         It assumes that in the page.data there is already all the data rendered.
 
         It is like rendering a page, but the previour content is set at the "children" elements.
+
+        Template names use a simplified syntax: type://resource.
+
+        Where types are the normal types around the app:
+         - http
+         - page
+
+        From it it composes a new definition and sets the viewer as the full string.
         """
-        template_def = self.loader.load_page(template_name)
+        template_def = self.loader.load(template_name)
         page.context = {
             **page.context,
             "children": page.content,
@@ -145,7 +153,7 @@ class Renderer:
         """
         Render a block asynchronously.
         """
-        element_renderer = self.get_element_renderer(block.type)
+        element_renderer = self.get_block_renderer(block.type)
 
         html = await element_renderer.render_html(data=block.data, context=page.context)
         css = await element_renderer.render_css(data=block.data, context=page.context)
@@ -153,23 +161,22 @@ class Renderer:
         return html, css
 
     @lru_cache(maxsize=100)
-    def get_element_renderer(self, type_name: str) -> ElementRendererBase:
+    def get_block_renderer(self, type_name: str) -> BlockRendererBase:
         """
-        Get an element renderer.
+        Get a block renderer.
         """
-        block = self.loader.load_element_definition(type_name)
+        block = self.config["elements"][type_name]
 
-        if block.viewer.startswith("builtin://"):
+        if block.type == "builtin":
             from pe.renderer.builtin import ElementRendererBuiltin
 
             return ElementRendererBuiltin(block=block)
-
-        if block.viewer.startswith("https://") or block.viewer.startswith("http://"):
+        elif block.type == "http":
             from pe.renderer.http import ElementRendererHttp
 
             return ElementRendererHttp(block=block)
 
-        raise ValueError(f"Unknown element renderer type: {type_name}, {block.viewer}")
+        raise ValueError(f"Unknown block renderer type: {type_name}, {block.viewer}")
 
 
 def css_dict_to_cs_text(css: dict[str, str]) -> str:

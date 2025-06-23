@@ -1,9 +1,9 @@
 from typing import Any
 import httpx
-from pe.renderer.types import ElementRendererBase
+from pe.renderer.types import BlockRendererBase
 
 
-class ElementRendererHttp(ElementRendererBase):
+class ElementRendererHttp(BlockRendererBase):
     """
     Renderer for HTTP elements.
     """

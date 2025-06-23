@@ -1,7 +1,7 @@
 # Editor Interface Documentation
 
 title: "Editor Interface"
-template: "builtin://_default.yaml"
+template: "page://_default"
 
 data:
   - type: header

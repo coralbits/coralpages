@@ -1,7 +1,7 @@
 # Getting Started with Coralbits Page Editor
 
 title: "Getting Started"
-template: "builtin://_default.yaml"
+template: "page://_default"
 
 data:
   - type: header
