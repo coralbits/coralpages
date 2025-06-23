@@ -70,33 +70,33 @@ class Renderer:
         self.loader = LoaderFactory(config=config)
         self.page = None
 
-    def render_page(self, page_name: str) -> str:
+    async def render_page(self, page_name: str) -> str:
         """
-        Render a page.
+        Render a page asynchronously.
         """
         page = self.loader.load_page(page_name)
-        return self.render(page)
+        return await self.render(page)
 
-    def render(self, page: PageDefinition) -> str:
+    async def render(self, page: PageDefinition) -> str:
         """
-        Render a page.
+        Render a page asynchronously.
         """
         self.page = RenderedPage(title=page.title)
 
-        self.render_page_data(page)
+        await self.render_page_data(page)
         if page.template:
-            self.render_in_template(page.template)
+            await self.render_in_template(page.template)
 
         page = self.page
         self.page = None
         return page
 
-    def render_page_data(self, page: PageDefinition) -> str:
+    async def render_page_data(self, page: PageDefinition) -> str:
         """
-        Render the page data.
+        Render the page data asynchronously.
         """
         for block in page.data:
-            html, css = self.render_block(block)
+            html, css = await self.render_block(block)
             cid = self.page.get_current_id(block.type)
 
             if block.style:
@@ -111,9 +111,9 @@ class Renderer:
             self.page.classes.update({block.type: css})
             self.page.append_content(html)
 
-    def render_in_template(self, template_name: str) -> str:
+    async def render_in_template(self, template_name: str) -> str:
         """
-        Render the template.
+        Render the template asynchronously.
 
         It assumes that in the page.data there is already all the data rendered.
 
@@ -125,18 +125,22 @@ class Renderer:
             "children": self.page.content,
         }
         self.page.content = ""
-        self.render_page_data(template)
+        await self.render_page_data(template)
         if template.template:
-            self.render_in_template(template.template)
+            await self.render_in_template(template.template)
 
-    def render_block(self, block: BlockDefinition) -> tuple[str, dict[str, str]]:
+    async def render_block(self, block: BlockDefinition) -> tuple[str, dict[str, str]]:
         """
-        Render a block.
+        Render a block asynchronously.
         """
         element_renderer = self.get_element_renderer(block.type)
 
-        html = element_renderer.render_html(data=block.data, context=self.page.context)
-        css = element_renderer.render_css(data=block.data, context=self.page.context)
+        html = await element_renderer.render_html(
+            data=block.data, context=self.page.context
+        )
+        css = await element_renderer.render_css(
+            data=block.data, context=self.page.context
+        )
 
         return html, css
 
@@ -147,12 +151,19 @@ class Renderer:
         """
         block = self.loader.load_element_definition(type_name)
 
-        if block.viewer.startswith("builtin:"):
+        if block.viewer.startswith("builtin://"):
             from pe2.renderer.builtin import ElementRendererBuiltin
 
             return ElementRendererBuiltin(block=block)
 
-        raise ValueError(f"Unknown element type: {type_name}")
+        if block.viewer.startswith("https://"):
+            from pe2.renderer.http import ElementRendererHttp
+
+            return ElementRendererHttp(block=block)
+
+        raise ValueError(
+            f"Unknown element type: {type_name}, known elements: {self.config['elements'].keys()}"
+        )
 
 
 def css_dict_to_cs_text(css: dict[str, str]) -> str:

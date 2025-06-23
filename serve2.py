@@ -1,6 +1,7 @@
 #!/usr/bin/env -S uv run --script
 
 import argparse
+import json
 from pathlib import Path
 from typing import Any
 import yaml
@@ -35,15 +36,24 @@ def create_app(args: argparse.Namespace):
     config = prepare_config()
 
     @app.get("/api/v1/view/{page_name}")
-    def read_root(page_name: str):
+    async def read_root(page_name: str):
         if page_name == "index":
             page_name = "builtin://index.yaml"
         else:
             page_name = f"builtin://{page_name}.yaml"
 
         renderer = Renderer(config)
-        page = renderer.render_page(page_name)
+        page = await renderer.render_page(page_name)
         return Response(content=str(page), media_type="text/html")
+
+    @app.get("/api/v1/element/")
+    def list_known_elements():
+        elements_dict = {
+            name: element.to_dict() for name, element in config["elements"].items()
+        }
+        return Response(
+            content=json.dumps(elements_dict), media_type="application/json"
+        )
 
     @app.get("/")
     def redirect_to_index():

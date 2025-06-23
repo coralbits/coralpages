@@ -84,6 +84,25 @@ class ElementDefinition:
         return cls(
             name=data["name"],
             viewer=data["viewer"],
-            editor=data["editor"],
-            css=data["css"],
+            editor=None,  # TODO: add editor
+            css=data.get("css", None),
         )
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert the element definition to a JSON-serializable dictionary.
+        """
+        editor_data = self.editor
+        if isinstance(editor_data, list):
+            # Convert FieldDefinition objects to dictionaries
+            editor_data = [
+                {"name": field.name, "type": field.type, "value": field.value}
+                for field in editor_data
+            ]
+
+        return {
+            "name": self.name,
+            "viewer": self.viewer,
+            "editor": editor_data,
+            "css": self.css,
+        }

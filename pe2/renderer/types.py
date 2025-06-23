@@ -12,14 +12,16 @@ class ElementRendererBase:
     def __init__(self, *, block: BlockDefinition):
         self.block = block
 
-    def render_html(self, *, data: dict[str, Any], context: dict[str, Any]) -> str:
+    async def render_html(
+        self, *, data: dict[str, Any], context: dict[str, Any]
+    ) -> str:
         """
-        Render an element.
+        Render an element asynchronously.
         """
         raise NotImplementedError("Not implemented")
 
-    def render_css(self, *, data: dict[str, Any], context: dict[str, Any]) -> str:
+    async def render_css(self, *, data: dict[str, Any], context: dict[str, Any]) -> str:
         """
-        Render the CSS for an element.
+        Render the CSS for an element asynchronously.
         """
         raise NotImplementedError("Not implemented")

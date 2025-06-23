@@ -25,9 +25,11 @@ class ElementRendererBuiltin(ElementRendererBase):
         """
         super().__init__(block=block)
 
-    def render_html(self, *, data: dict[str, Any], context: dict[str, Any]) -> str:
+    async def render_html(
+        self, *, data: dict[str, Any], context: dict[str, Any]
+    ) -> str:
         """
-        Render a built-in element. using jinja2.
+        Render a built-in element asynchronously using jinja2.
 
         The component is defined in the config as "builtin://templates/block/block.html"
         """
@@ -38,9 +40,9 @@ class ElementRendererBuiltin(ElementRendererBase):
             context=context,
         )
 
-    def render_css(self, *, data: dict[str, Any], context: dict[str, Any]) -> str:
+    async def render_css(self, *, data: dict[str, Any], context: dict[str, Any]) -> str:
         """
-        Render the CSS for a built-in element.
+        Render the CSS for a built-in element asynchronously.
         """
         template = jinja_env.get_template(self.block.css[10:])
         css = template.render(
@@ -48,5 +50,4 @@ class ElementRendererBuiltin(ElementRendererBase):
             data=data,
             context=context,
         )
-
         return css

@@ -42,11 +42,7 @@ elements:
     viewer: builtin://children/view.html
     css: builtin://children/style.css
     editor: builtin://children/editor.html
-  - name: __error__
-    viewer: builtin://error/view.html
-    css: builtin://error/style.css
-    editor: builtin://error/editor.html
-  - name: div
-    viewer: builtin://div/view.html
-    css: builtin://div/style.css
-    editor: builtin://div/editor.html
+
+  # Examples,
+  - name: ipinfo
+    viewer: https://ipinfo.io/json
