@@ -7,6 +7,26 @@ from pe.types import ElementDefinition
 
 
 @dataclass
+class ServerConfig:
+    """
+    The server configuration.
+    """
+
+    port: int = 8000
+    host: str = "0.0.0.0"
+    reload: bool = False
+    directory: list[Path] = field(default_factory=list)
+    etag_salt: str = "%Y-%m-%d"
+
+    @staticmethod
+    def from_dict(data: dict) -> Self:
+        """
+        Load the server configuration from a dictionary.
+        """
+        return ServerConfig(**data)
+
+
+@dataclass
 class Config:
     """
     The configuration for the page editor.
@@ -15,6 +35,7 @@ class Config:
     page_path: Path = field(default_factory=Path)
     elements: dict[str, ElementDefinition] = field(default_factory=dict)
     debug: bool = False
+    server: ServerConfig = field(default_factory=ServerConfig)
 
     @staticmethod
     def read(path: str) -> Self:
@@ -37,4 +58,5 @@ class Config:
                 element["name"]: ElementDefinition.from_dict(element)
                 for element in data.get("elements", [])
             },
+            server=ServerConfig.from_dict(data.get("server", {})),
         )

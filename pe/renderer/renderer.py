@@ -1,10 +1,16 @@
+import datetime
+import logging
 from dataclasses import dataclass, field
 from functools import lru_cache
+import hashlib
+import json
 from typing import Any
 
 from pe.loader import LoaderFactory
 from pe.renderer.types import BlockRendererBase
 from pe.types import BlockDefinition, PageDefinition
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -23,6 +29,8 @@ class RenderedPage:
     classes: dict[str, str] = field(default_factory=dict)
     max_id: int = 1
     context: dict[str, Any] = field(default_factory=dict)
+    headers: dict[str, str] = field(default_factory=dict)
+    response_code: int = 200
 
     def append_content(self, content: str):
         """
@@ -41,6 +49,9 @@ class RenderedPage:
         """
         Render the page as a string.
         """
+        if self.response_code == 304:
+            return ""
+
         css = "\n".join(self.classes.values())
         content = self.content
         title = self.title
@@ -75,14 +86,43 @@ class Renderer:
         """
         return RenderedPage(title="")
 
-    async def render_page(self, page_name: str) -> str:
+    async def render_page(
+        self, page_name: str, *, headers: dict[str, str] = {}
+    ) -> RenderedPage:
         """
         Render a page asynchronously.
-        """
-        page = self.loader.load(page_name)
-        return await self.render(page)
 
-    async def render(self, page_def: PageDefinition) -> str:
+        Might use headers to check caches and so on
+        """
+        page_definition = self.loader.load(page_name)
+        new_etag = None
+        if "etag" in page_definition.cache:
+            old_etag = headers.get("If-None-Match")
+            new_etag = self.calculate_etag(page_definition)
+            logger.debug(f"Old etag: %s, new etag: %s", old_etag, new_etag)
+            if old_etag == new_etag:
+                page = self.new_page()
+                page.headers["ETag"] = old_etag
+                page.response_code = 304
+                return page
+
+        page = await self.render(page_definition)
+        if new_etag:
+            page.headers["ETag"] = new_etag
+        return page
+
+    def calculate_etag(self, page_definition: PageDefinition) -> str:
+        """
+        Calculate the etag for a page definition.
+        """
+        salt = datetime.datetime.now().strftime(self.config.server.etag_salt)
+
+        return hashlib.sha256(
+            json.dumps(page_definition.to_dict(), sort_keys=True).encode()
+            + salt.encode()
+        ).hexdigest()
+
+    async def render(self, page_def: PageDefinition) -> RenderedPage:
         """
         Render a page asynchronously.
         """

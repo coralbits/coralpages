@@ -32,7 +32,7 @@ def create_app(args: argparse.Namespace):
     config = prepare_config()
 
     @app.get("/api/v1/view/{page_name}")
-    async def read_page(page_name: str):
+    async def read_page(request: Request, page_name: str):
         if page_name.startswith("_") or ".." in page_name:
             return Response(content="Forbidden", status_code=403)
 
@@ -43,8 +43,13 @@ def create_app(args: argparse.Namespace):
 
         try:
             renderer = Renderer(config)
-            page = await renderer.render_page(page_name)
-            return Response(content=str(page), media_type="text/html")
+            page = await renderer.render_page(page_name, headers=request.headers)
+            return Response(
+                content=str(page),
+                media_type="text/html",
+                status_code=page.response_code,
+                headers=page.headers,
+            )
         except Exception:  # pylint: disable=broad-exception-caught
             traceback.print_exc()
             if config.debug:

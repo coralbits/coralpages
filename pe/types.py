@@ -3,7 +3,7 @@ Types for the page editor.
 """
 
 from typing import Any, Self
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -31,6 +31,17 @@ class BlockDefinition:
             style=data.get("style", {}),
         )
 
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert the block definition to a JSON-serializable dictionary.
+        """
+        return {
+            "type": self.type,
+            "data": self.data,
+            "children": [child.to_dict() for child in self.children],
+            "style": self.style,
+        }
+
 
 @dataclass
 class PageDefinition:
@@ -41,6 +52,7 @@ class PageDefinition:
     title: str
     template: str
     data: list[BlockDefinition]
+    cache: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -51,7 +63,19 @@ class PageDefinition:
             title=data["title"],
             template=data["template"],
             data=[BlockDefinition.from_dict(block) for block in data["data"]],
+            cache=data.get("cache", []),
         )
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert the page definition to a JSON-serializable dictionary.
+        """
+        return {
+            "title": self.title,
+            "template": self.template,
+            "cache": self.cache,
+            "data": [block.to_dict() for block in self.data],
+        }
 
 
 @dataclass
