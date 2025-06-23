@@ -5,6 +5,7 @@ Loaders for the page editor.
 from pathlib import Path
 
 import yaml
+from pe.config import Config
 from pe.types import BlockDefinition, PageDefinition
 
 
@@ -23,7 +24,7 @@ class LoaderFactory:
 
     file_loader: LoaderBase = None
 
-    def __init__(self, config: dict[str, str]):
+    def __init__(self, config: Config):
         self.config = config
 
     def load(self, path: str) -> PageDefinition:
@@ -40,7 +41,7 @@ class LoaderFactory:
         Get the file loader.
         """
         if not self.file_loader:
-            self.file_loader = FileLoader(self.config["page_path"])
+            self.file_loader = FileLoader(self.config.page_path)
         return self.file_loader
 
 
@@ -49,8 +50,8 @@ class FileLoader(LoaderBase):
     Load a page from a file.
     """
 
-    def __init__(self, base_path: str):
-        self.base_path = Path(base_path)
+    def __init__(self, base_path: Path):
+        self.base_path = base_path
 
     def load(self, path: str) -> PageDefinition:
         path = f"{path}.yaml"

@@ -165,7 +165,7 @@ class Renderer:
         """
         Get a block renderer.
         """
-        block = self.config["elements"][type_name]
+        block = self.config.elements[type_name]
 
         if block.type == "builtin":
             from pe.renderer.builtin import ElementRendererBuiltin

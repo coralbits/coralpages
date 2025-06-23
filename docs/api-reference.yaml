@@ -2,6 +2,9 @@
 
 title: "API Reference"
 template: "page://_default"
+cache:
+  - etag
+  - last-modified
 
 data:
   - type: header

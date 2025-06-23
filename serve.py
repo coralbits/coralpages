@@ -6,6 +6,7 @@ from pathlib import Path
 import traceback
 from typing import Any
 import yaml
+from pe.config import Config
 from pe.renderer.renderer import Renderer
 from pe.types import BlockDefinition, ElementDefinition
 import uvicorn
@@ -20,20 +21,13 @@ def create_app(args: argparse.Namespace):
     """
     app = FastAPI()  # type: ignore
 
-    def prepare_config() -> dict[str, Any]:
+    def prepare_config() -> Config:
         """
         Prepare the config for the renderer.
         """
-        with open("config.yaml", "rt", encoding="utf-8") as fd:
-            config_dict = yaml.safe_load(fd)
-
-        return {
-            "page_path": Path(args.directory),
-            "elements": {
-                element["name"]: ElementDefinition.from_dict(element)
-                for element in config_dict["elements"]
-            },
-        }
+        config = Config.read("config.yaml")
+        config.page_path = Path(args.directory)
+        return config
 
     config = prepare_config()
 
@@ -53,7 +47,7 @@ def create_app(args: argparse.Namespace):
             return Response(content=str(page), media_type="text/html")
         except Exception:  # pylint: disable=broad-exception-caught
             traceback.print_exc()
-            if config.get("debug", False):
+            if config.debug:
                 exception_str = traceback.format_exc()
                 return Response(
                     content=f"Internal Server Error: {exception_str}",
