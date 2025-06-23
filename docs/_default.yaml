@@ -40,6 +40,8 @@ data:
           link: "./examples"
         - label: "Architecture"
           link: "./architecture"
+        - label: "External API"
+          link: "./external-api"
     style:
       background: #f8f9fa
       border-radius: 8px
