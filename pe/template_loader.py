@@ -77,12 +77,13 @@ class TemplateLoader:
         # Process template elements and replace children placeholders
         merged_elements = []
         for element in template_elements:
-            if element.get("type") == "children":
-                # Replace children placeholder with actual page data
-                merged_elements.extend(page.data)
+            # Convert template element to PageElement and process its children
+            processed_element = self._process_template_element(element, page.data)
+            # Check if this is a children placeholder
+            if processed_element.type == "__children_placeholder__":
+                # Replace with the page data
+                merged_elements.extend(processed_element.children)
             else:
-                # Convert template element to PageElement and process its children
-                processed_element = self._process_template_element(element, page.data)
                 merged_elements.append(processed_element)
 
         return merged_elements
@@ -91,6 +92,17 @@ class TemplateLoader:
         self, element_data: Dict[str, Any], page_data: list[PageElement]
     ) -> PageElement:
         """Process a template element, replacing children placeholders."""
+        # Handle children type as a special case
+        if element_data.get("type") == "children":
+            # Create a dummy element that will be replaced with page data
+            # We'll use a special marker to identify this
+            return PageElement(
+                type="__children_placeholder__",
+                data={},
+                children=page_data,  # Store page data in children
+                style=None,
+            )
+
         # Create a copy of element_data without children for initial conversion
         element_data_copy = element_data.copy()
         original_children = element_data_copy.pop("children", [])

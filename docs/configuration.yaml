@@ -1,5 +1,8 @@
 # Configuration Documentation
 
+title: "Configuration"
+template: "default"
+
 data:
   - type: header
     data:

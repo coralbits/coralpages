@@ -1,0 +1,6 @@
+<div class="error-placeholder" style="border: 2px solid red; padding: 10px; margin: 10px; background: #ffe6e6;">
+    Error: {{ data.error if data.error else "Unknown error" }}
+    {% if data.original_type %}
+    <br><small>Original type: {{ data.original_type }}</small>
+    {% endif %}
+</div>

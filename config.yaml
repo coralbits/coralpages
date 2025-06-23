@@ -38,3 +38,15 @@ elements:
     viewer: builtin://markdown/view.html
     css: builtin://markdown/style.css
     editor: builtin://markdown/editor.html
+  - name: children
+    viewer: builtin://children/view.html
+    css: builtin://children/style.css
+    editor: builtin://children/editor.html
+  - name: __error__
+    viewer: builtin://error/view.html
+    css: builtin://error/style.css
+    editor: builtin://error/editor.html
+  - name: div
+    viewer: builtin://div/view.html
+    css: builtin://div/style.css
+    editor: builtin://div/editor.html

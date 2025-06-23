@@ -14,7 +14,7 @@ class PageElement:
     def __from_dict__(cls, data: dict):
         return cls(
             type=data["type"],
-            data=data["data"],
+            data=data.get("data", {}),
             children=[cls.__from_dict__(x) for x in data.get("children", [])],
             style=data.get("style"),
         )

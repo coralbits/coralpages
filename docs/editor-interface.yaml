@@ -1,5 +1,8 @@
 # Editor Interface Documentation
 
+title: "Editor Interface"
+template: "default"
+
 data:
   - type: header
     data:

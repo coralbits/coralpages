@@ -1,5 +1,8 @@
 # Examples Documentation
 
+title: "Examples"
+template: "default"
+
 data:
   - type: header
     data:

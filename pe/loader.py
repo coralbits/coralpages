@@ -36,6 +36,13 @@ class ElementLoader:
         pass
 
     def render_element(self, element: PageElement, context: dict, css_class: str = ""):
+        # Debug print to show available element types
+        if not hasattr(self, "_printed_element_types"):
+            print(f"DEBUG: Available element types: {list(element_definitions.keys())}")
+            self._printed_element_types = True
+        print(
+            f"DEBUG: Rendering element type: {element.type}, children count: {len(element.children) if hasattr(element, 'children') else 'N/A'}"
+        )
         element_definition = element_definitions.get(element.type)
         if not element_definition:
             raise ValueError(f"Element type {element.type} not found")
@@ -43,13 +50,47 @@ class ElementLoader:
         viewer = element_definition.viewer
 
         if viewer.startswith("builtin://"):
-            # Process children with their own CSS classes
-            children = PEList(
-                [
-                    self.render_element(child, context, getattr(child, "css_class", ""))
-                    for child in element.children
-                ]
-            )
+            # Special handling for children type
+            if element.type == "children":
+                # For children type, render children from context
+                children_from_context = context.get("children", [])
+                children = PEList(
+                    [
+                        self.render_element(
+                            child, context, getattr(child, "css_class", "")
+                        )
+                        for child in children_from_context
+                    ]
+                )
+            # Special handling for div passthrough
+            elif element.type == "div":
+                # Render children as HTML, passthrough
+                children = PEList(
+                    [
+                        self.render_element(
+                            child, context, getattr(child, "css_class", "")
+                        )
+                        for child in element.children
+                    ]
+                )
+                # Render the div template with its children
+                return self.render_builtin_element(
+                    type=viewer[10:],
+                    element=element,
+                    context=context,
+                    children=children,
+                    css_class=css_class,
+                )
+            else:
+                # Process children with their own CSS classes
+                children = PEList(
+                    [
+                        self.render_element(
+                            child, context, getattr(child, "css_class", "")
+                        )
+                        for child in element.children
+                    ]
+                )
             return self.render_builtin_element(
                 type=viewer[10:],
                 element=element,

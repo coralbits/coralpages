@@ -1,0 +1,8 @@
+<!-- Error element editor -->
+<div class="error-editor">
+    <p>This element represents an error that occurred during rendering.</p>
+    <p>Error: {{ data.error if data.error else "Unknown error" }}</p>
+    {% if data.original_type %}
+    <p>Original type: {{ data.original_type }}</p>
+    {% endif %}
+</div>

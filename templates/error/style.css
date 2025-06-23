@@ -1,0 +1,8 @@
+/* Error element styles */
+.error-placeholder {
+    border: 2px solid red;
+    padding: 10px;
+    margin: 10px;
+    background: #ffe6e6;
+    color: #cc0000;
+}

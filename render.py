@@ -1,10 +1,9 @@
 #!/usr/bin/env -S uv run --script
 import argparse
 from pe.page import YamlLoader
-from pe.renderer import Renderer
+from pe.renderer import Renderer, TemplateLoader
 from pe.loader import ElementLoader
 from pe.adapters import BuiltinCSSLoader
-from pe.template_loader import TemplateLoader
 
 
 def parse_args():

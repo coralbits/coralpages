@@ -1,4 +1,6 @@
 # Architecture Documentation
+title: "Architecture"
+template: "default"
 
 data:
   - type: header
