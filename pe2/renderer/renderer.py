@@ -68,7 +68,6 @@ class Renderer:
         """
         self.config = config
         self.loader = LoaderFactory(config=config)
-        self.page = None
 
     def new_page(self) -> RenderedPage:
         """
@@ -90,14 +89,14 @@ class Renderer:
         page = self.new_page()
         page.title = page_def.title
 
-        await self.render_page_data(page, page_def)
+        await self.render_page_data(page=page, page_def=page_def)
         if page_def.template:
-            await self.render_in_template(page, page_def.template)
+            await self.render_in_template(page=page, template_name=page_def.template)
 
         return page
 
     async def render_page_data(
-        self, page: RenderedPage, page_def: PageDefinition
+        self, *, page: RenderedPage, page_def: PageDefinition
     ) -> str:
         """
         Render the page data asynchronously.
@@ -118,7 +117,9 @@ class Renderer:
             page.classes.update({block.type: css})
             page.append_content(html)
 
-    async def render_in_template(self, page: RenderedPage, template_name: str) -> str:
+    async def render_in_template(
+        self, *, page: RenderedPage, template_name: str
+    ) -> str:
         """
         Render the template asynchronously.
 
@@ -126,15 +127,17 @@ class Renderer:
 
         It is like rendering a page, but the previour content is set at the "children" elements.
         """
-        template = self.loader.load_page(template_name)
+        template_def = self.loader.load_page(template_name)
         page.context = {
             **page.context,
             "children": page.content,
         }
         page.content = ""
-        await self.render_page_data(page, template)
-        if template.template:
-            await self.render_in_template(page, template.template)
+        await self.render_page_data(page=page, page_def=template_def)
+        if template_def.template:
+            await self.render_in_template(
+                page=page, template_name=template_def.template
+            )
 
     async def render_block(
         self, page: RenderedPage, block: BlockDefinition

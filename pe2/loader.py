@@ -5,7 +5,7 @@ Loaders for the page editor.
 from pathlib import Path
 
 import yaml
-from pe2.types import BlockDefinition, ElementDefinition, PageDefinition
+from pe2.types import ElementDefinition, PageDefinition
 
 
 class LoaderBase:
