@@ -27,7 +27,7 @@ class LoaderFactory:
     Depending on URLs will use another loader. This is the generic one.
     """
 
-    file_loader: LoaderBase
+    file_loader: LoaderBase = None
 
     def __init__(self, config: dict[str, str]):
         self.config = config

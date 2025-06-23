@@ -1,3 +1,4 @@
+import re
 from typing import Any
 
 import jinja2
@@ -24,11 +25,11 @@ class ElementRendererBuiltin(ElementRendererBase):
         """
         super().__init__(block=block)
 
-    def render(self, *, data: dict[str, Any], context: dict[str, Any]) -> str:
+    def render_html(self, *, data: dict[str, Any], context: dict[str, Any]) -> str:
         """
         Render a built-in element. using jinja2.
 
-        The component is defined in the config as "builtin:templates/block/block.html"
+        The component is defined in the config as "builtin://templates/block/block.html"
         """
         template = jinja_env.get_template(self.block.viewer[10:])
         return template.render(
@@ -36,3 +37,16 @@ class ElementRendererBuiltin(ElementRendererBase):
             data=data,
             context=context,
         )
+
+    def render_css(self, *, data: dict[str, Any], context: dict[str, Any]) -> str:
+        """
+        Render the CSS for a built-in element.
+        """
+        template = jinja_env.get_template(self.block.css[10:])
+        css = template.render(
+            block=self.block,
+            data=data,
+            context=context,
+        )
+
+        return css

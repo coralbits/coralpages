@@ -9,7 +9,7 @@ data:
     data:
       text: "Coralbits Page Editor Documentation"
     style:
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
       color: white
       font-size: 32px
       font-weight: bold
@@ -18,7 +18,7 @@ data:
       margin: 0
       border-radius: 0
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
-  
+
   - type: menu
     data:
       items:
@@ -47,9 +47,9 @@ data:
       max-width: 1200px
       padding: 20px
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
-  
+
   - type: children
-  
+
   - type: section
     data:
       text: "(C) 2025 Coralbits"
