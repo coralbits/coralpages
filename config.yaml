@@ -61,21 +61,8 @@ stores:
     tags:
       - pages
       - templates
-      - post:json
-      # - get:qs
+      # - post:json
+      - get:qs
   - name: db
     type: db
     url: sqlite://./data/pe.db
-
-elements:
-  # Examples,
-  - name: text-api
-    description: |
-      Uses the API to render the text element. Normally just use the builtin, but this proves
-      how to use the API to get an element from another server and render it.
-    store: http
-    method: GET
-    html: text/html
-    css: text/css
-    tags:
-      - data_at_query

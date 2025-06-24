@@ -2,12 +2,15 @@
 HTTP store implementation.
 """
 
+import logging
 from typing import Any
 from urllib.parse import urlencode
 import httpx
 
 from pe.stores.types import StoreBase
-from pe.types import PageDefinition, ElementDefinition, StoreConfig
+from pe.types import StoreConfig
+
+logger = logging.getLogger(__name__)
 
 
 class HttpStore(StoreBase):
@@ -19,13 +22,24 @@ class HttpStore(StoreBase):
         super().__init__(config)
         self.base_url = config.base_url or ""
 
-    def _build_url(self, path: str) -> str:
+    def _build_url(self, path: str, type: str = "") -> str:
         """
         Build the full URL for a path.
         """
-        if path.startswith("http"):
-            return path
-        return f"{self.base_url.rstrip('/')}/{path.lstrip('/')}"
+        path = self.clean_path(path)
+
+        if self.base_url:
+            if path.startswith("http://") or path.startswith("https://"):
+                raise ValueError(
+                    f"Can not use bare URLs ({path}), they have to be relative to {self.base_url}"
+                )
+
+            path = self.base_url.rstrip("/") + "/" + path.lstrip("/")
+
+        if type:
+            path = f"{path}/{type}"
+
+        return path
 
     async def load_html(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]
@@ -33,8 +47,8 @@ class HttpStore(StoreBase):
         """
         Load a page from the HTTP store.
         """
-        url = self._build_url(f"{path}.yaml")
-        return await self.load_generic(path=url, data=data, context=context)
+        url = self._build_url(path, "html")
+        return await self.load_generic(url=url, data=data, context=context)
 
     async def load_css(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]
@@ -42,16 +56,17 @@ class HttpStore(StoreBase):
         """
         Load a CSS file from the HTTP store.
         """
-        url = self._build_url(path)
-        return await self.load_generic(path=url, data=data, context=context)
+        url = self._build_url(path, "css")
+        return await self.load_generic(url=url, data=data, context=context)
 
     async def load_generic(
-        self, *, path: str, data: dict[str, Any], context: dict[str, Any]
+        self, *, url: str, data: dict[str, Any], context: dict[str, Any]
     ) -> str | None:
         """
         Load a generic file from the HTTP store.
         """
-        url = self._build_url(path)
+        logger.debug("Loading %s", url)
+
         if "post:json" in self.config.tags:
             data = {"data": data, "context": context}
             response = await httpx.AsyncClient().post(url, json=data)

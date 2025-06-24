@@ -75,6 +75,8 @@ def create_app(args: argparse.Namespace):
     async def read_element_html(request: Request, element_name: str):
         data = dict(request.query_params)
 
+        element_name = f"builtin://{element_name}"
+
         block = BlockDefinition(
             type=element_name,
             data=data,
@@ -89,6 +91,8 @@ def create_app(args: argparse.Namespace):
     @app.get("/api/v1/element/{element_name}/css")
     async def read_element_css(request: Request, element_name: str):
         data = dict(request.query_params)
+
+        element_name = f"builtin://{element_name}"
 
         block = BlockDefinition(
             type=element_name,

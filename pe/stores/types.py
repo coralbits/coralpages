@@ -55,3 +55,15 @@ class StoreBase:
 
         logger.debug("No element definition found for: %s", path)
         return None
+
+    def clean_path(self, path: str) -> str:
+        """
+        Clean a path.
+
+        Removes the protocol part of the path, if its the same as the store's name.
+        """
+        store_prefix = f"{self.config.name}://"
+        if path.startswith(store_prefix):
+            path = path[len(store_prefix) :]
+
+        return path

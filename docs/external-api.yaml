@@ -8,7 +8,7 @@ data:
       text: |
         # next is data directly from an external API
 
-  - type: http://text-api
+  - type: http://text
     data:
       text: |
         This data is sent to another server, which renders the component and then is included into the
