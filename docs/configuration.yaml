@@ -26,12 +26,6 @@ data:
         - **Hierarchical**: Settings can be overridden at different levels
         - **Environment-aware**: Different settings for development and production
         - **Extensible**: Easy to add new components and settings
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       title: "Main Configuration File"
@@ -98,15 +92,6 @@ data:
           css: http://auth-service:8080/api/login-form/css
           editor: http://auth-service:8080/api/login-form/editor
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Environment Variables"
@@ -180,15 +165,6 @@ data:
         # Test mode
         export TEST_MODE=true
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Component Templates"
@@ -257,15 +233,6 @@ data:
         - **Validation**: Client-side validation rules
         - **Live Preview**: Real-time preview of changes
         - **Style Controls**: Visual style editing
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Custom Components"
@@ -375,15 +342,6 @@ data:
                 'css': get_custom_widget_editor_css()
             }
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Advanced Configuration"
@@ -471,15 +429,6 @@ data:
             cache.delete(f"page:{page_name}")
             cache.delete(f"render:{page_name}")
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Configuration Best Practices"
@@ -563,12 +512,3 @@ data:
             - /metrics
             - /health
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px

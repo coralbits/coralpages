@@ -47,12 +47,6 @@ data:
           "timestamp": "2024-01-01T00:00:00Z"
         }
         ```
-    style:
-      max-width: 1200px
-      margin: 0
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       text: |
@@ -137,12 +131,6 @@ data:
           ]
         }
         ```
-    style:
-      max-width: 1200px
-      margin: 0
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       text: |
@@ -234,12 +222,6 @@ data:
           }
         }
         ```
-    style:
-      max-width: 1200px
-      margin: 0
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       text: |
@@ -306,12 +288,6 @@ data:
           }
         }
         ```
-    style:
-      max-width: 1200px
-      margin: 0
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       text: |
@@ -399,12 +375,6 @@ data:
           }
         }
         ```
-    style:
-      max-width: 1200px
-      margin: 0
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       text: |
@@ -468,12 +438,6 @@ data:
           }
         }
         ```
-    style:
-      max-width: 1200px
-      margin: 0
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       text: |
@@ -504,9 +468,3 @@ data:
         X-RateLimit-Remaining: 95
         X-RateLimit-Reset: 1640995200
         ```
-    style:
-      max-width: 1200px
-      margin: 0
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333

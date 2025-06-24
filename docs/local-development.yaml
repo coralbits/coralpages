@@ -52,12 +52,6 @@ data:
         ```
 
         The server will start on `http://localhost:8000` by default.
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       title: "Working with Pages"
@@ -107,15 +101,6 @@ data:
         3. **View in browser** by opening the generated HTML
         4. **Iterate and refine** your page design
         5. **Use the editor** for visual editing (if available)
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Directory Structure"
@@ -153,15 +138,6 @@ data:
         - **`templates/`**: HTML templates for each component
         - **`docs/`**: Documentation pages in YAML format
         - **`config.yaml`**: Component definitions and configuration
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Development Tools"
@@ -222,15 +198,6 @@ data:
         chmod +x run.sh
         chmod +x render.py
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Testing"
@@ -278,15 +245,6 @@ data:
             assert "Hello World" in result
             assert "color: blue" in result
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Configuration"
@@ -331,12 +289,3 @@ data:
             css: http://localhost:8080/api/custom-css
             editor: http://localhost:8080/api/custom-editor
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px

@@ -31,12 +31,6 @@ data:
         - **Style Panel**: CSS property editing
         - **Preview Pane**: Live preview of the page
         - **Component Library**: Available components sidebar
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       title: "Getting Started with the Editor"
@@ -76,15 +70,6 @@ data:
         4. **Style**: Use the style panel to customize appearance
         5. **Preview**: See changes in real-time
         6. **Save**: Save your changes to the page
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Component Editors"
@@ -155,15 +140,6 @@ data:
         | [+ Add Menu Item]      |
         +------------------------+
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Style Editor"
@@ -205,15 +181,6 @@ data:
         - **Mobile-First**: Design for mobile, enhance for desktop
         - **Media Queries**: Conditional styling for different screens
         - **Touch-Friendly**: Optimize for touch interfaces
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Layout Management"
@@ -255,15 +222,6 @@ data:
         - **Snap to Grid**: Align components to grid
         - **Distribute**: Evenly space multiple components
         - **Group/Ungroup**: Group related components
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Preview and Testing"
@@ -303,15 +261,6 @@ data:
         - **CSS Export**: Export component styles
         - **JSON Export**: Export page data
         - **PDF Export**: Generate PDF version
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Advanced Features"
@@ -371,12 +320,3 @@ data:
         | `Ctrl+V` | Paste component |
         | `Ctrl+D` | Duplicate component |
         | `F12` | Toggle developer tools |
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px

@@ -32,9 +32,3 @@ data:
         - **Reusability**: Components can be shared across different projects
 
         Whether you're building a simple landing page or a complex web application, the Coralbits Page Editor provides the tools and flexibility you need.
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333

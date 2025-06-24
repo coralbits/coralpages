@@ -46,12 +46,6 @@ data:
         │   Components    │    │   Components    │    │   Components    │
         └─────────────────┘    └─────────────────┘    └─────────────────┘
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       title: "Core Components"
@@ -103,15 +97,6 @@ data:
         - Manage component health checks
         - Provide fallback mechanisms
         - Load balancing across component instances
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Component Architecture"
@@ -180,15 +165,6 @@ data:
         - **JavaScript**: Returns client-side logic
         - **Validation**: Returns validation rules
         - **Preview**: Returns preview data
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Data Flow"
@@ -270,15 +246,6 @@ data:
            │   Editor    │
            └─────────────┘
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Caching Strategy"
@@ -291,11 +258,11 @@ data:
 
         **Purpose**: Cache component templates to avoid repeated file I/O
 
-        **Storage**: In-memory cache
-        **TTL**: 1 hour (configurable)
-        **Invalidation**: On template file changes
+        * **Storage**: In-memory cache
+        * **TTL**: 1 hour (configurable)
+        * **Invalidation**: On template file changes
 
-        ```python
+        ```
         # Example cache key
         cache_key = f"template:{component_name}:{template_type}"
         ```
@@ -340,15 +307,6 @@ data:
         - **Pre-render**: Render popular pages on startup
         - **Background**: Periodic re-rendering of cached pages
         - **Predictive**: Cache pages based on usage patterns
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Security Architecture"
@@ -400,15 +358,6 @@ data:
         **TLS**: Secure communication channels
         **Secrets Management**: Secure handling of API keys and secrets
         **Audit Logging**: Track all system activities
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Scalability Design"
@@ -476,15 +425,6 @@ data:
         - **Readiness Probes**: Check if service is ready to serve
         - **Component Health**: Check external component health
         - **Dependency Health**: Check database, cache, etc.
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Deployment Architecture"
@@ -536,12 +476,3 @@ data:
         - **Blue-Green Deployment**: Zero-downtime deployments
         - **Rollback Strategy**: Quick rollback capabilities
         - **Feature Flags**: Feature flag management
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px

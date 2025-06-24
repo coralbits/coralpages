@@ -97,9 +97,3 @@ data:
         - Learn about [Local Development](./local-development)
         - Check out [Examples](./examples) for inspiration
         - Read about the [Architecture](./architecture) for deeper understanding
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333

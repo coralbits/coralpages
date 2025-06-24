@@ -42,12 +42,6 @@ data:
           children:
             # Nested components (if supported)
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
   - type: builtin://markdown
     data:
       title: "Layout Components"
@@ -100,15 +94,6 @@ data:
             padding: 30px
             margin: 0
         ```
-    style:
-      max-width: 1200px
-      margin: 0 auto
-      padding: 40px 20px
-      line-height: 1.6
-      color: #333
-      background: #f8f9fa
-      border-radius: 8px
-      margin-top: 20px
   - type: builtin://markdown
     data:
       title: "Content Components"
