@@ -6,7 +6,7 @@ import hashlib
 import json
 from typing import Any
 
-from pe.loader import LoaderFactory
+from pe.loader.factory import LoaderFactory
 from pe.renderer.types import BlockRendererBase
 from pe.types import BlockDefinition, PageDefinition
 
@@ -96,6 +96,7 @@ class Renderer:
         """
         page_definition = self.loader.load(page_name)
         new_etag = None
+        new_last_modified = None
         if "etag" in page_definition.cache:
             old_etag = headers.get("If-None-Match")
             new_etag = self.calculate_etag(page_definition)
