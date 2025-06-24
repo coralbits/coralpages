@@ -201,20 +201,9 @@ class Renderer:
         logger.debug("Rendering page, %d blocks", len(page_def.data))
         for block in page_def.data:
             logger.debug("Rendering block: %s", block)
-            html, css = await self.render_block(page, block)
+            html = await self.render_block(page, block)
             logger.debug("Block rendered: %s", block)
-            cid = page.get_current_id(block.type)
 
-            if block.style:
-                css_id = f"#{cid}"
-                page.classes.update(
-                    {css_id: f"{css_id} {{\n{css_dict_to_css_text(block.style)} \n}}"}
-                )
-            html = html.replace("@@class@@", cid)
-            html = html.replace("@@id@@", cid)
-
-            # add the css to the page and content
-            page.classes.update({block.type: css})
             page.append_content(html)
             logger.debug("Block appended: %s", block)
 
@@ -256,9 +245,7 @@ class Renderer:
                 page=page, template_name=template_def.template
             )
 
-    async def render_block(
-        self, page: RenderedPage, block: BlockDefinition
-    ) -> tuple[str, dict[str, str]]:
+    async def render_block(self, page: RenderedPage, block: BlockDefinition) -> str:
         """
         Render a block asynchronously.
         """
@@ -282,30 +269,53 @@ class Renderer:
             or ""
         )
 
+        children = StrList(
+            [await self.render_block(page, child) for child in (block.children or [])]
+        )
+
         if "jinja2" in element_loader.tags:
             logger.debug("Rendering Jinja2 for block: %s", block)
             html = self.jinja2_render(
-                html, data=block.data, context=page.context, page=page
+                html,
+                data=block.data,
+                context=page.context,
+                page=page,
+                children=children,
             )
             css = self.jinja2_render(
-                css, data=block.data, context=page.context, page=page
+                css,
+                data=block.data,
+                context=page.context,
+                page=page,
             )
+        elif "@@children@@" in html:
+            html = html.replace("@@children@@", "\n".join(children))
 
-        print("-----------------------", repr(page))
-        return html, css
+        block_id = page.get_current_id(block.type)
+
+        if block.style:
+            css_id = f"#{block_id}"
+            page.classes.update(
+                {css_id: f"{css_id} {{\n{css_dict_to_css_text(block.style)} \n}}"}
+            )
+        html = html.replace("@@class@@", block_id)
+        html = html.replace("@@id@@", block_id)
+
+        # add the css to the page and content
+        page.classes.update({block.type: css})
+
+        return html
 
     def jinja2_render(
         self,
         html: str,
-        data: dict[str, Any],
-        context: dict[str, Any],
-        page: RenderedPage,
+        **context: Any,
     ) -> str:
         """
         Render a Jinja2 template.
         """
         template = self.jinja2_env.from_string(html)
-        return template.render(data=data, context=context, page=page)
+        return template.render(**context)
 
 
 def css_dict_to_css_text(css: dict[str, str]) -> str:
@@ -313,3 +323,12 @@ def css_dict_to_css_text(css: dict[str, str]) -> str:
     Convert a dict of CSS to a string.
     """
     return "\n".join([f"  {k}: {v};" for k, v in css.items()])
+
+
+class StrList(list[str]):
+    """
+    A list of strings.
+    """
+
+    def __str__(self) -> str:
+        return "\n".join([str(x) for x in self])

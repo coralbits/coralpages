@@ -65,7 +65,15 @@ data:
       padding: 20px
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
 
-  - type: builtin://children
+  - type: builtin://section
+    style:
+      max-width: 1200px
+      min-height: 40vh
+      margin: 20px auto
+      padding: 20px
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+    children:
+      - type: builtin://children
 
   - type: builtin://section
     data:

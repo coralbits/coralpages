@@ -1,10 +1,7 @@
-<section class="content-section @@class@@">
-    {% if data.title %}
-    <h2>{{data.title}}</h2>
-    {% endif %}
-    {% if data.text %}
-    <p>{{data.text}}</p>
-    {% endif %}
-
-    {{children}}
+<section class="content-section @@class@@" id="@@id@@">
+  {% if data.title %}
+  <h2>{{data.title}}</h2>
+  {% endif %} {% if data.text %}
+  <p>{{data.text}}</p>
+  {% endif %} {{children}}
 </section>
