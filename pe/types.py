@@ -73,6 +73,7 @@ class PageDefinition:
     cache: list[str] = field(default_factory=list)
     last_modified: datetime.datetime | None = None
     meta: list[MetaDefinition] = field(default_factory=list)
+    css_variables: dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -91,6 +92,7 @@ class PageDefinition:
             cache=data.get("cache", []),
             last_modified=last_modified,
             meta=[MetaDefinition.from_dict(meta) for meta in data.get("meta", [])],
+            css_variables=data.get("css_variables", {}),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -106,6 +108,7 @@ class PageDefinition:
                 self.last_modified.isoformat() if self.last_modified else None
             ),
             "meta": [meta.to_dict() for meta in self.meta],
+            "css_variables": self.css_variables,
         }
 
 

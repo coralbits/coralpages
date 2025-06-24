@@ -34,6 +34,7 @@ class RenderedPage:
     headers: dict[str, str] = field(default_factory=dict)
     response_code: int = 200
     meta: list[MetaDefinition] = field(default_factory=list)
+    css_variables: dict[str, str] = field(default_factory=dict)
 
     def append_content(self, content: str):
         """
@@ -54,6 +55,10 @@ class RenderedPage:
         """
         self.title = page_def.title
         self.meta = [*page_def.meta]
+        self.css_variables = {
+            **self.css_variables,
+            **page_def.css_variables,
+        }
 
     def get_current_id(self, prefix: str = "id-") -> int:
         """
@@ -236,6 +241,7 @@ class Renderer:
         )
         if not template_def:
             raise ValueError(f"Template not found: {template_name}")
+        page.update_from_definition(template_def)
 
         page.context = {
             **page.context,

@@ -1,0 +1,30 @@
+title: "Configuration"
+template: "docs://_default"
+
+data:
+  - type: builtin://markdown
+    data:
+      title: "CSS"
+      text: |
+        The Coralbits Page Editor uses CSS to style the components and editor interface.
+
+        ## CSS Variables
+
+        For CSS try please to use thse varaibles, so we can change the look and feel easily from 
+        the config of the page / template.
+
+        ```css
+        :root {
+          --primary-color: #000;
+          --secondary-color: #fff;
+          --background-color: #f0f0f0;
+          --text-color: #333;
+          --font-size: 16px;
+          --font-family: Arial, sans-serif;
+          --border-radius: 5px;
+          --box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+          --transition: all 0.3s ease;
+        }
+        ```
+
+        ## CSS Classes

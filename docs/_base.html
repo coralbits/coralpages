@@ -7,6 +7,19 @@
     {% endfor %}
     <title>{{page.title}}</title>
     <style type="text/css">
+      :root {
+        {% for key, value in page.css_variables.items() %}
+        {{key}}: {{value}};
+        {% endfor %}
+      }
+      body {
+        background: var(--background-color);
+        color: var(--text-color);
+        font-family: var(--font-family);
+        font-size: var(--font-size);
+        margin: 0;
+        padding: 0;
+      }
       {% for _key, css in page.classes.items() %}
       {{css}}
       {% endfor %}
