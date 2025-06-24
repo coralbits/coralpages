@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from pe.types import PageDefinition, StoreConfig
+from pe.types import BlockDefinition, PageDefinition, StoreConfig
 from pe.stores.types import StoreBase
 
 logger = logging.getLogger(__name__)
@@ -29,6 +29,9 @@ class FileStore(StoreBase):
         """
         Load a page from the file store.
         """
+        if path == "builtin://html":
+            return data.get("html", "")
+
         element_definition = self.get_element_definition(path)
         if element_definition is None:
             return None
@@ -66,12 +69,30 @@ class FileStore(StoreBase):
         if "://" in path:
             path = path.split("://", 1)[1]
 
+        if path.endswith(".html"):
+            return await self.load_html_definition(path=path)
+
         path = f"{path}.yaml"
 
         yamldata = await self.load_generic(path=path, data={}, context={})
         if not yamldata:
             return None
         return PageDefinition.from_dict(yaml.safe_load(yamldata))
+
+    async def load_html_definition(self, *, path: str) -> PageDefinition | None:
+        """
+        Load an HTML page definition from the file store.
+        """
+        filepath = self.base_path / path
+        if not filepath.exists():
+            return None
+
+        with open(filepath, "r", encoding="utf-8") as file:
+            html = file.read()
+
+        return PageDefinition(
+            data=[BlockDefinition(type="builtin://html", data={"html": html})]
+        )
 
     async def load_generic(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]  # type: ignore

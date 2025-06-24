@@ -10,7 +10,7 @@ import markdown
 
 from pe.config import Config
 from pe.stores.factory import StoreFactory
-from pe.types import BlockDefinition, PageDefinition
+from pe.types import BlockDefinition, MetaDefinition, PageDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +33,7 @@ class RenderedPage:
     context: dict[str, Any] = field(default_factory=dict)
     headers: dict[str, str] = field(default_factory=dict)
     response_code: int = 200
+    meta: list[MetaDefinition] = field(default_factory=list)
 
     def append_content(self, content: str):
         """
@@ -41,10 +42,26 @@ class RenderedPage:
         self.content += content
         self.max_id += 1
 
+    def append_meta(self, meta: MetaDefinition):
+        """
+        Append a meta definition to the page.
+        """
+        self.meta.append(meta)
+
+    def update_from_definition(self, page_def: PageDefinition):
+        """
+        Update the page from a page definition.
+        """
+        self.title = page_def.title
+        self.meta = [*page_def.meta]
+
     def get_current_id(self, prefix: str = "id-") -> int:
         """
         Get the current id.
         """
+        prefix = prefix.replace("://", "-")
+        prefix = prefix.replace(":", "-")
+        prefix = prefix.replace("/", "-")
         return f"{prefix}-{self.max_id}"
 
     def __str__(self):
@@ -54,20 +71,7 @@ class RenderedPage:
         if self.response_code == 304:
             return ""
 
-        css = "\n".join(self.classes.values())
-        content = self.content
-        title = self.title
-        return f"""<!DOCTYPE html>
-<html>
-<head>
-<title>{title}</title>
-<style type="text/css">{css}</style>
-</head>
-<body>
-{content}
-</body>
-</html>
-"""
+        return self.content
 
 
 class Renderer:
@@ -170,7 +174,7 @@ class Renderer:
         Render a page asynchronously.
         """
         page = self.new_page()
-        page.title = page_def.title
+        page.update_from_definition(page_def)
 
         logger.debug("Rendering page data")
         await self.render_page_data(page=page, page_def=page_def)
@@ -186,6 +190,9 @@ class Renderer:
         """
         Render the page data asynchronously.
         """
+        for meta in page_def.meta:
+            page.append_meta(meta)
+
         logger.debug("Rendering page, %d blocks", len(page_def.data))
         for block in page_def.data:
             logger.debug("Rendering block: %s", block)
@@ -255,29 +262,44 @@ class Renderer:
 
         logger.debug("Loader for element: %s", element_loader)
         logger.debug("Loading HTML for block: %s", block)
-        html = await element_loader.load_html(
-            path=block.type, data=block.data, context=page.context
+        html = (
+            await element_loader.load_html(
+                path=block.type, data=block.data, context=page.context
+            )
+            or ""
         )
         logger.debug("Loading CSS for block: %s", block)
-        css = await element_loader.load_css(
-            path=block.type, data=block.data, context=page.context
+        css = (
+            await element_loader.load_css(
+                path=block.type, data=block.data, context=page.context
+            )
+            or ""
         )
 
         if "jinja2" in element_loader.tags:
             logger.debug("Rendering Jinja2 for block: %s", block)
-            html = self.jinja2_render(html, data=block.data, context=page.context)
-            css = self.jinja2_render(css, data=block.data, context=page.context)
+            html = self.jinja2_render(
+                html, data=block.data, context=page.context, page=page
+            )
+            css = self.jinja2_render(
+                css, data=block.data, context=page.context, page=page
+            )
 
+        print("-----------------------", repr(page))
         return html, css
 
     def jinja2_render(
-        self, html: str, data: dict[str, Any], context: dict[str, Any]
+        self,
+        html: str,
+        data: dict[str, Any],
+        context: dict[str, Any],
+        page: RenderedPage,
     ) -> str:
         """
         Render a Jinja2 template.
         """
         template = self.jinja2_env.from_string(html)
-        return template.render(data=data, context=context)
+        return template.render(data=data, context=context, page=page)
 
 
 def css_dict_to_css_text(css: dict[str, str]) -> str:

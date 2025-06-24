@@ -5,19 +5,6 @@ title: "Coralbits Page Editor Documentation"
 template: "docs://_default"
 
 data:
-  - type: builtin://header
-    data:
-      text: "Coralbits Page Editor Documentation"
-    style:
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-      color: white
-      font-size: 32px
-      font-weight: bold
-      text-align: center
-      padding: 30px
-      margin: 0
-      border-radius: 0
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
   - type: builtin://markdown
     data:
       title: "Welcome to Coralbits Page Editor"

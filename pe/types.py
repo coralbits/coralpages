@@ -8,6 +8,23 @@ from dataclasses import dataclass, field
 
 
 @dataclass
+class MetaDefinition:
+    """
+    A meta definition.
+    """
+
+    name: str
+    content: str
+
+    @classmethod
+    def from_dict(cls, data: dict) -> Self:
+        """
+        Load a meta definition from a dictionary.
+        """
+        return cls(name=data["name"], content=data["content"])
+
+
+@dataclass
 class BlockDefinition:
     """
     Each block definition, with content, and maybe more children
@@ -15,8 +32,8 @@ class BlockDefinition:
 
     type: str
     data: Any
-    children: list[Self]
-    style: dict[str, str]
+    children: list[Self] = field(default_factory=list)
+    style: dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -50,11 +67,12 @@ class PageDefinition:
     The page definition, with a title, and a list of blocks
     """
 
-    title: str
-    template: str
-    data: list[BlockDefinition]
+    title: str = ""
+    template: str | None = None
+    data: list[BlockDefinition] = field(default_factory=list)
     cache: list[str] = field(default_factory=list)
     last_modified: datetime.datetime | None = None
+    meta: list[MetaDefinition] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -72,6 +90,7 @@ class PageDefinition:
             data=[BlockDefinition.from_dict(block) for block in data["data"]],
             cache=data.get("cache", []),
             last_modified=last_modified,
+            meta=[MetaDefinition.from_dict(meta) for meta in data.get("meta", [])],
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -86,6 +105,7 @@ class PageDefinition:
             "last_modified": (
                 self.last_modified.isoformat() if self.last_modified else None
             ),
+            "meta": [meta.to_dict() for meta in self.meta],
         }
 
 

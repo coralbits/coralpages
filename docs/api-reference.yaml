@@ -7,18 +7,6 @@ cache:
   - last-modified
 
 data:
-  - type: builtin://header
-    data:
-      text: "API Reference"
-    style:
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-      color: white
-      font-size: 28px
-      font-weight: bold
-      text-align: center
-      padding: 40px 20px
-      margin: 0
-      border-radius: 0
   - type: builtin://markdown
     data:
       text: |

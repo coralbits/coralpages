@@ -4,18 +4,6 @@ title: "Components"
 template: "docs://_default"
 
 data:
-  - type: builtin://header
-    data:
-      text: "Built-in Components"
-    style:
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-      color: white
-      font-size: 28px
-      font-weight: bold
-      text-align: center
-      padding: 25px
-      margin: 0
-      border-radius: 0
   - type: builtin://markdown
     data:
       title: "Component Overview"

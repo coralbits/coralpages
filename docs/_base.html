@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="{{page.lang}}">
+  <head>
+    <meta charset="UTF-8" />
+    {% for meta in page.meta %}
+    <meta name="{{meta.name}}" content="{{meta.content}}" />
+    {% endfor %}
+    <title>{{page.title}}</title>
+    <style type="text/css">
+      {% for _key, css in page.classes.items() %}
+      {{css}}
+      {% endfor %}
+    </style>
+  </head>
+  <body>
+    {{page.context.children}}
+  </body>
+</html>

@@ -2,7 +2,11 @@
 # This template provides a consistent layout with navigation menu
 
 title: "Coralbits Page Editor"
-template: ""
+template: "docs://_base.html"
+
+meta:
+  - name: viewport
+    content: "width=device-width, initial-scale=1"
 
 data:
   - type: builtin://header
