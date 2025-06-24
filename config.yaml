@@ -24,6 +24,35 @@ stores:
     tags:
       - blocks
       - jinja2
+    blocks:
+      - name: text
+        html: text/view.html
+        css: text/style.css
+      - name: image
+        html: image/view.html
+        css: image/style.css
+      - name: header
+        html: header/view.html
+        css: header/style.css
+      - name: section
+        html: section/view.html
+        css: section/style.css
+      - name: tag-cloud
+        html: tag-cloud/view.html
+        css: tag-cloud/style.css
+      - name: paragraph
+        html: text/view.html
+        css: text/style.css
+      - name: menu
+        html: menu/view.html
+        css: menu/style.css
+      - name: markdown
+        html: markdown/view.html
+        css: markdown/style.css
+      - name: children
+        html: children/view.html
+        css: children/style.css
+
   - name: http
     type: http
     # This is the base URL for the HTTP store. It is used to load the elements.
@@ -32,48 +61,13 @@ stores:
     tags:
       - pages
       - templates
+      - post:json
+      # - get:qs
   - name: db
     type: db
     url: sqlite://./data/pe.db
 
 elements:
-  - name: text
-    store: builtin
-    html: text/view.html
-    css: text/style.css
-  - name: image
-    store: builtin
-    html: image/view.html
-    css: image/style.css
-  - name: header
-    store: builtin
-    html: header/view.html
-    css: header/style.css
-  - name: section
-    store: builtin
-    html: section/view.html
-    css: section/style.css
-  - name: tag-cloud
-    store: builtin
-    html: tag-cloud/view.html
-    css: tag-cloud/style.css
-  - name: paragraph
-    store: builtin
-    html: text/view.html
-    css: text/style.css
-  - name: menu
-    store: builtin
-    html: menu/view.html
-    css: menu/style.css
-  - name: markdown
-    store: builtin
-    html: markdown/view.html
-    css: markdown/style.css
-  - name: children
-    store: builtin
-    html: children/view.html
-    css: children/style.css
-
   # Examples,
   - name: text-api
     description: |

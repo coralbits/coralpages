@@ -1,5 +1,6 @@
 from typing import Any
-from pe.types import BlockDefinition
+from pe.types import ElementDefinition
+from pe.loader.factory import LoaderRoot
 
 
 class BlockRendererBase:
@@ -9,8 +10,9 @@ class BlockRendererBase:
     Specific renderers have other implementations.
     """
 
-    def __init__(self, *, block: BlockDefinition):
-        self.block = block
+    def __init__(self, *, element: ElementDefinition, loader: LoaderRoot):
+        self.element = element
+        self.loader = loader
 
     async def render_html(
         self, *, data: dict[str, Any], context: dict[str, Any]

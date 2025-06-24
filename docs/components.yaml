@@ -1,10 +1,10 @@
 # Built-in Components Documentation
 
 title: "Components"
-template: "page://_default"
+template: "docs://_default"
 
 data:
-  - type: header
+  - type: builtin://header
     data:
       text: "Built-in Components"
     style:
@@ -16,7 +16,7 @@ data:
       padding: 25px
       margin: 0
       border-radius: 0
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Component Overview"
       text: |
@@ -46,7 +46,7 @@ data:
         Every component follows this structure:
 
         ```yaml
-        - type: component_name
+        - type: builtin://component_name
           data:
             # Component-specific data
           style:
@@ -60,7 +60,7 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Layout Components"
       text: |
@@ -75,7 +75,7 @@ data:
 
         **Example:**
         ```yaml
-        - type: section
+        - type: builtin://section
           data:
             title: "About Us"
             text: "Learn more about our company"
@@ -86,7 +86,7 @@ data:
             background: #f9f9f9
             border-radius: 8px
           children:
-            - type: text
+            - type: builtin://text
               data:
                 text: "Content goes here"
         ```
@@ -100,7 +100,7 @@ data:
 
         **Example:**
         ```yaml
-        - type: header
+        - type: builtin://header
           data:
             text: "Welcome to Our Website"
           style:
@@ -121,7 +121,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Content Components"
       text: |
@@ -134,7 +134,7 @@ data:
 
         **Example:**
         ```yaml
-        - type: text
+        - type: builtin://text
           data:
             text: "<h2>Rich Text Content</h2><p>This supports <strong>HTML formatting</strong> and <em>styling</em>.</p>"
           style:
@@ -152,7 +152,7 @@ data:
 
         **Example:**
         ```yaml
-        - type: paragraph
+        - type: builtin://paragraph
           data:
             text: "This is a simple paragraph of text."
           style:

@@ -54,7 +54,7 @@ class PageDefinition:
     template: str
     data: list[BlockDefinition]
     cache: list[str] = field(default_factory=list)
-    last_modified: str = ""
+    last_modified: datetime.datetime | None = None
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -63,7 +63,8 @@ class PageDefinition:
         """
         last_modified = data.get("last_modified", None)
         if last_modified:
-            last_modified = datetime.datetime.fromisoformat(last_modified)
+            if isinstance(last_modified, str):
+                last_modified = datetime.datetime.fromisoformat(last_modified)
 
         return cls(
             title=data["title"],
@@ -106,10 +107,11 @@ class ElementDefinition:
     """
 
     name: str
-    type: str
-    viewer: str | None
-    editor: str | list[FieldDefinition] | None
-    css: str | None
+    store: str | None = None
+    html: str | None = None
+    css: str | None = None
+    method: str | None = None
+    tags: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -118,28 +120,75 @@ class ElementDefinition:
         """
         return cls(
             name=data["name"],
-            type=data["type"],
-            viewer=data.get("viewer", None),
-            editor=None,  # TODO: add editor
-            css=data.get("css", None),
+            store=data.get("store", None),
+            html=data.get("html"),
+            css=data.get("css"),
+            method=data.get("method"),
+            tags=data.get("tags", []),
         )
 
     def to_dict(self) -> dict[str, Any]:
         """
         Convert the element definition to a JSON-serializable dictionary.
         """
-        editor_data = self.editor
-        if isinstance(editor_data, list):
-            # Convert FieldDefinition objects to dictionaries
-            editor_data = [
-                {"name": field.name, "type": field.type, "value": field.value}
-                for field in editor_data
-            ]
+        return {
+            "name": self.name,
+            "store": self.store,
+            "html": self.html,
+            "css": self.css,
+            "method": self.method,
+            "tags": self.tags,
+        }
 
+
+@dataclass
+class StoreConfig:
+    """
+    Configuration for a store.
+    """
+
+    name: str
+    type: str
+    path: str | None = None
+    base_url: str | None = None
+    url: str | None = None
+    tags: list[str] = field(default_factory=list)
+    blocks: list[ElementDefinition] = field(default_factory=list)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> Self:
+        """
+        Load a store configuration from a dictionary.
+        """
+        tags = data.get("tags", [])
+
+        blocks = [
+            ElementDefinition.from_dict(block) for block in data.get("blocks", [])
+        ]
+        for block in blocks:
+            block.store = data["name"]
+            block.tags.extend(tags)
+
+        return cls(
+            name=data["name"],
+            type=data["type"],
+            path=data.get("path"),
+            base_url=data.get("base_url"),
+            url=data.get("url"),
+            tags=tags,
+            blocks=blocks,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert the store configuration to a JSON-serializable dictionary.
+        """
         return {
             "name": self.name,
             "type": self.type,
-            "viewer": self.viewer,
-            "editor": editor_data,
-            "css": self.css,
+            "path": self.path,
+            "base_url": self.base_url,
+            "url": self.url,
+            "tags": self.tags,
+            "blocks": [block.to_dict() for block in self.blocks],
         }

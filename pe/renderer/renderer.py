@@ -1,13 +1,15 @@
 import datetime
 import logging
 from dataclasses import dataclass, field
-from functools import lru_cache
 import hashlib
 import json
 from typing import Any
 
-from pe.loader.factory import LoaderFactory
-from pe.renderer.types import BlockRendererBase
+import jinja2
+import markdown
+
+from pe.config import Config
+from pe.stores.factory import StoreFactory
 from pe.types import BlockDefinition, PageDefinition
 
 logger = logging.getLogger(__name__)
@@ -73,12 +75,14 @@ class Renderer:
     Renderer for the page editor.
     """
 
-    def __init__(self, config: dict[str, str]):
+    def __init__(self, config: Config):
         """
         Initialize the renderer.
         """
         self.config = config
-        self.loader = LoaderFactory(config=config)
+        self.store = StoreFactory(config=config)
+        self.jinja2_env = jinja2.Environment()
+        self.jinja2_env.filters["markdown"] = markdown.markdown
 
     def new_page(self) -> RenderedPage:
         """
@@ -94,32 +98,48 @@ class Renderer:
 
         Might use headers to check caches and so on
         """
-        page_definition = self.loader.load(page_name)
+        logger.debug("Rendering page: %s", page_name)
+        page_definition = await self.store.load_page_definition_all_stores(
+            path=page_name
+        )
+        if not page_definition:
+            raise ValueError(f"Page definition not found: {page_name}")
+
+        logger.debug("Page definition: %s", page_definition)
         new_etag = None
         new_last_modified = None
         if "etag" in page_definition.cache:
+            logger.debug("Checking etag")
             old_etag = headers.get("If-None-Match")
             new_etag = self.calculate_etag(page_definition)
-            logger.debug(f"Old etag: %s, new etag: %s", old_etag, new_etag)
+            logger.debug("Old etag: %s, new etag: %s", old_etag, new_etag)
             if old_etag == new_etag:
                 page = self.new_page()
                 page.headers["ETag"] = old_etag
                 page.response_code = 304
+                logger.debug("Page not modified, returning 304")
                 return page
         if "last-modified" in page_definition.cache:
+            logger.debug("Checking last modified")
             old_last_modified = headers.get("If-Modified-Since")
             new_last_modified = self.calculate_last_modified(page_definition)
             if old_last_modified == new_last_modified:
                 page = self.new_page()
                 page.headers["Last-Modified"] = new_last_modified
                 page.response_code = 304
+                logger.debug("Page not modified, returning 304")
                 return page
 
+        logger.debug("Rendering page")
         page = await self.render(page_definition)
+        logger.debug("Page rendered")
+
         if new_etag:
             page.headers["ETag"] = new_etag
         if new_last_modified:
             page.headers["Last-Modified"] = new_last_modified
+
+        logger.debug("Returning page")
         return page
 
     def calculate_last_modified(self, page_definition: PageDefinition) -> str:
@@ -128,7 +148,11 @@ class Renderer:
 
         Looks at the last modified data of the page definition and the blocks.
         """
-        return page_definition.last_modified.isoformat()
+        return (
+            page_definition.last_modified.isoformat()
+            if page_definition.last_modified
+            else datetime.datetime.now().isoformat()
+        )
 
     def calculate_etag(self, page_definition: PageDefinition) -> str:
         """
@@ -148,8 +172,10 @@ class Renderer:
         page = self.new_page()
         page.title = page_def.title
 
+        logger.debug("Rendering page data")
         await self.render_page_data(page=page, page_def=page_def)
         if page_def.template:
+            logger.debug("Rendering in template %s", page_def.template)
             await self.render_in_template(page=page, template_name=page_def.template)
 
         return page
@@ -160,14 +186,17 @@ class Renderer:
         """
         Render the page data asynchronously.
         """
+        logger.debug("Rendering page, %d blocks", len(page_def.data))
         for block in page_def.data:
+            logger.debug("Rendering block: %s", block)
             html, css = await self.render_block(page, block)
+            logger.debug("Block rendered: %s", block)
             cid = page.get_current_id(block.type)
 
             if block.style:
                 css_id = f"#{cid}"
                 page.classes.update(
-                    {css_id: f"{css_id} {{\n{css_dict_to_cs_text(block.style)} \n}}"}
+                    {css_id: f"{css_id} {{\n{css_dict_to_css_text(block.style)} \n}}"}
                 )
             html = html.replace("@@class@@", cid)
             html = html.replace("@@id@@", cid)
@@ -175,6 +204,7 @@ class Renderer:
             # add the css to the page and content
             page.classes.update({block.type: css})
             page.append_content(html)
+            logger.debug("Block appended: %s", block)
 
     async def render_in_template(
         self, *, page: RenderedPage, template_name: str
@@ -194,14 +224,21 @@ class Renderer:
 
         From it it composes a new definition and sets the viewer as the full string.
         """
-        template_def = self.loader.load(template_name)
+        template_def = await self.store.get_store(template_name).load_page_definition(
+            path=template_name
+        )
+        if not template_def:
+            raise ValueError(f"Template not found: {template_name}")
+
         page.context = {
             **page.context,
             "children": page.content,
         }
         page.content = ""
+        logger.debug("Rendering template data")
         await self.render_page_data(page=page, page_def=template_def)
         if template_def.template:
+            logger.debug("Rendering in template %s", template_def.template)
             await self.render_in_template(
                 page=page, template_name=template_def.template
             )
@@ -212,33 +249,38 @@ class Renderer:
         """
         Render a block asynchronously.
         """
-        element_renderer = self.get_block_renderer(block.type)
+        element_loader = self.store.get_store(block.type)
+        if element_loader is None:
+            raise ValueError(f"Element loader not found for block: {block.type}")
 
-        html = await element_renderer.render_html(data=block.data, context=page.context)
-        css = await element_renderer.render_css(data=block.data, context=page.context)
+        logger.debug("Loader for element: %s", element_loader)
+        logger.debug("Loading HTML for block: %s", block)
+        html = await element_loader.load_html(
+            path=block.type, data=block.data, context=page.context
+        )
+        logger.debug("Loading CSS for block: %s", block)
+        css = await element_loader.load_css(
+            path=block.type, data=block.data, context=page.context
+        )
+
+        if "jinja2" in element_loader.tags:
+            logger.debug("Rendering Jinja2 for block: %s", block)
+            html = self.jinja2_render(html, data=block.data, context=page.context)
+            css = self.jinja2_render(css, data=block.data, context=page.context)
 
         return html, css
 
-    @lru_cache(maxsize=100)
-    def get_block_renderer(self, type_name: str) -> BlockRendererBase:
+    def jinja2_render(
+        self, html: str, data: dict[str, Any], context: dict[str, Any]
+    ) -> str:
         """
-        Get a block renderer.
+        Render a Jinja2 template.
         """
-        block = self.config.elements[type_name]
-
-        if block.type == "builtin":
-            from pe.renderer.builtin import ElementRendererBuiltin
-
-            return ElementRendererBuiltin(block=block)
-        elif block.type == "http":
-            from pe.renderer.http import ElementRendererHttp
-
-            return ElementRendererHttp(block=block)
-
-        raise ValueError(f"Unknown block renderer type: {type_name}, {block.viewer}")
+        template = self.jinja2_env.from_string(html)
+        return template.render(data=data, context=context)
 
 
-def css_dict_to_cs_text(css: dict[str, str]) -> str:
+def css_dict_to_css_text(css: dict[str, str]) -> str:
     """
     Convert a dict of CSS to a string.
     """

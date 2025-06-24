@@ -10,6 +10,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "markdown>=3.6",
     "pyyaml>=6.0.2",
+    "requests>=2.31.0",
     "tortoise-orm>=0.25.1",
     "uvicorn>=0.34.3",
 ]

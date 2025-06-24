@@ -5,7 +5,7 @@ title: "Coralbits Page Editor"
 template: ""
 
 data:
-  - type: header
+  - type: builtin://header
     data:
       text: "Coralbits Page Editor Documentation"
     style:
@@ -19,7 +19,7 @@ data:
       border-radius: 0
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
 
-  - type: menu
+  - type: builtin://menu
     data:
       items:
         - label: "Home"
@@ -50,9 +50,9 @@ data:
       padding: 20px
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
 
-  - type: children
+  - type: builtin://children
 
-  - type: section
+  - type: builtin://section
     data:
       text: "(C) 2025 Coralbits"
     style:

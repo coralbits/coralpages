@@ -5,12 +5,15 @@ from pathlib import Path
 import sys
 from contextlib import contextmanager
 from typing import TextIO
+import logging
 
 import yaml
 
 from pe.config import Config
 from pe.renderer.renderer import Renderer
-from pe.types import ElementDefinition, PageDefinition
+from pe.types import PageDefinition
+
+logging.basicConfig(level=logging.DEBUG)
 
 
 def parse_args():

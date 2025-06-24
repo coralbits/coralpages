@@ -3,7 +3,7 @@ from typing import Self
 from pathlib import Path
 
 import yaml
-from pe.types import ElementDefinition
+from pe.types import ElementDefinition, StoreConfig
 
 
 @dataclass
@@ -34,6 +34,7 @@ class Config:
 
     page_path: Path = field(default_factory=Path)
     elements: dict[str, ElementDefinition] = field(default_factory=dict)
+    stores: dict[str, StoreConfig] = field(default_factory=dict)
     debug: bool = False
     server: ServerConfig = field(default_factory=ServerConfig)
 
@@ -57,6 +58,10 @@ class Config:
             elements={
                 element["name"]: ElementDefinition.from_dict(element)
                 for element in data.get("elements", [])
+            },
+            stores={
+                store["name"]: StoreConfig.from_dict(store)
+                for store in data.get("stores", [])
             },
             server=ServerConfig.from_dict(data.get("server", {})),
         )

@@ -1,9 +1,9 @@
 # Architecture Documentation
 title: "Architecture"
-template: "page://_default"
+template: "docs://_default"
 
 data:
-  - type: header
+  - type: builtin://header
     data:
       text: "Architecture"
     style:
@@ -15,7 +15,7 @@ data:
       padding: 25px
       margin: 0
       border-radius: 0
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "System Architecture Overview"
       text: |
@@ -64,7 +64,7 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Core Components"
       text: |
@@ -124,7 +124,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Component Architecture"
       text: |
@@ -201,7 +201,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Data Flow"
       text: |
@@ -291,7 +291,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Caching Strategy"
       text: |
@@ -361,7 +361,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Security Architecture"
       text: |
@@ -421,7 +421,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Scalability Design"
       text: |
@@ -497,7 +497,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Deployment Architecture"
       text: |

@@ -1,0 +1,65 @@
+"""
+Store factory for creating store instances.
+"""
+
+from typing import Dict
+
+from pe.config import Config
+from pe.stores.types import StoreBase
+from pe.stores.file import FileStore
+from pe.stores.http import HttpStore
+from pe.stores.db import DbStore
+from pe.types import PageDefinition, StoreConfig
+
+
+class StoreFactory:
+    """
+    Factory for creating store instances.
+    """
+
+    def __init__(self, config: Config):
+        self.config = config
+        self._stores: dict[str, StoreBase] = {
+            store_name: self.create_store(store_config)
+            for store_name, store_config in self.config.stores.items()
+        }
+
+    def create_store(self, store_config: StoreConfig) -> StoreBase:
+        """
+        Create a store instance by name.
+        """
+        if store_config.type == "file":
+            return FileStore(store_config)
+        elif store_config.type == "http":
+            return HttpStore(store_config)
+        elif store_config.type == "db":
+            return DbStore(store_config)
+        else:
+            raise ValueError(f"Unknown store type: {store_config.type}")
+
+    def get_store(self, store_name: str) -> StoreBase:
+        """
+        Get a store instance by name.
+        """
+        if "://" in store_name:
+            store_name = store_name.split("://", 1)[0]
+
+        return self._stores[store_name]
+
+    def get_all_stores(self) -> Dict[str, StoreBase]:
+        """
+        Get all store instances.
+        """
+        return self._stores
+
+    async def load_page_definition_all_stores(self, path: str) -> PageDefinition:
+        """
+        Load a page definition from all stores.
+
+        This is for pages which do not have a proper schema, so we try them all in order
+        """
+        for store in self.get_all_stores().values():
+            page_definition = await store.load_page_definition(path=path)
+            if page_definition:
+                return page_definition
+        return None

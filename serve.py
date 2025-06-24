@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import logging
 from pathlib import Path
 import traceback
 from typing import Any
@@ -37,9 +38,9 @@ def create_app(args: argparse.Namespace):
             return Response(content="Forbidden", status_code=403)
 
         if page_name == "index":
-            page_name = "page://index"
+            page_name = "index"
         else:
-            page_name = f"page://{page_name}"
+            page_name = page_name
 
         try:
             renderer = Renderer(config)
@@ -64,7 +65,7 @@ def create_app(args: argparse.Namespace):
     @app.get("/api/v1/element/")
     def list_known_elements():
         elements_dict = {
-            name: element.to_dict() for name, element in config["elements"].items()
+            name: element.to_dict() for name, element in config.elements.items()
         }
         return Response(
             content=json.dumps(elements_dict), media_type="application/json"
@@ -72,7 +73,7 @@ def create_app(args: argparse.Namespace):
 
     @app.get("/api/v1/element/{element_name}/html")
     async def read_element_html(request: Request, element_name: str):
-        data = request.query_params
+        data = dict(request.query_params)
 
         block = BlockDefinition(
             type=element_name,
@@ -87,7 +88,7 @@ def create_app(args: argparse.Namespace):
 
     @app.get("/api/v1/element/{element_name}/css")
     async def read_element_css(request: Request, element_name: str):
-        data = request.query_params
+        data = dict(request.query_params)
 
         block = BlockDefinition(
             type=element_name,
@@ -124,6 +125,7 @@ def parse_args():
     parser.add_argument(
         "--reload", action="store_true", help="Enable auto-reload on file changes"
     )
+    parser.add_argument("--log-level", default="info", help="Log level")
     return parser.parse_args()
 
 
@@ -132,7 +134,14 @@ app = create_app(parse_args())
 
 def main():
     opts = parse_args()
-    uvicorn.run("serve:app", host=opts.host, port=opts.port, reload=opts.reload)
+
+    uvicorn.run(
+        "serve:app",
+        host=opts.host,
+        port=opts.port,
+        reload=opts.reload,
+        log_level=opts.log_level,
+    )
 
 
 if __name__ == "__main__":

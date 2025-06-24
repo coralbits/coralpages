@@ -1,10 +1,10 @@
 # Local Development Guide
 
 title: "Local Development"
-template: "page://_default"
+template: "docs://_default"
 
 data:
-  - type: header
+  - type: builtin://header
     data:
       text: "Local Development"
     style:
@@ -16,7 +16,7 @@ data:
       padding: 25px
       margin: 0
       border-radius: 0
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Development Environment Setup"
       text: |
@@ -70,7 +70,7 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Working with Pages"
       text: |
@@ -81,7 +81,7 @@ data:
         ```yaml
         # my-page.yaml
         data:
-          - type: header
+          - type: builtin://header
             data:
               text: "My New Page"
             style:
@@ -90,7 +90,7 @@ data:
               text-align: center
               padding: 20px
           
-          - type: text
+          - type: builtin://text
             data:
               text: "Welcome to my new page!"
             style:
@@ -128,7 +128,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Directory Structure"
       text: |
@@ -174,7 +174,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Development Tools"
       text: |
@@ -243,7 +243,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Testing"
       text: |
@@ -299,7 +299,7 @@ data:
       background: #f8f9fa
       border-radius: 8px
       margin-top: 20px
-  - type: markdown
+  - type: builtin://markdown
     data:
       title: "Configuration"
       text: |

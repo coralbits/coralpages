@@ -1,13 +1,13 @@
 # API Reference Documentation
 
 title: "API Reference"
-template: "page://_default"
+template: "docs://_default"
 cache:
   - etag
   - last-modified
 
 data:
-  - type: header
+  - type: builtin://header
     data:
       text: "API Reference"
     style:
@@ -19,7 +19,7 @@ data:
       padding: 40px 20px
       margin: 0
       border-radius: 0
-  - type: markdown
+  - type: builtin://markdown
     data:
       text: |
         The Coralbits Page Editor provides a RESTful API for page rendering, editing, and management. 
@@ -65,7 +65,7 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-  - type: markdown
+  - type: builtin://markdown
     data:
       text: |
         ## Render Page
@@ -155,7 +155,7 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-  - type: markdown
+  - type: builtin://markdown
     data:
       text: |
         ## List Pages
@@ -194,7 +194,7 @@ data:
           "success": true,
           "data": {
             "name": "index",
-            "yaml": "data:\n  - type: header\n    data:\n      text: \"...\"",
+            "yaml": "data:\n  - type: builtin://header\n    data:\n      text: \"...\"",
             "last_modified": "2024-01-01T00:00:00Z"
           }
         }
@@ -252,7 +252,7 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-  - type: markdown
+  - type: builtin://markdown
     data:
       text: |
         ## List Components
@@ -324,7 +324,7 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-  - type: markdown
+  - type: builtin://markdown
     data:
       text: |
         ## Get Editor Interface
@@ -417,7 +417,7 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-  - type: markdown
+  - type: builtin://markdown
     data:
       text: |
         ## Health Check
@@ -486,7 +486,7 @@ data:
       padding: 40px 20px
       line-height: 1.6
       color: #333
-  - type: markdown
+  - type: builtin://markdown
     data:
       text: |
         ## Common Error Codes
