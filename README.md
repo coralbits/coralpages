@@ -1,12 +1,28 @@
 # Page Editor
 
-This is an API first page editor and renderer.
+This is an API first page renderer. There is no editor, nor editing API yet.
 
-The main functionality is a full featured page editor, using an embedable SPA, and it generates
-HTML on an API endpoint.
+It has several endpoints that allow to assemble pages.
 
-The generated HTML can be from the builtin elements (section, block, image, button, rich text,
-video...), or from another external microservice via REST API.
+- /api/v1/view/{page_name}
+
+It has a nested approach to page creation. Basic mode is just using
+builtin blocks, passing some data, and rendering the result. The
+elements can be nested themselves. The page is rendered as a single HTML
+page, with the elements rendered as if they were in the page.
+
+On a more advanced level, the blocks can be requested to be rendered by
+remote endpoints, and the result will be rendered as if it were a builtin
+block.
+
+This is structure in stores, which can return HTML with jinja templating,
+or raw HTML. Each store has diferent configuration, and can be mixed.
+
+Stores have several functions:
+
+- Pages
+- Blocks
+- Templates
 
 ## Builtin Elements
 
@@ -28,20 +44,60 @@ To add external elements edit the config.yaml and add the endpoints for the exte
 must have thse format:
 
 ```yaml
-external:
+stores:
+  - name: myremote
+    type: http
+    base_url: http://localhost:8080/api/v1/element/
+    tags:
+      - pages
+      - blocks
+      - templates
+
+blocks:
   - name: Login Button
-    renderer: http://localhost:8080/api/login-button
-    editor: http://localhost:8080/api/login-button-editor
+    store: myremote
+    html: login-button/view.html
+    css: login-button/style.css
+    tags:
+      - jinja2
 ```
 
-Actually all internal elements are defined in the same way in the config file, and can be changed
-if necessary.
+## Config structure and data flow
 
-The render function will receive a JSON object with the definition as given by the editor, as well
-as page context, and must return the HTML content.
+In the config there are several stores configured, each store is a loader hat can get data in a way, from filesystem, database, or HTTP.
 
-The page collector will use cache as possible to ensure its not rendered more than necesary, using
-the standard "expires" header.
+When viewing a page all stores in order are queried for the given page,first to answer is used.
 
-The editor must be an HTML form, using internally whatever is desired. Initial values are passed
-to the constructor as well.
+The page has blocks, for the block we follow the same idea, but first we
+heck into the config one, and then maybe on the store.
+
+Each store has its own configuration and may not have blocks pages or
+whatever. We use tags to filter out when not needed.
+
+Once we have the definitions, we proceed to render each block, in
+parallel, and finally assemble the final page.
+
+The page may have a template, which do the same process, only for
+template stores, and sets the children.
+
+The sequence diagram is the following:
+
+```mermaid
+sequenceDiagram
+  User ->>+ Renderer: Request page
+  Renderer <<->>+ Loader: Load page
+  Loader <<->>- Store: Load page from store
+  Renderer <<->>+ Loader: Load block
+  Loader <<->>- Store: Load block from store
+  Renderer <<->>+ Loader: Load element
+  Loader <<->>- Store: Load element from store
+  Renderer <<->>+ Loader: Load template
+  Loader <<->>- Store: Load template from store
+  Renderer ->>- User: Render response
+```
+
+The renderer may need to change the response in some ways, for example
+jinja templating, or nothing.
+
+The loader can actually use the block data to render it itself and do not
+require any more templating.

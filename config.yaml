@@ -7,77 +7,81 @@ server:
   etag_salt: "%Y-%m-%d" # change this to a random string to invalidate the etag. Set to a date format to invalidate the etag on every change
 
 page_path: ./docs
-templates:
-  paths:
-    - ./templates/
-
 debug: true
+
+# tags from stores are inherited into their elements, for exmaple
+# jinja2 at store, makes all the elements jinja2 rendered.
+stores:
+  - name: docs
+    type: file
+    path: ./docs/
+    tags:
+      - pages
+      - templates
+  - name: builtin
+    type: file
+    path: ./builtin/
+    tags:
+      - blocks
+      - jinja2
+  - name: http
+    type: http
+    # This is the base URL for the HTTP store. It is used to load the elements.
+    # if not set should use full url, but its less secure
+    base_url: http://localhost:8000/api/v1/element/
+    tags:
+      - pages
+      - templates
+  - name: db
+    type: db
+    url: sqlite://./data/pe.db
 
 elements:
   - name: text
-    type: builtin
-    templating: jinja2 # this is the default, but it can be overridden for each element
-    viewer: text/view.html
+    store: builtin
+    html: text/view.html
     css: text/style.css
-    editor:
-      type: form
-      fields:
-        - id: text
-          type: rich-text
-
   - name: image
-    type: builtin
-    viewer: image/view.html
+    store: builtin
+    html: image/view.html
     css: image/style.css
-    editor:
-      - id: image
-        type: image
-        accept: image/*
-        maxSize: 10240000
-        minSize: 1024
   - name: header
-    type: builtin
-    viewer: header/view.html
+    store: builtin
+    html: header/view.html
     css: header/style.css
-    editor: header/editor.html
   - name: section
-    type: builtin
-    viewer: section/view.html
+    store: builtin
+    html: section/view.html
     css: section/style.css
-    editor: section/editor.html
   - name: tag-cloud
-    type: builtin
-    viewer: tag-cloud/view.html
+    store: builtin
+    html: tag-cloud/view.html
     css: tag-cloud/style.css
-    editor: tag-cloud/editor.html
   - name: paragraph
-    type: builtin
-    viewer: text/view.html
+    store: builtin
+    html: text/view.html
     css: text/style.css
-    editor: text/editor.html
   - name: menu
-    type: builtin
-    viewer: menu/view.html
+    store: builtin
+    html: menu/view.html
     css: menu/style.css
-    editor: menu/editor.html
   - name: markdown
-    type: builtin
-    viewer: markdown/view.html
+    store: builtin
+    html: markdown/view.html
     css: markdown/style.css
-    editor: markdown/editor.html
   - name: children
-    type: builtin
-    viewer: children/view.html
+    store: builtin
+    html: children/view.html
     css: children/style.css
-    editor: children/editor.html
 
   # Examples,
   - name: text-api
-    type: http
-    templating: none # no templating is used, just the raw HTML and CSS. But could be jinja2. Be sure you trust the source!
     description: |
-      Uses the API to render the text element. Noemally just use the builtin, but this proves
+      Uses the API to render the text element. Normally just use the builtin, but this proves
       how to use the API to get an element from another server and render it.
+    store: http
     method: GET
-    viewer: http://localhost:8000/api/v1/element/text/html
-    css: http://localhost:8000/api/v1/element/text/css
+    html: text/html
+    css: text/css
+    tags:
+      - data_at_query
