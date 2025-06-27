@@ -5,6 +5,11 @@ server:
   directory:
     - docs
   etag_salt: "%Y-%m-%d" # change this to a random string to invalidate the etag. Set to a date format to invalidate the etag on every change
+  allow_origins: # CORS
+    - http://localhost:1234
+    - http://localhost:3000
+    - http://127.0.0.1:1234
+    - http://127.0.0.1:3000
 
 page_path: ./docs
 debug: true

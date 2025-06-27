@@ -13,6 +13,7 @@ from pe.stores.factory import StoreFactory
 from pe.types import BlockDefinition, ElementDefinition
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse, Response
 from fastapi.requests import Request
 
@@ -34,6 +35,15 @@ def create_app(args: argparse.Namespace):
     config = prepare_config()
     store = StoreFactory(config=config)
     renderer = Renderer(config, store)
+
+    # Add CORS middleware
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=config.server.allow_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     @app.get("/api/v1/view/{page_name}")
     async def read_page(request: Request, page_name: str):

@@ -17,13 +17,21 @@ class ServerConfig:
     reload: bool = False
     directory: list[Path] = field(default_factory=list)
     etag_salt: str = "%Y-%m-%d"
+    allow_origins: list[str] = field(default_factory=list)
 
     @staticmethod
     def from_dict(data: dict) -> Self:
         """
         Load the server configuration from a dictionary.
         """
-        return ServerConfig(**data)
+        return ServerConfig(
+            port=data.get("port", 8000),
+            host=data.get("host", "0.0.0.0"),
+            reload=data.get("reload", False),
+            directory=data.get("directory", []),
+            etag_salt=data.get("etag_salt", "%Y-%m-%d"),
+            allow_origins=data.get("allow_origins", []),
+        )
 
 
 @dataclass
