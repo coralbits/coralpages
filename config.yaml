@@ -42,32 +42,56 @@ stores:
             label: Text
             name: text
             placeholder: Enter text
-            required: true
       - name: image
         description: An image element
         icon: image
         html: image/view.html
         css: image/style.css
+        editor:
+          - type: text
+            label: Image
+            name: image
+            placeholder: Enter image URL
       - name: header
         description: A header element
         icon: header
         html: header/view.html
         css: header/style.css
+        editor:
+          - type: text
+            label: Text
+            name: text
+            placeholder: Enter text
       - name: section
         description: A section element
         icon: section
         html: section/view.html
         css: section/style.css
+        editor:
+          - type: textarea
+            label: Text
+            name: text
+            placeholder: Enter text
       - name: tag-cloud
         description: A tag cloud element
         icon: tag-cloud
         html: tag-cloud/view.html
         css: tag-cloud/style.css
+        editor:
+          - type: text
+            label: Title
+            name: tags
+            placeholder: Enter tags
       - name: paragraph
         description: A paragraph element
         icon: paragraph
         html: text/view.html
         css: text/style.css
+        editor:
+          - type: textarea
+            label: Text
+            name: text
+            placeholder: Enter text
       - name: menu
         description: A menu element
         icon: menu
@@ -99,6 +123,15 @@ stores:
         icon: button
         html: button/view.html
         css: button/style.css
+        editor:
+          - type: text
+            label: Text
+            name: text
+            placeholder: Enter text
+          - type: textarea
+            label: Onclick
+            name: onclick
+            placeholder: Enter onclick javascript
       - name: div
         description: A div element
         icon: div

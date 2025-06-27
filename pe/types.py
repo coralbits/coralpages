@@ -23,6 +23,12 @@ class MetaDefinition:
         """
         return cls(name=data["name"], content=data["content"])
 
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert the meta definition to a JSON-serializable dictionary.
+        """
+        return {"name": self.name, "content": self.content}
+
 
 @dataclass
 class BlockDefinition:

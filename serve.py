@@ -45,15 +45,20 @@ def create_app(args: argparse.Namespace):
         allow_headers=["*"],
     )
 
+    @app.get("/api/v1/page/{page_name}/json")
+    async def read_page_json(page_name: str):
+        page = await store.load_page_definition_all_stores(page_name)
+        return Response(
+            content=json.dumps(page.to_dict()), media_type="application/json"
+        )
+
     @app.get("/api/v1/view/{page_name}")
     async def read_page(request: Request, page_name: str):
         if page_name.startswith("_") or ".." in page_name:
             return Response(content="Forbidden", status_code=403)
 
-        if page_name == "index":
+        if page_name == "":
             page_name = "index"
-        else:
-            page_name = page_name
 
         try:
             page = await renderer.render_page(page_name, headers=request.headers)
