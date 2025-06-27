@@ -197,7 +197,7 @@ data:
         <!-- templates/text/view.html -->
         <div class="text-component" data-component="text">
           <div class="text-content">
-            {{ data.text | safe }}
+            \{\{ data.text | safe \}\}
           </div>
         </div>
         ```
@@ -222,7 +222,7 @@ data:
             name="text" 
             class="rich-text-editor"
             data-component-field="text">
-            {{ data.text }}
+            \{\{ data.text \}\}
           </textarea>
         </div>
         ```
@@ -257,12 +257,12 @@ data:
         ```html
         <!-- templates/custom-widget/view.html -->
         <div class="custom-widget" data-component="custom-widget">
-          <h3>{{ data.title }}</h3>
+          <h3>\{\{ data.title \}\}</h3>
           <div class="widget-content">
-            {{ data.content }}
+            \{\{ data.content \}\}
           </div>
           <div class="widget-footer">
-            <span class="widget-meta">{{ data.meta }}</span>
+            <span class="widget-meta">\{\{ data.meta \}\}</span>
           </div>
         </div>
         ```
@@ -273,15 +273,15 @@ data:
         <div class="custom-widget-editor">
           <div class="form-group">
             <label for="title">Title:</label>
-            <input type="text" id="title" name="title" value="{{ data.title }}">
+            <input type="text" id="title" name="title" value="\{\{ data.title \}\}">
           </div>
           <div class="form-group">
             <label for="content">Content:</label>
-            <textarea id="content" name="content">{{ data.content }}</textarea>
+            <textarea id="content" name="content">\{\{ data.content \}\}</textarea>
           </div>
           <div class="form-group">
             <label for="meta">Meta:</label>
-            <input type="text" id="meta" name="meta" value="{{ data.meta }}">
+            <input type="text" id="meta" name="meta" value="\{\{ data.meta \}\}">
           </div>
         </div>
         ```

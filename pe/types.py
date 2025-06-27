@@ -32,6 +32,7 @@ class BlockDefinition:
 
     type: str
     data: Any
+    id: str | None = None
     children: list[Self] = field(default_factory=list)
     style: dict[str, str] = field(default_factory=dict)
 
@@ -41,6 +42,7 @@ class BlockDefinition:
         Load a block definition from a dictionary.
         """
         return cls(
+            id=data.get("id", None),
             type=data["type"],
             data=data.get("data", {}),
             children=[
@@ -54,6 +56,7 @@ class BlockDefinition:
         Convert the block definition to a JSON-serializable dictionary.
         """
         return {
+            "id": self.id,
             "type": self.type,
             "data": self.data,
             "children": [child.to_dict() for child in self.children],

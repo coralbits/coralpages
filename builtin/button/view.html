@@ -1,0 +1,23 @@
+<button class="button @@class@@" id="@@id@@">
+  {{data.text}}{{ children }}
+</button>
+{% if "toggle_show" in data.onclick %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOMContentLoaded");
+
+    const element = document.getElementById("@@id@@");
+    element.addEventListener("click", function () {
+      {{data.onclick}}
+    });
+
+    function toggle_show(id, display) {
+      const element = document.querySelector(id);
+      element.style.display =
+        (element.style.display === "none" || element.style.display === "")
+          ? display
+          : "none";
+    }
+  });
+</script>
+{% endif %}

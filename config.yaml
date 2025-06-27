@@ -52,6 +52,12 @@ stores:
       - name: children
         html: children/view.html
         css: children/style.css
+      - name: button
+        html: button/view.html
+        css: button/style.css
+      - name: div
+        html: div/view.html
+        css: div/style.css
 
   - name: http
     type: http

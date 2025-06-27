@@ -1,7 +1,7 @@
 # Default template for documentation pages
 # This template provides a consistent layout with navigation menu
 
-title: "Coralbits Page Editor"
+title: "Coralbits Page Editor - Template"
 template: "docs://_base.html"
 
 meta:
@@ -18,52 +18,91 @@ css_variables:
   "--font-size": "16px"
   "--font-family": "Roboto, Arial, sans-serif"
   "--border-radius": "16px"
+  "--button-background-color": "#667eea"
+  "--button-text-color": "#fff"
+  "--button-border-color": "#667eea"
+  "--button-border-radius": "16px"
+  "--button-padding": "10px 20px"
+  "--button-margin": "10px"
+  "--button-font-size": "16px"
+  "--button-font-weight": "bold"
+  "--button-text-align": "center"
+  "--button-background-color-hover": "#556ee5"
+  "--button-text-color-hover": "#fff"
+  "--button-border-color-hover": "#556ee5"
+  "--button-background-color-active": "#4455d4"
 
 data:
   - type: builtin://header
     data:
       text: "Coralbits Page Editor Documentation"
     style:
-      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
-      color: white
-      font-size: 32px
-      font-weight: bold
-      text-align: center
-      padding: 30px
-      margin: 0
-      border-radius: 0
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1)
-
-  - type: builtin://menu
-    data:
-      items:
-        - label: "Home"
-          link: "./index"
-        - label: "Getting Started"
-          link: "./getting-started"
-        - label: "Components"
-          link: "./components"
-        - label: "Local Development"
-          link: "./local-development"
-        - label: "API Reference"
-          link: "./api-reference"
-        - label: "Editor Interface"
-          link: "./editor-interface"
-        - label: "Configuration"
-          link: "./configuration"
-        - label: "Examples"
-          link: "./examples"
-        - label: "Architecture"
-          link: "./architecture"
-        - label: "External API"
-          link: "./external-api"
-    style:
-      background: #f8f9fa
-      border-radius: 8px
-      margin: 20px auto
       max-width: 1200px
-      padding: 20px
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
+      margin: 20px auto
+
+  - type: builtin://div
+    id: "header-full-width"
+    style:
+      width: 100vw
+      margin: auto
+      background-color: var(--primary-color)
+    children:
+      - type: builtin://div
+        id: "header-content"
+        style:
+          display: flex
+          flex-direction: row
+          align-items: center
+          justify-content: space-between
+          max-width: 1200px
+          margin: auto
+          position: relative
+        children:
+          - type: builtin://header
+            data:
+              text: "{{page.title}}"
+            style:
+              color: white
+              -webkit-text-fill-color: white
+
+          - type: builtin://button
+            data:
+              text: "☰"
+              link: "./getting-started"
+              onclick: toggle_show("#menu", "flex")
+          - type: builtin://menu
+            id: "menu"
+            style:
+              display: none
+              position: absolute
+              top: 100%
+              left: calc( 100% - 300px )
+              background-color: var(--primary-color)
+              z-index: 100
+              padding: 10px
+            data:
+              direction: "column"
+              items:
+                - label: "Home"
+                  link: "./index"
+                - label: "Getting Started"
+                  link: "./getting-started"
+                - label: "Components"
+                  link: "./components"
+                - label: "Local Development"
+                  link: "./local-development"
+                - label: "API Reference"
+                  link: "./api-reference"
+                - label: "Editor Interface"
+                  link: "./editor-interface"
+                - label: "Configuration"
+                  link: "./configuration"
+                - label: "Examples"
+                  link: "./examples"
+                - label: "Architecture"
+                  link: "./architecture"
+                - label: "External API"
+                  link: "./external-api"
 
   - type: builtin://section
     style:

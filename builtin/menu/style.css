@@ -63,6 +63,28 @@
   outline-offset: 2px;
 }
 
+.menu-column {
+  width: auto;
+}
+
+.menu-column .menu-list {
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: fit-content;
+  display: flex;
+  flex-grow: 1;
+  width: 300px;
+}
+
+.menu-column .menu-item {
+  width: 100%;
+}
+
+.menu-column .menu-link {
+  width: 260px;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .menu-list {

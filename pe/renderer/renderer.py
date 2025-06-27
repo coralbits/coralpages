@@ -3,6 +3,7 @@ import logging
 from dataclasses import dataclass, field
 import hashlib
 import json
+import traceback
 from typing import Any
 
 import jinja2
@@ -53,17 +54,24 @@ class RenderedPage:
         """
         Update the page from a page definition.
         """
-        self.title = page_def.title
+        if not self.title:
+            self.title = page_def.title
+
         self.meta = [*page_def.meta]
         self.css_variables = {
             **self.css_variables,
             **page_def.css_variables,
         }
 
-    def get_current_id(self, prefix: str = "id-") -> int:
+    def get_current_id(self, block: BlockDefinition) -> int:
         """
         Get the current id.
         """
+        if block.id:
+            return block.id
+
+        prefix = block.type
+
         prefix = prefix.replace("://", "-")
         prefix = prefix.replace(":", "-")
         prefix = prefix.replace("/", "-")
@@ -201,8 +209,16 @@ class Renderer:
         logger.debug("Rendering page, %d blocks", len(page_def.data))
         for block in page_def.data:
             logger.debug("Rendering block: %s", block)
-            html = await self.render_block(page, block)
-            logger.debug("Block rendered: %s", block)
+            try:
+                html = await self.render_block(page, block)
+                logger.debug("Block rendered: %s", block)
+            except Exception as e:
+                logger.error("Error rendering block: %s", block)
+                logger.error("Error: %s", e)
+                if self.config.debug:
+                    html = f"<div style='color: red;'>Error rendering block: {block.type}<pre>{html_safe(traceback.format_exc())}</pre></div>"
+                else:
+                    raise
 
             page.append_content(html)
             logger.debug("Block appended: %s", block)
@@ -269,29 +285,41 @@ class Renderer:
             or ""
         )
 
-        children = StrList(
-            [await self.render_block(page, child) for child in (block.children or [])]
-        )
+        children = StrList()
+        for child in block.children or []:
+            try:
+                children_data = await self.render_block(page, child)
+                children.append(children_data)
+            except Exception as e:
+                logger.error("Error rendering child: %s", child)
+                logger.error("Error: %s", e)
+                if self.config.debug:
+                    children_data = f"<div style='color: red;'>Error rendering child: {child.type}<pre>{html_safe(traceback.format_exc())}</pre></div>"
+                else:
+                    raise
 
         if "jinja2" in element_loader.tags:
             logger.debug("Rendering Jinja2 for block: %s", block)
+
+            data = self.jinja2_render_dict(block.data, page=page, context=page.context)
+
             html = self.jinja2_render(
                 html,
-                data=block.data,
+                data=data,
                 context=page.context,
                 page=page,
                 children=children,
             )
             css = self.jinja2_render(
                 css,
-                data=block.data,
+                data=data,
                 context=page.context,
                 page=page,
             )
         elif "@@children@@" in html:
             html = html.replace("@@children@@", "\n".join(children))
 
-        block_id = page.get_current_id(block.type)
+        block_id = page.get_current_id(block)
 
         if block.style:
             css_id = f"#{block_id}"
@@ -317,6 +345,24 @@ class Renderer:
         template = self.jinja2_env.from_string(html)
         return template.render(**context)
 
+    def jinja2_render_dict(
+        self, data: dict[str, Any], **context: Any
+    ) -> dict[str, Any]:
+        """
+        Render a Jinja2 template.
+        """
+        ret = {}
+        for key, value in data.items():
+            if isinstance(value, str):
+                ret[key] = self.jinja2_render(value, **context)
+            elif isinstance(value, dict):
+                ret[key] = self.jinja2_render_dict(value, **context)
+            elif isinstance(value, list):
+                ret[key] = [self.jinja2_render_dict(item, **context) for item in value]
+            else:
+                ret[key] = value
+        return ret
+
 
 def css_dict_to_css_text(css: dict[str, str]) -> str:
     """
@@ -332,3 +378,10 @@ class StrList(list[str]):
 
     def __str__(self) -> str:
         return "\n".join([str(x) for x in self])
+
+
+def html_safe(text: str) -> str:
+    """
+    Escape HTML.
+    """
+    return text.replace("<", "&lt;").replace(">", "&gt;")
