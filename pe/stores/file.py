@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from pe.types import BlockDefinition, PageDefinition, StoreConfig
+from pe.types import BlockDefinition, ElementDefinition, PageDefinition, StoreConfig
 from pe.stores.types import StoreBase
 
 logger = logging.getLogger(__name__)
@@ -110,3 +110,9 @@ class FileStore(StoreBase):
 
         with open(filepath, "r", encoding="utf-8") as file:
             return file.read()
+
+    def get_element_list(self) -> list[ElementDefinition]:
+        """
+        Get a list of all elements in the file store.
+        """
+        return self.config.blocks

@@ -92,12 +92,15 @@ class Renderer:
     Renderer for the page editor.
     """
 
-    def __init__(self, config: Config):
+    def __init__(self, config: Config, store: StoreFactory | None = None):
         """
         Initialize the renderer.
         """
         self.config = config
-        self.store = StoreFactory(config=config)
+        if store:
+            self.store = store
+        else:
+            self.store = StoreFactory(config=config)
         self.jinja2_env = jinja2.Environment()
         self.jinja2_env.filters["markdown"] = markdown.markdown
 

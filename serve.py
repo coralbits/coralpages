@@ -9,6 +9,7 @@ from typing import Any
 import yaml
 from pe.config import Config
 from pe.renderer.renderer import Renderer
+from pe.stores.factory import StoreFactory
 from pe.types import BlockDefinition, ElementDefinition
 import uvicorn
 from fastapi import FastAPI
@@ -31,6 +32,8 @@ def create_app(args: argparse.Namespace):
         return config
 
     config = prepare_config()
+    store = StoreFactory(config=config)
+    renderer = Renderer(config, store)
 
     @app.get("/api/v1/view/{page_name}")
     async def read_page(request: Request, page_name: str):
@@ -43,7 +46,6 @@ def create_app(args: argparse.Namespace):
             page_name = page_name
 
         try:
-            renderer = Renderer(config)
             page = await renderer.render_page(page_name, headers=request.headers)
             return Response(
                 content=str(page),
@@ -64,9 +66,13 @@ def create_app(args: argparse.Namespace):
 
     @app.get("/api/v1/element/")
     def list_known_elements():
-        elements_dict = {
-            name: element.to_dict() for name, element in config.elements.items()
-        }
+        elements_dict = []
+        for store_item in store.get_all_stores().values():
+            for element in store_item.get_element_list():
+                eldef = element.to_dict()
+                eldef["store"] = store_item.config.name
+                eldef["name"] = f"{store_item.config.name}://{element.name}"
+                elements_dict.append(eldef)
         return Response(
             content=json.dumps(elements_dict), media_type="application/json"
         )
@@ -83,7 +89,6 @@ def create_app(args: argparse.Namespace):
             children=[],
             style={},
         )
-        renderer = Renderer(config)
         page = renderer.new_page()
         html, _ = await renderer.render_block(page, block)
         return Response(content=html, media_type="text/html")
@@ -100,7 +105,6 @@ def create_app(args: argparse.Namespace):
             children=[],
             style={},
         )
-        renderer = Renderer(config)
         page = renderer.new_page()
         _, css = await renderer.render_block(page, block)
         return Response(content=css, media_type="text/css")

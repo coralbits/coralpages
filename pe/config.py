@@ -33,7 +33,6 @@ class Config:
     """
 
     page_path: Path = field(default_factory=Path)
-    elements: dict[str, ElementDefinition] = field(default_factory=dict)
     stores: dict[str, StoreConfig] = field(default_factory=dict)
     debug: bool = False
     server: ServerConfig = field(default_factory=ServerConfig)
@@ -55,10 +54,6 @@ class Config:
         return Config(
             debug=data.get("debug", False),
             page_path=Path(data.get("page_path", "")),
-            elements={
-                element["name"]: ElementDefinition.from_dict(element)
-                for element in data.get("elements", [])
-            },
             stores={
                 store["name"]: StoreConfig.from_dict(store)
                 for store in data.get("stores", [])

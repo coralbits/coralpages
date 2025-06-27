@@ -41,6 +41,13 @@ class StoreBase:
         """
         raise NotImplementedError("load_page_definition not implemented")
 
+    def get_element_list(self) -> list[ElementDefinition]:
+        """
+        Get a list of all elements in the store.
+        """
+        logger.debug("Getting element list for store: %s", self.config.name)
+        return []
+
     def get_element_definition(self, path: str) -> ElementDefinition | None:
         """
         Get an element definition from the store.
