@@ -3,7 +3,7 @@ from typing import Self
 from pathlib import Path
 
 import yaml
-from pe.types import ElementDefinition, StoreConfig
+from pe.types import StoreConfig
 
 
 @dataclass
