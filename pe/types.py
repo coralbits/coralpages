@@ -124,6 +124,42 @@ class FieldDefinition:
     name: str
     type: str
     value: Any
+    label: str
+    placeholder: str
+
+    @classmethod
+    def from_dict(cls, data: dict) -> Self:
+        """
+        Load a field definition from a dictionary.
+        """
+        return cls(
+            name=data.get("name", ""),
+            type=data.get("type", ""),
+            value=data.get("value", ""),
+            label=data.get("label", ""),
+            placeholder=data.get("placeholder", ""),
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert the field definition to a JSON-serializable dictionary.
+        """
+        return clean_dict(
+            {
+                "name": self.name,
+                "type": self.type,
+                "value": self.value,
+                "label": self.label,
+                "placeholder": self.placeholder,
+            }
+        )
+
+
+def clean_dict(data: dict[str, Any]) -> dict[str, Any]:
+    """
+    Clean a dictionary of None values.
+    """
+    return {k: v for k, v in data.items() if v is not None}
 
 
 @dataclass
@@ -135,9 +171,11 @@ class ElementDefinition:
     name: str
     store: str | None = None
     html: str | None = None
+    editor: list[FieldDefinition] | None = None
     css: str | None = None
     method: str | None = None
     tags: list[str] = field(default_factory=list)
+    icon: str | None = None
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -151,6 +189,10 @@ class ElementDefinition:
             css=data.get("css"),
             method=data.get("method"),
             tags=data.get("tags", []),
+            icon=data.get("icon"),
+            editor=[
+                FieldDefinition.from_dict(field) for field in data.get("editor", [])
+            ],
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -164,6 +206,8 @@ class ElementDefinition:
             "css": self.css,
             "method": self.method,
             "tags": self.tags,
+            "icon": self.icon,
+            "editor": [field.to_dict() for field in self.editor],
         }
 
 

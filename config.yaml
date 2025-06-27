@@ -31,36 +31,75 @@ stores:
       - jinja2
     blocks:
       - name: text
+        description: A text element
+        icon: text
         html: text/view.html
         css: text/style.css
+        editor:
+          - type: textarea
+            label: Text
+            name: text
+            placeholder: Enter text
+            required: true
       - name: image
+        description: An image element
+        icon: image
         html: image/view.html
         css: image/style.css
       - name: header
+        description: A header element
+        icon: header
         html: header/view.html
         css: header/style.css
       - name: section
+        description: A section element
+        icon: section
         html: section/view.html
         css: section/style.css
       - name: tag-cloud
+        description: A tag cloud element
+        icon: tag-cloud
         html: tag-cloud/view.html
         css: tag-cloud/style.css
       - name: paragraph
+        description: A paragraph element
+        icon: paragraph
         html: text/view.html
         css: text/style.css
       - name: menu
+        description: A menu element
+        icon: menu
         html: menu/view.html
         css: menu/style.css
       - name: markdown
+        description: A markdown element
+        icon: markdown
         html: markdown/view.html
         css: markdown/style.css
+        editor:
+          - type: text
+            label: Title
+            name: title
+            placeholder: Enter title
+            required: true
+          - type: textarea
+            label: Markdown
+            name: markdown
+            placeholder: Enter markdown text
+            required: true
       - name: children
+        description: A children element
+        icon: children
         html: children/view.html
         css: children/style.css
       - name: button
+        description: A button element
+        icon: button
         html: button/view.html
         css: button/style.css
       - name: div
+        description: A div element
+        icon: div
         html: div/view.html
         css: div/style.css
 
