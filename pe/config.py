@@ -18,6 +18,7 @@ class ServerConfig:
     directory: list[Path] = field(default_factory=list)
     etag_salt: str = "%Y-%m-%d"
     allow_origins: list[str] = field(default_factory=list)
+    render: bool = False
 
     @staticmethod
     def from_dict(data: dict) -> Self:
@@ -31,6 +32,7 @@ class ServerConfig:
             directory=data.get("directory", []),
             etag_salt=data.get("etag_salt", "%Y-%m-%d"),
             allow_origins=data.get("allow_origins", []),
+            render=data.get("render", False),
         )
 
 

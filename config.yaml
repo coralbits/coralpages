@@ -11,6 +11,8 @@ server:
     - http://127.0.0.1:1234
     - http://127.0.0.1:3000
 
+  render: true
+
 page_path: ./docs
 debug: true
 
@@ -84,7 +86,7 @@ stores:
             required: true
           - type: textarea
             label: Markdown
-            name: markdown
+            name: text
             placeholder: Enter markdown text
             required: true
       - name: children

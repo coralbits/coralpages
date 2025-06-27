@@ -10,7 +10,7 @@ import yaml
 from pe.config import Config
 from pe.renderer.renderer import Renderer
 from pe.stores.factory import StoreFactory
-from pe.types import BlockDefinition, ElementDefinition
+from pe.types import BlockDefinition, ElementDefinition, PageDefinition
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -118,6 +118,21 @@ def create_app(args: argparse.Namespace):
         page = renderer.new_page()
         _, css = await renderer.render_block(page, block)
         return Response(content=css, media_type="text/css")
+
+    @app.post("/api/v1/render/")
+    async def render_page(request: Request):
+        if not config.server.render:
+            return Response(content="Not enabled", status_code=500)
+
+        data = await request.json()
+        page = PageDefinition.from_dict(data)
+        page = await renderer.render(page)
+        return Response(
+            content=str(page),
+            media_type="text/html",
+            status_code=page.response_code,
+            headers=page.headers,
+        )
 
     @app.get("/")
     def redirect_to_index():
