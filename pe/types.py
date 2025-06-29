@@ -5,6 +5,7 @@ Types for the page editor.
 import datetime
 from typing import Any, Self
 from dataclasses import dataclass, field
+import uuid
 
 
 @dataclass
@@ -48,7 +49,7 @@ class BlockDefinition:
         Load a block definition from a dictionary.
         """
         return cls(
-            id=data.get("id", None),
+            id=data.get("id", None) or f"_{uuid.uuid4()}",
             type=data["type"],
             data=data.get("data", {}),
             children=[
