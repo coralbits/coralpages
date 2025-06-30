@@ -63,3 +63,16 @@ class StoreFactory:
             if page_definition:
                 return page_definition
         return None
+
+    async def save_page_definition(self, path: str, data: PageDefinition) -> None:
+        """
+        Save a page definition to all stores.
+        """
+        if "://" in path:
+            store_name, path = path.split("://", 1)
+        else:
+            store_name = "default"
+        store = self.get_store(store_name)
+        if not store:
+            raise ValueError(f"Store {store_name} not found")
+        await store.save_page_definition(path=path, data=data)

@@ -41,6 +41,12 @@ class StoreBase:
         """
         raise NotImplementedError("load_page_definition not implemented")
 
+    async def save_page_definition(self, *, path: str, data: PageDefinition) -> None:
+        """
+        Save a page to the store.
+        """
+        raise NotImplementedError("save_page_definition not implemented")
+
     def get_element_list(self) -> list[ElementDefinition]:
         """
         Get a list of all elements in the store.

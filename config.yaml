@@ -19,6 +19,12 @@ debug: true
 # tags from stores are inherited into their elements, for exmaple
 # jinja2 at store, makes all the elements jinja2 rendered.
 stores:
+  - name: default
+    type: db
+    url: sqlite://./data/pe.db
+    types:
+      - pages
+      - templates
   - name: docs
     type: file
     path: ./docs/
@@ -148,6 +154,3 @@ stores:
       - templates
       # - post:json
       - get:qs
-  - name: db
-    type: db
-    url: sqlite://./data/pe.db

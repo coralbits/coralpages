@@ -1,5 +1,5 @@
 <ul class="tag-cloud @@class@@">
-    {% for tag in data.tags %}
-    <li>{{tag}}</li>
-    {% endfor %}
+  {% for tag in data.tags.split(None) %}
+  <li>{{tag}}</li>
+  {% endfor %}
 </ul>

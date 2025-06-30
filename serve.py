@@ -79,6 +79,15 @@ def create_app(args: argparse.Namespace):
             else:
                 return Response(content="Internal Server Error", status_code=500)
 
+    @app.post("/api/v1/page/{page_name}/json")
+    async def save_page_json(request: Request, page_name: str):
+        data = await request.json()
+        store_name = data.get("store", "default")
+        path = f"{store_name}://{page_name}"
+        page = PageDefinition.from_dict(data)
+        await store.save_page_definition(path=path, data=page)
+        return Response(content="OK", status_code=200)
+
     @app.get("/api/v1/element/")
     def list_known_elements():
         elements_dict = []
