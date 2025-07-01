@@ -2,8 +2,6 @@ server:
   port: 8000
   host: 0.0.0.0
   reload: true
-  directory:
-    - docs
   etag_salt: "%Y-%m-%d" # change this to a random string to invalidate the etag. Set to a date format to invalidate the etag on every change
   allow_origins: # CORS
     - http://localhost:1234
@@ -13,7 +11,6 @@ server:
 
   render: true
 
-page_path: ./docs
 debug: true
 
 # tags from stores are inherited into their elements, for exmaple

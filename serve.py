@@ -18,6 +18,9 @@ from fastapi.responses import RedirectResponse, Response
 from fastapi.requests import Request
 
 
+logging.basicConfig(level=logging.DEBUG)
+
+
 def create_app(args: argparse.Namespace):
     """
     Create the FastAPI app.
@@ -28,8 +31,7 @@ def create_app(args: argparse.Namespace):
         """
         Prepare the config for the renderer.
         """
-        config = Config.read("config.yaml")
-        config.page_path = Path(args.directory)
+        config = Config.read(args.config)
         return config
 
     config = prepare_config()
@@ -162,7 +164,9 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Serve pages using FastAPI with hexagonal architecture."
     )
-    parser.add_argument("directory", help="Directory containing YAML pages to serve")
+    parser.add_argument(
+        "config", help="Path to the config file", default="config.yaml", nargs="?"
+    )
     parser.add_argument(
         "--host", default="0.0.0.0", help="Host to bind to (default: 0.0.0.0)"
     )

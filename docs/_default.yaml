@@ -59,6 +59,13 @@ data:
           margin: auto
           position: relative
         children:
+          - type: builtin://image
+            id: "header-logo"
+            data:
+              src: "http://localhost:8005/page-assets/logo.png"
+            style:
+              max-width: 100px
+              max-height: 100px
           - type: builtin://header
             id: "header-title"
             data:
