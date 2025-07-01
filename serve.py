@@ -165,7 +165,14 @@ def parse_args():
         description="Serve pages using FastAPI with hexagonal architecture."
     )
     parser.add_argument(
-        "config", help="Path to the config file", default="config.yaml", nargs="?"
+        "other",
+        help="Other arguments are ignored",
+        nargs="*",
+    )
+    parser.add_argument(
+        "--config",
+        help="Path to the config file",
+        default="config.yaml",
     )
     parser.add_argument(
         "--host", default="0.0.0.0", help="Host to bind to (default: 0.0.0.0)"
