@@ -35,11 +35,28 @@ css_variables:
 data:
   - type: builtin://header
     id: "header"
-    data:
-      text: "Coralbits Page Editor Documentation"
     style:
       max-width: 1200px
       margin: 20px auto
+      background-color: var(--primary-color)
+      justify-content: space-between
+    children:
+      - type: builtin://text
+        id: "header-title-base"
+        data:
+          text: "Coralbits Page Editor Documentation"
+        style:
+          font-size: 48px
+          font-weight: bold
+          color: var(--primary-color)
+      - type: builtin://image
+        id: "header-logo"
+        data:
+          src: "http://localhost:8005/page-assets/logo.png"
+        style:
+          max-width: 100px
+          max-height: 100px
+          margin-left: 20px
 
   - type: builtin://div
     id: "header-full-width"
@@ -59,13 +76,6 @@ data:
           margin: auto
           position: relative
         children:
-          - type: builtin://image
-            id: "header-logo"
-            data:
-              src: "http://localhost:8005/page-assets/logo.png"
-            style:
-              max-width: 100px
-              max-height: 100px
           - type: builtin://header
             id: "header-title"
             data:
