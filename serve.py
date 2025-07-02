@@ -47,13 +47,6 @@ def create_app(args: argparse.Namespace):
         allow_headers=["*"],
     )
 
-    @app.get("/api/v1/page/{page_name}/json")
-    async def read_page_json(page_name: str):
-        page = await store.load_page_definition_all_stores(page_name)
-        return Response(
-            content=json.dumps(page.to_dict()), media_type="application/json"
-        )
-
     @app.get("/api/v1/view/{page_name}")
     async def read_page(request: Request, page_name: str):
         if page_name.startswith("_") or ".." in page_name:
@@ -80,6 +73,16 @@ def create_app(args: argparse.Namespace):
                 )
             else:
                 return Response(content="Internal Server Error", status_code=500)
+
+    @app.get("/api/v1/page/{page_name}/json")
+    async def read_page_json(request: Request, page_name: str):
+        page = await store.load_page_definition_all_stores(page_name)
+        page.url = (
+            f"{request.url.scheme}://{request.url.netloc}/api/v1/view/{page_name}"
+        )
+        return Response(
+            content=json.dumps(page.to_dict()), media_type="application/json"
+        )
 
     @app.post("/api/v1/page/{page_name}/json")
     async def save_page_json(request: Request, page_name: str):

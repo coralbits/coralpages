@@ -78,6 +78,7 @@ class PageDefinition:
     """
 
     title: str = ""
+    url: str | None = None
     template: str | None = None
     data: list[BlockDefinition] = field(default_factory=list)
     cache: list[str] = field(default_factory=list)
@@ -97,6 +98,7 @@ class PageDefinition:
 
         return cls(
             title=data["title"],
+            url=data.get("url", None),
             template=data["template"],
             data=[BlockDefinition.from_dict(block) for block in data["data"]],
             cache=data.get("cache", []),
@@ -111,6 +113,7 @@ class PageDefinition:
         """
         return {
             "title": self.title,
+            "url": self.url,
             "template": self.template,
             "cache": self.cache,
             "data": [block.to_dict() for block in self.data],
