@@ -1,5 +1,5 @@
 server:
-  port: 8000
+  port: 8006
   host: 0.0.0.0
   reload: true
   etag_salt: "%Y-%m-%d" # change this to a random string to invalidate the etag. Set to a date format to invalidate the etag on every change
