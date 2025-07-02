@@ -51,10 +51,18 @@ stores:
         html: image/view.html
         css: image/style.css
         editor:
-          - type: text
+          - type: image
             label: Image
-            name: image
-            placeholder: Enter image URL
+            name: src
+            placeholder: Image URL
+          - type: text
+            label: Alt
+            name: alt
+            placeholder: Enter alt text
+          - type: text
+            label: Caption
+            name: caption
+            placeholder: Enter caption
       - name: header
         description: A header element
         icon: header
