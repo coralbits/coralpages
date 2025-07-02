@@ -1,6 +1,15 @@
+{% if data.caption %}
 <figure class="image-container @@class@@" id="@@id@@">
   <img class="content-image" src="{{data.src}}" alt="{{data.alt or ''}}" />
   {% if data.caption %}
   <figcaption>{{data.caption}}</figcaption>
   {% endif %}
 </figure>
+{% else %}
+<img
+  class="content-image @@class@@"
+  id="@@id@@"
+  src="{{data.src}}"
+  alt="{{data.alt or ''}}"
+/>
+{% endif %}
