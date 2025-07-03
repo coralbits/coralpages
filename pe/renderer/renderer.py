@@ -42,6 +42,11 @@ class RenderedPage:
         Append content to the page. Also increments the max_id.
         """
         self.content += content
+
+    def increment_id(self):
+        """
+        Increment the max_id.
+        """
         self.max_id += 1
 
     def append_meta(self, meta: MetaDefinition):
@@ -103,6 +108,7 @@ class Renderer:
             self.store = StoreFactory(config=config)
         self.jinja2_env = jinja2.Environment()
         self.jinja2_env.filters["markdown"] = markdown.markdown
+        self.jinja2_env.filters["json"] = lambda x: json.dumps(x, indent=2, default=str)
 
     def new_page(self) -> RenderedPage:
         """
@@ -125,7 +131,6 @@ class Renderer:
         if not page_definition:
             raise ValueError(f"Page definition not found: {page_name}")
 
-        logger.debug("Page definition: %s", page_definition)
         new_etag = None
         new_last_modified = None
         if "etag" in page_definition.cache:
@@ -211,20 +216,18 @@ class Renderer:
 
         logger.debug("Rendering page, %d blocks", len(page_def.data))
         for block in page_def.data:
-            logger.debug("Rendering block: %s", block)
+            logger.debug("Rendering block: %s", block.type)
             try:
-                html = await self.render_block(page, block)
-                logger.debug("Block rendered: %s", block)
-            except Exception as e:
-                logger.error("Error rendering block: %s", block)
-                logger.error("Error: %s", e)
+                html = await self.render_block(page, block, context=page.context)
+            except Exception:  # pylint: disable=broad-exception-caught
+                logger.exception("Error rendering block: %s", block)
                 if self.config.debug:
                     html = f"<div style='color: red;'>Error rendering block: {block.type}<pre>{html_safe(traceback.format_exc())}</pre></div>"
                 else:
                     raise
 
             page.append_content(html)
-            logger.debug("Block appended: %s", block)
+            page.increment_id()
 
     async def render_in_template(
         self, *, page: RenderedPage, template_name: str
@@ -264,63 +267,80 @@ class Renderer:
                 page=page, template_name=template_def.template
             )
 
-    async def render_block(self, page: RenderedPage, block: BlockDefinition) -> str:
+    async def render_block(
+        self, page: RenderedPage, block: BlockDefinition, context: dict[str, Any]
+    ) -> str:
         """
         Render a block asynchronously.
         """
-        element_loader = self.store.get_store(block.type)
+        store, eltype = block.type.split("://", 1)
+        element_loader = self.store.get_store(store)
         if element_loader is None:
             raise ValueError(f"Element loader not found for block: {block.type}")
 
-        logger.debug("Loader for element: %s", element_loader)
-        logger.debug("Loading HTML for block: %s", block)
+        new_context = await element_loader.load_context(
+            path=eltype, data=block.data, context=context
+        )
+        if new_context:
+            context = {
+                **context,
+                **new_context,
+            }
+
         html = (
             await element_loader.load_html(
-                path=block.type, data=block.data, context=page.context
+                path=eltype, data=block.data, context=context
             )
             or ""
         )
-        logger.debug("Loading CSS for block: %s", block)
         css = (
-            await element_loader.load_css(
-                path=block.type, data=block.data, context=page.context
-            )
+            await element_loader.load_css(path=eltype, data=block.data, context=context)
             or ""
         )
 
         children = StrList()
         for child in block.children or []:
             try:
-                children_data = await self.render_block(page, child)
+                children_data = await self.render_block(page, child, context=context)
+                # logger.debug("Rendered child: %s", children_data)
                 children.append(children_data)
-            except Exception as e:
-                logger.error("Error rendering child: %s", child)
-                logger.error("Error: %s", e)
+                page.increment_id()
+            except Exception:  # pylint: disable=broad-exception-caught
+                logger.exception("Error rendering child: %s", child)
                 if self.config.debug:
                     children_data = f"<div style='color: red;'>Error rendering child: {child.type}<pre>{html_safe(traceback.format_exc())}</pre></div>"
                 else:
                     raise
 
         if "jinja2" in element_loader.tags:
-            logger.debug("Rendering Jinja2 for block: %s", block)
-
-            data = self.jinja2_render_dict(block.data, page=page, context=page.context)
+            data = self.jinja2_render_dict(block.data, page=page, context=context)
 
             html = self.jinja2_render(
                 html,
                 data=data,
-                context=page.context,
+                context=context,
                 page=page,
                 children=children,
             )
             css = self.jinja2_render(
                 css,
                 data=data,
-                context=page.context,
+                context=context,
                 page=page,
             )
         elif "@@children@@" in html:
             html = html.replace("@@children@@", "\n".join(children))
+            # logger.debug("Rendered block: %s", html)
+
+        # logger.debug(
+        #     "Rendered block=%s, data=%s, context=%s, children=%s, html=%s, element_loader=%s",
+        #     block.type,
+        #     block.data,
+        #     context,
+        #     children,
+        #     html,
+        #     element_loader,
+        # )
 
         block_id = page.get_current_id(block)
 

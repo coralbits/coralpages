@@ -2,6 +2,7 @@
 Store factory for creating store instances.
 """
 
+import logging
 from typing import Dict
 
 from pe.config import Config
@@ -10,6 +11,8 @@ from pe.stores.file import FileStore
 from pe.stores.http import HttpStore
 from pe.stores.db import DbStore
 from pe.types import PageDefinition, StoreConfig
+
+logger = logging.getLogger(__name__)
 
 
 class StoreFactory:
@@ -44,7 +47,17 @@ class StoreFactory:
         if "://" in store_name:
             store_name = store_name.split("://", 1)[0]
 
-        return self._stores[store_name]
+        store = self._stores.get(store_name)
+        if not store:
+            logger.error(
+                "Store %s not found. Available stores: %s",
+                store_name,
+                self._stores.keys(),
+            )
+            raise ValueError(
+                f"Store {store_name} not found. Available stores: {list(self._stores.keys())}"
+            )
+        return store
 
     def get_all_stores(self) -> Dict[str, StoreBase]:
         """

@@ -148,14 +148,16 @@ stores:
         icon: div
         html: div/view.html
         css: div/style.css
+      - name: html
+        description: A HTML element
+        icon: html
+        html: html/view.html
+        editor:
+          - type: html
+            label: HTML
 
+  # allow HTTP based stores
   - name: http
     type: http
-    # This is the base URL for the HTTP store. It is used to load the elements.
-    # if not set should use full url, but its less secure
-    base_url: http://localhost:8000/api/v1/element/
-    tags:
-      - pages
-      - templates
-      # - post:json
-      - get:qs
+    base_urls: # only allow HTTP request that start like any of these
+      - http://localhost:8000/api/v1/element/

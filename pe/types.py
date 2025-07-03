@@ -133,9 +133,9 @@ class FieldDefinition:
 
     name: str
     type: str
-    value: Any
-    label: str
-    placeholder: str
+    label: str | None = None
+    placeholder: str | None = None
+    options: list[str] = field(default_factory=list)
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -145,9 +145,9 @@ class FieldDefinition:
         return cls(
             name=data.get("name", ""),
             type=data.get("type", ""),
-            value=data.get("value", ""),
-            label=data.get("label", ""),
-            placeholder=data.get("placeholder", ""),
+            label=data.get("label", None),
+            placeholder=data.get("placeholder", None),
+            options=data.get("options", []),
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -158,9 +158,9 @@ class FieldDefinition:
             {
                 "name": self.name,
                 "type": self.type,
-                "value": self.value,
                 "label": self.label,
                 "placeholder": self.placeholder,
+                "options": self.options,
             }
         )
 
@@ -179,13 +179,14 @@ class ElementDefinition:
     """
 
     name: str
+    description: str | None = None
     store: str | None = None
     html: str | None = None
     editor: list[FieldDefinition] | None = None
     css: str | None = None
-    method: str | None = None
     tags: list[str] = field(default_factory=list)
     icon: str | None = None
+    children: bool = False
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -195,9 +196,9 @@ class ElementDefinition:
         return cls(
             name=data["name"],
             store=data.get("store", None),
+            description=data.get("description", None),
             html=data.get("html"),
             css=data.get("css"),
-            method=data.get("method"),
             tags=data.get("tags", []),
             icon=data.get("icon"),
             editor=[
@@ -212,9 +213,9 @@ class ElementDefinition:
         return {
             "name": self.name,
             "store": self.store,
+            "description": self.description,
             "html": self.html,
             "css": self.css,
-            "method": self.method,
             "tags": self.tags,
             "icon": self.icon,
             "editor": [field.to_dict() for field in self.editor],
@@ -234,6 +235,13 @@ class StoreConfig:
     url: str | None = None
     tags: list[str] = field(default_factory=list)
     blocks: list[ElementDefinition] = field(default_factory=list)
+    config: dict[str, Any] = field(default_factory=dict)
+
+    def get(self, key: str, default: Any = None) -> Any:
+        """
+        Get a configuration value.
+        """
+        return self.config.get(key, default)
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -257,6 +265,7 @@ class StoreConfig:
             url=data.get("url"),
             tags=tags,
             blocks=blocks,
+            config=data,
         )
 
     def to_dict(self) -> dict[str, Any]:
@@ -271,4 +280,15 @@ class StoreConfig:
             "url": self.url,
             "tags": self.tags,
             "blocks": [block.to_dict() for block in self.blocks],
+            **map_drop(
+                self.config,
+                ["name", "type", "path", "base_url", "url", "tags", "blocks"],
+            ),
         }
+
+
+def map_drop(data: dict[str, Any], keys: list[str]) -> dict[str, Any]:
+    """
+    Map a dictionary, dropping the keys.
+    """
+    return {k: v for k, v in data.items() if k not in keys}

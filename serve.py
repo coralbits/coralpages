@@ -94,10 +94,10 @@ def create_app(args: argparse.Namespace):
         return Response(content="OK", status_code=200)
 
     @app.get("/api/v1/element/")
-    def list_known_elements():
+    async def list_known_elements():
         elements_dict = []
         for store_item in store.get_all_stores().values():
-            for element in store_item.get_element_list():
+            for element in await store_item.get_element_list():
                 eldef = element.to_dict()
                 eldef["store"] = store_item.config.name
                 eldef["name"] = f"{store_item.config.name}://{element.name}"

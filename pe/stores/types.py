@@ -35,6 +35,14 @@ class StoreBase:
         """
         raise NotImplementedError("load_css not implemented")
 
+    async def load_context(
+        self, *, path: str, data: dict[str, Any], context: dict[str, Any]
+    ) -> dict[str, Any] | None:
+        """
+        Load the context for the store. By default do nothing, keep current context as is.
+        """
+        return None
+
     async def load_page_definition(self, *, path: str) -> PageDefinition | None:
         """
         Load a page from the store.
@@ -47,27 +55,24 @@ class StoreBase:
         """
         raise NotImplementedError("save_page_definition not implemented")
 
-    def get_element_list(self) -> list[ElementDefinition]:
+    async def get_element_list(self) -> list[ElementDefinition]:
         """
         Get a list of all elements in the store.
         """
         logger.debug("Getting element list for store: %s", self.config.name)
         return []
 
-    def get_element_definition(self, path: str) -> ElementDefinition | None:
+    async def get_element_definition(self, path: str) -> ElementDefinition | None:
         """
         Get an element definition from the store.
         """
-        if "://" in path:
-            path = path.split("://", 1)[1]
-
-        for block in self.config.blocks:
+        for block in await self.get_element_list():
             if block.name == path:
-                logger.debug("Found element definition: %s", block)
                 return block
 
-        logger.debug("No element definition found for: %s", path)
-        return None
+        raise ValueError(
+            f"Element definition not found for path: {path}. Available elements: {list(block.name for block in await self.get_element_list())}"
+        )
 
     def clean_path(self, path: str) -> str:
         """

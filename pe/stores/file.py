@@ -29,10 +29,10 @@ class FileStore(StoreBase):
         """
         Load a page from the file store.
         """
-        if path == "builtin://html":
+        if path == "html":
             return data.get("html", "")
 
-        element_definition = self.get_element_definition(path)
+        element_definition = await self.get_element_definition(path)
         if element_definition is None:
             return None
 
@@ -51,7 +51,7 @@ class FileStore(StoreBase):
 
         CSS is plain CSS data
         """
-        element_definition = self.get_element_definition(path)
+        element_definition = await self.get_element_definition(path)
         if element_definition is None:
             return None
 
@@ -103,15 +103,13 @@ class FileStore(StoreBase):
         data is ignored, to be rendered by the renderer.
         """
         filepath = self.base_path / path
-        logger.debug("Loading generic from: %s", filepath)
         if not filepath.exists():
-            logger.debug("File not found: %s", filepath)
             return None
 
         with open(filepath, "r", encoding="utf-8") as file:
             return file.read()
 
-    def get_element_list(self) -> list[ElementDefinition]:
+    async def get_element_list(self) -> list[ElementDefinition]:
         """
         Get a list of all elements in the file store.
         """
