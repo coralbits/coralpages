@@ -127,7 +127,7 @@ class HttpStore(StoreBase):
             ElementDefinition(
                 name="apicontext",
                 description="Point to a JSON API endpoint, and children can use the data to render. It can itself use some context data as well.",
-                icon="api",
+                icon="server",
                 children=True,
                 editor=[
                     FieldDefinition(
@@ -153,7 +153,7 @@ class HttpStore(StoreBase):
             ElementDefinition(
                 name="embed",
                 description="Embed a URL, and children can use the data to render. It can itself use some context data as well.",
-                icon="link",
+                icon="html",
                 children=True,
                 editor=[
                     FieldDefinition(

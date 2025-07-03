@@ -49,7 +49,7 @@ blocks:
         placeholder: Enter text
   - name: tag-cloud
     description: A tag cloud element
-    icon: tag-cloud
+    icon: tag
     html: tag-cloud/view.html
     css: tag-cloud/style.css
     editor:
