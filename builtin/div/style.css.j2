@@ -1,0 +1,50 @@
+{% if data.direction or data.alignment_vertical or data.alignment_horizontal %}
+#{{data.id}} {
+  display: flex;
+  {% if data.wrap == "true" %}
+    flex-wrap: wrap;
+  {% endif %}
+  {% if data.direction == 'column' %}
+    flex-direction: column;
+    {% if data.alignment_vertical == "top" %}
+      justify-content: start;
+    {% elif data.alignment_vertical == "center" %}
+      justify-content: center;
+    {% elif data.alignment_vertical == "bottom" %}
+      justify-content: end;
+    {% else %}
+      justify-content: start;
+    {% endif %}
+    {% if data.alignment_horizontal == "left" %}
+      align-items: start;
+    {% elif data.alignment_horizontal == "center" %}
+      align-items: center;
+    {% elif data.alignment_horizontal == "right" %}
+      align-items: end;
+    {% endif %}
+  {% else %}
+    flex-direction: row;
+    {% if data.alignment_vertical == "top" %}
+      align-items: start;
+    {% elif data.alignment_vertical == "center" %}
+      align-items: center;
+    {% elif data.alignment_vertical == "bottom" %}
+      align-items: end;
+    {% else %}
+      align-items: start;
+    {% endif %}
+    {% if data.alignment_horizontal == "left" %}
+      justify-content: start;
+    {% elif data.alignment_horizontal == "center" %}
+      justify-content: center;
+    {% elif data.alignment_horizontal == "right" %}
+      justify-content: end;
+    {% else %}
+      justify-content: start;
+    {% endif %}
+  {% endif %}
+  {% if data.gap %}
+    gap: {{data.gap}}px;
+  {% endif %}
+}
+{% endif %}

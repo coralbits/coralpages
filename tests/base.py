@@ -32,7 +32,7 @@ class TestCase(IsolatedAsyncioTestCase):
                 name="default",
                 type="file",
                 path="builtin",
-                tags=["jinja2"],
+                tags=["jinja2", "blocks"],
                 blocks=[
                     ElementDefinition(
                         name="text",

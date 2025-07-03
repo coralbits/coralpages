@@ -30,16 +30,28 @@ class FileStore(StoreBase):
         Load the blocks from the file store.
         """
         if "blocks" not in self.config.tags:
+            logger.debug(
+                "No blocks tag in config.yaml for store=%s, skipping load blocks",
+                self.config.name,
+            )
             return
         with open(self.base_path / "config.yaml", "r", encoding="utf-8") as fd:
             yamlconfig = yaml.safe_load(fd)
 
         block_data = yamlconfig.get("blocks", [])
         if not block_data:
+            logger.warning("No blocks found in file store from path=%s", self.base_path)
             return
 
         blocks = [ElementDefinition.from_dict(x) for x in block_data]
         self.blocks = {x.name: x for x in blocks}
+        if len(self.blocks) == 0:
+            logger.warning("No blocks found in file store from path=%s", self.base_path)
+        logger.debug(
+            "Loaded count=%d blocks from file store from path=%s",
+            len(self.blocks),
+            self.base_path,
+        )
         return self.blocks
 
     async def load_html(
@@ -48,12 +60,14 @@ class FileStore(StoreBase):
         """
         Load a page from the file store.
         """
-        if path == "html":
+        if path == "html":  # html is special internal for top level html
             return data.get("html", "")
 
         element_definition = await self.get_element_definition(path)
         if element_definition is None:
-            return None
+            raise ValueError(
+                f"Element definition not found for path={path}, known elements={list(self.blocks.keys())}"
+            )
 
         if not element_definition.html:
             return None
