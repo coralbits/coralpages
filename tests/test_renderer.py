@@ -1,4 +1,7 @@
 import logging
+from pathlib import Path
+
+import yaml
 
 from pe.renderer.renderer import Renderer, RenderedPage
 from pe.types import BlockDefinition, PageDefinition
@@ -62,3 +65,21 @@ class TestRenderer(TestCase):
         self.assertIn("* test1", page.content)
 
         logger.debug("page=%s", page.content)
+
+    async def test_page_render(self):
+        """
+        Test rendering a page with a HTML block.
+        """
+        renderer = Renderer(config=self.get_full_config())
+        page = await renderer.render(
+            PageDefinition.from_dict(
+                yaml.safe_load(
+                    open(Path(__file__).parent.parent / "docs" / "index.yaml")
+                )
+            )
+        )
+        logger.debug("page_size=%s", len(page.content))
+        for error in page.errors:
+            logger.error("error=%s", error)
+        self.assertFalse(page.has_errors())
+        self.assertIsNotNone(page)

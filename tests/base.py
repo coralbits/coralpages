@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 from unittest import IsolatedAsyncioTestCase
 
 from pe.config import Config
@@ -42,4 +43,8 @@ class TestCase(IsolatedAsyncioTestCase):
             ),
             "http": StoreConfig(name="http", type="http"),
         }
+        return config
+
+    def get_full_config(self) -> Config:
+        config = Config.read(Path(__file__).parent.parent / "config.yaml")
         return config

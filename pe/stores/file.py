@@ -22,6 +22,25 @@ class FileStore(StoreBase):
     def __init__(self, config: StoreConfig):
         super().__init__(config)
         self.base_path = Path(config.path) if config.path else Path(".")
+        self.blocks = {}
+        self.load_blocks()
+
+    def load_blocks(self) -> dict[str, ElementDefinition]:
+        """
+        Load the blocks from the file store.
+        """
+        if "blocks" not in self.config.tags:
+            return
+        with open(self.base_path / "config.yaml", "r", encoding="utf-8") as fd:
+            yamlconfig = yaml.safe_load(fd)
+
+        block_data = yamlconfig.get("blocks", [])
+        if not block_data:
+            return
+
+        blocks = [ElementDefinition.from_dict(x) for x in block_data]
+        self.blocks = {x.name: x for x in blocks}
+        return self.blocks
 
     async def load_html(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]
@@ -113,4 +132,10 @@ class FileStore(StoreBase):
         """
         Get a list of all elements in the file store.
         """
-        return self.config.blocks
+        return list(self.blocks.values())
+
+    async def get_element_definition(self, path: str) -> ElementDefinition | None:
+        """
+        Get an element definition from the file store.
+        """
+        return self.blocks.get(path)

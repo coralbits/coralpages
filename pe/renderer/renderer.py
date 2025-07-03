@@ -17,6 +17,16 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+class PageError:
+    """
+    A page error.
+    """
+
+    error: Exception
+    block: BlockDefinition
+
+
+@dataclass
 class RenderedPage:
     """
     A rendered page.
@@ -36,6 +46,7 @@ class RenderedPage:
     response_code: int = 200
     meta: list[MetaDefinition] = field(default_factory=list)
     css_variables: dict[str, str] = field(default_factory=dict)
+    errors: list[Exception] = field(default_factory=list)
 
     def append_content(self, content: str):
         """
@@ -90,6 +101,18 @@ class RenderedPage:
             return ""
 
         return self.content
+
+    def has_errors(self) -> bool:
+        """
+        Check if the page has errors.
+        """
+        return len(self.errors) > 0
+
+    def add_error(self, *, error: Exception, block: BlockDefinition):
+        """
+        Add an error to the page.
+        """
+        self.errors.append(PageError(error=error, block=block))
 
 
 class Renderer:
@@ -225,7 +248,8 @@ class Renderer:
             logger.debug("Rendering block: %s", block.type)
             try:
                 html = await self.render_block(page, block, context=page.context)
-            except Exception:  # pylint: disable=broad-exception-caught
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                page.add_error(error=e, block=block)
                 logger.exception("Error rendering block: %s", block)
                 if self.config.debug:
                     html = f"<div style='color: red;'>Error rendering block: {block.type}<pre>{html_safe(traceback.format_exc())}</pre></div>"
@@ -311,7 +335,8 @@ class Renderer:
                 # logger.debug("Rendered child: %s", children_data)
                 children.append(children_data)
                 page.increment_id()
-            except Exception:  # pylint: disable=broad-exception-caught
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                page.add_error(error=e, block=child)
                 logger.exception("Error rendering child: %s", child)
                 if self.config.debug:
                     children_data = f"<div style='color: red;'>Error rendering child: {child.type}<pre>{html_safe(traceback.format_exc())}</pre></div>"
