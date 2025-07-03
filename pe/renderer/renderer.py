@@ -107,7 +107,13 @@ class Renderer:
         else:
             self.store = StoreFactory(config=config)
         self.jinja2_env = jinja2.Environment()
-        self.jinja2_env.filters["markdown"] = markdown.markdown
+        self.jinja2_env.filters["markdown"] = lambda x: markdown.markdown(
+            x,
+            extensions=[
+                "markdown.extensions.fenced_code",
+                "markdown.extensions.tables",
+            ],
+        )
         self.jinja2_env.filters["json"] = lambda x: json.dumps(x, indent=2, default=str)
 
     def new_page(self) -> RenderedPage:
