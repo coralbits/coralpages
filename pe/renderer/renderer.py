@@ -84,14 +84,18 @@ class RenderedPage:
         Get the current id.
         """
         if block.id:
-            return block.id
+            id = block.id
+        else:
+            prefix = block.type
 
-        prefix = block.type
+            prefix = prefix.replace("://", "-")
+            prefix = prefix.replace(":", "-")
+            prefix = prefix.replace("/", "-")
+            id = f"{prefix}-{self.max_id}"
 
-        prefix = prefix.replace("://", "-")
-        prefix = prefix.replace(":", "-")
-        prefix = prefix.replace("/", "-")
-        return f"{prefix}-{self.max_id}"
+        if id[0].isdigit():
+            id = f"block_{id}"
+        return id
 
     def __str__(self):
         """
@@ -186,7 +190,11 @@ class Renderer:
 
         logger.debug("Rendering page")
         page = await self.render(page_definition)
-        logger.debug("Page rendered")
+        logger.debug(
+            "Page rendered block_count=%s, page_size=%s",
+            len(page_definition.data),
+            len(page.content),
+        )
 
         if new_etag:
             page.headers["ETag"] = new_etag
@@ -307,6 +315,8 @@ class Renderer:
         element_loader = self.store.get_store(store)
         if element_loader is None:
             raise ValueError(f"Element loader not found for block: {block.type}")
+        block_id = page.get_current_id(block)
+        block.data["id"] = block_id
 
         new_context = await element_loader.load_context(
             path=eltype, data=block.data, context=context
@@ -316,17 +326,6 @@ class Renderer:
                 **context,
                 **new_context,
             }
-
-        html = (
-            await element_loader.load_html(
-                path=eltype, data=block.data, context=context
-            )
-            or ""
-        )
-        css = (
-            await element_loader.load_css(path=eltype, data=block.data, context=context)
-            or ""
-        )
 
         children = StrList()
         for child in block.children or []:
@@ -342,6 +341,17 @@ class Renderer:
                     children_data = f"<div style='color: red;'>Error rendering child: {child.type}<pre>{html_safe(traceback.format_exc())}</pre></div>"
                 else:
                     raise
+
+        html = (
+            await element_loader.load_html(
+                path=eltype, data=block.data, context=context
+            )
+            or ""
+        )
+        css = (
+            await element_loader.load_css(path=eltype, data=block.data, context=context)
+            or ""
+        )
 
         if "jinja2" in element_loader.tags:
             data = self.jinja2_render_dict(block.data, page=page, context=context)
@@ -373,8 +383,6 @@ class Renderer:
         #     element_loader,
         # )
 
-        block_id = page.get_current_id(block)
-
         if block.style:
             css_id = f"#{block_id}"
             page.classes.update(
@@ -383,8 +391,12 @@ class Renderer:
         html = html.replace("@@class@@", block_id)
         html = html.replace("@@id@@", block_id)
 
-        # add the css to the page and content
-        page.classes.update({block.type: css})
+        # add the css to the page and content. The idea is to avoid repetition of the same css.
+        # This is a very simple approach, but it works.
+        css_md5 = hashlib.md5(
+            css.encode()
+        ).hexdigest()  # md5 is not crypto secure, but much faster, and very low risk of collission
+        page.classes.update({css_md5: css})
 
         return html
 
