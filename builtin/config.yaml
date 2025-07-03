@@ -113,18 +113,18 @@ blocks:
     html: div/view.html
     css: div/style.css.j2
     editor:
-      - type: select
+      - type: select-buttons
         label: Direction
         name: direction
         options:
           - label: Column
             value: column
-            icon: column
+            icon: down
           - label: Row
             value: row
-            icon: row
+            icon: right
         default: column
-      - type: select
+      - type: select-buttons
         label: Vertical Alignment
         name: alignment_vertical
         options:
@@ -133,12 +133,12 @@ blocks:
             icon: top
           - label: center
             value: center
-            icon: center
+            icon: middle
           - label: bottom
             value: bottom
             icon: bottom
         default: top
-      - type: select
+      - type: select-buttons
         label: Horizontal Alignment
         name: alignment_horizontal
         options:
