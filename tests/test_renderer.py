@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 
 from pe.renderer.renderer import Renderer, RenderedPage
-from pe.types import BlockDefinition, PageDefinition
+from pe.types import Block, Page
 from tests.base import TestCase
 
 logger = logging.getLogger(__name__)
@@ -17,10 +17,10 @@ class TestRenderer(TestCase):
     async def test_render_text(self):
         renderer = Renderer(config=self.get_config())
         page = await renderer.render(
-            page_def=PageDefinition(
+            page_def=Page(
                 title="Test test_render_text",
                 data=[
-                    BlockDefinition(
+                    Block(
                         type="default://text",
                         data={"text": "Hello, world!"},
                     )
@@ -37,18 +37,18 @@ class TestRenderer(TestCase):
         """
         renderer = Renderer(config=self.get_config())
         page: RenderedPage = await renderer.render(
-            page_def=PageDefinition(
+            page_def=Page(
                 title="Test test_render_html",
                 data=[
-                    BlockDefinition(
+                    Block(
                         type="http://apicontext",
                         data={"url": "test", "name": "test"},
                         children=[
-                            BlockDefinition(
+                            Block(
                                 type="default://text",
                                 data={"text": "{{context.test.title}}"},
                             ),
-                            BlockDefinition(
+                            Block(
                                 type="default://text",
                                 data={
                                     "text": "{% for item in context.test.array %}* {{item.name}}\n{% endfor %}"
@@ -72,7 +72,7 @@ class TestRenderer(TestCase):
         """
         renderer = Renderer(config=self.get_full_config())
         page = await renderer.render(
-            PageDefinition.from_dict(
+            Page.from_dict(
                 yaml.safe_load(
                     open(Path(__file__).parent.parent / "docs" / "index.yaml")
                 )

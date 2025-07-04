@@ -3,7 +3,7 @@ from pathlib import Path
 from unittest import IsolatedAsyncioTestCase
 
 from pe.config import Config
-from pe.types import BlockDefinition, ElementDefinition, StoreConfig
+from pe.types import Block, BlockTemplate, StoreConfig
 
 
 class TestCase(IsolatedAsyncioTestCase):
@@ -34,7 +34,7 @@ class TestCase(IsolatedAsyncioTestCase):
                 path="builtin",
                 tags=["jinja2", "blocks"],
                 blocks=[
-                    ElementDefinition(
+                    BlockTemplate(
                         name="text",
                         html="text/view.html",
                         css="text/style.css",

@@ -11,7 +11,7 @@ import markdown
 
 from pe.config import Config
 from pe.stores.factory import StoreFactory
-from pe.types import BlockDefinition, MetaDefinition, PageDefinition
+from pe.types import Block, MetaDefinition, Page
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class PageError:
     """
 
     error: Exception
-    block: BlockDefinition
+    block: Block
 
 
 @dataclass
@@ -66,7 +66,7 @@ class RenderedPage:
         """
         self.meta.append(meta)
 
-    def update_from_definition(self, page_def: PageDefinition):
+    def update_from_definition(self, page_def: Page):
         """
         Update the page from a page definition.
         """
@@ -79,7 +79,7 @@ class RenderedPage:
             **page_def.css_variables,
         }
 
-    def get_current_id(self, block: BlockDefinition) -> int:
+    def get_current_id(self, block: Block) -> int:
         """
         Get the current id.
         """
@@ -112,7 +112,7 @@ class RenderedPage:
         """
         return len(self.errors) > 0
 
-    def add_error(self, *, error: Exception, block: BlockDefinition):
+    def add_error(self, *, error: Exception, block: Block):
         """
         Add an error to the page.
         """
@@ -204,7 +204,7 @@ class Renderer:
         logger.debug("Returning page")
         return page
 
-    def calculate_last_modified(self, page_definition: PageDefinition) -> str:
+    def calculate_last_modified(self, page_definition: Page) -> str:
         """
         Calculate the last modified for a page definition.
 
@@ -216,7 +216,7 @@ class Renderer:
             else datetime.datetime.now().isoformat()
         )
 
-    def calculate_etag(self, page_definition: PageDefinition) -> str:
+    def calculate_etag(self, page_definition: Page) -> str:
         """
         Calculate the etag for a page definition.
         """
@@ -227,7 +227,7 @@ class Renderer:
             + salt.encode()
         ).hexdigest()
 
-    async def render(self, page_def: PageDefinition) -> RenderedPage:
+    async def render(self, page_def: Page) -> RenderedPage:
         """
         Render a page asynchronously.
         """
@@ -242,9 +242,7 @@ class Renderer:
 
         return page
 
-    async def render_page_data(
-        self, *, page: RenderedPage, page_def: PageDefinition
-    ) -> str:
+    async def render_page_data(self, *, page: RenderedPage, page_def: Page) -> str:
         """
         Render the page data asynchronously.
         """
@@ -306,7 +304,7 @@ class Renderer:
             )
 
     async def render_block(
-        self, page: RenderedPage, block: BlockDefinition, context: dict[str, Any]
+        self, page: RenderedPage, block: Block, context: dict[str, Any]
     ) -> str:
         """
         Render a block asynchronously.

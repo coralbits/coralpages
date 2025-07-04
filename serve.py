@@ -10,7 +10,7 @@ import yaml
 from pe.config import Config
 from pe.renderer.renderer import Renderer
 from pe.stores.factory import StoreFactory
-from pe.types import BlockDefinition, ElementDefinition, PageDefinition
+from pe.types import Block, BlockTemplate, Page
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -89,7 +89,7 @@ def create_app(args: argparse.Namespace):
         data = await request.json()
         store_name = data.get("store", "default")
         path = f"{store_name}://{page_name}"
-        page = PageDefinition.from_dict(data)
+        page = Page.from_dict(data)
         await store.save_page_definition(path=path, data=page)
         return Response(content="OK", status_code=200)
 
@@ -112,7 +112,7 @@ def create_app(args: argparse.Namespace):
 
         element_name = f"builtin://{element_name}"
 
-        block = BlockDefinition(
+        block = Block(
             type=element_name,
             data=data,
             children=[],
@@ -128,7 +128,7 @@ def create_app(args: argparse.Namespace):
 
         element_name = f"builtin://{element_name}"
 
-        block = BlockDefinition(
+        block = Block(
             type=element_name,
             data=data,
             children=[],
@@ -144,7 +144,7 @@ def create_app(args: argparse.Namespace):
             return Response(content="Not enabled", status_code=500)
 
         data = await request.json()
-        page = PageDefinition.from_dict(data)
+        page = Page.from_dict(data)
         page = await renderer.render(page)
         return Response(
             content=str(page),

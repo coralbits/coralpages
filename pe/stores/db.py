@@ -8,7 +8,7 @@ from typing import Any
 import sqlite3
 
 from pe.stores.types import StoreBase
-from pe.types import PageDefinition, StoreConfig
+from pe.types import Page, StoreConfig
 
 logger = logging.getLogger(__name__)
 
@@ -57,7 +57,7 @@ class DbStore(StoreBase):
             return result["css"]
         return None
 
-    async def load_page_definition(self, *, path: str) -> PageDefinition | None:
+    async def load_page_definition(self, *, path: str) -> Page | None:
         """
         Load a page definition from the database store.
         """
@@ -67,10 +67,10 @@ class DbStore(StoreBase):
             result = cursor.fetchone()
         if result:
             page_def = json.loads(result["data"])
-            return PageDefinition.from_dict(page_def)
+            return Page.from_dict(page_def)
         return None
 
-    async def save_page_definition(self, *, path: str, data: PageDefinition) -> None:
+    async def save_page_definition(self, *, path: str, data: Page) -> None:
         """
         Save a page definition to the database store.
         """

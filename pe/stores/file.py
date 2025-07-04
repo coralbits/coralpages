@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from pe.types import BlockDefinition, ElementDefinition, PageDefinition, StoreConfig
+from pe.types import Block, BlockTemplate, Page, StoreConfig
 from pe.stores.types import StoreBase
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,7 @@ class FileStore(StoreBase):
         self.blocks = {}
         self.load_blocks()
 
-    def load_blocks(self) -> dict[str, ElementDefinition]:
+    def load_blocks(self) -> dict[str, BlockTemplate]:
         """
         Load the blocks from the file store.
         """
@@ -43,7 +43,7 @@ class FileStore(StoreBase):
             logger.warning("No blocks found in file store from path=%s", self.base_path)
             return
 
-        blocks = [ElementDefinition.from_dict(x) for x in block_data]
+        blocks = [BlockTemplate.from_dict(x) for x in block_data]
         self.blocks = {x.name: x for x in blocks}
         if len(self.blocks) == 0:
             logger.warning("No blocks found in file store from path=%s", self.base_path)
@@ -95,7 +95,7 @@ class FileStore(StoreBase):
             path=element_definition.css, data=data, context=context
         )
 
-    async def load_page_definition(self, *, path: str) -> PageDefinition | None:
+    async def load_page_definition(self, *, path: str) -> Page | None:
         """
         Load a page definition from the file store.
         """
@@ -110,9 +110,9 @@ class FileStore(StoreBase):
         yamldata = await self.load_generic(path=path, data={}, context={})
         if not yamldata:
             return None
-        return PageDefinition.from_dict(yaml.safe_load(yamldata))
+        return Page.from_dict(yaml.safe_load(yamldata))
 
-    async def load_html_definition(self, *, path: str) -> PageDefinition | None:
+    async def load_html_definition(self, *, path: str) -> Page | None:
         """
         Load an HTML page definition from the file store.
         """
@@ -123,9 +123,7 @@ class FileStore(StoreBase):
         with open(filepath, "r", encoding="utf-8") as file:
             html = file.read()
 
-        return PageDefinition(
-            data=[BlockDefinition(type="builtin://html", data={"html": html})]
-        )
+        return Page(data=[Block(type="builtin://html", data={"html": html})])
 
     async def load_generic(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]  # type: ignore
@@ -142,13 +140,13 @@ class FileStore(StoreBase):
         with open(filepath, "r", encoding="utf-8") as file:
             return file.read()
 
-    async def get_element_list(self) -> list[ElementDefinition]:
+    async def get_element_list(self) -> list[BlockTemplate]:
         """
         Get a list of all elements in the file store.
         """
         return list(self.blocks.values())
 
-    async def get_element_definition(self, path: str) -> ElementDefinition | None:
+    async def get_element_definition(self, path: str) -> BlockTemplate | None:
         """
         Get an element definition from the file store.
         """

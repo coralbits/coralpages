@@ -1,4 +1,6 @@
-# Page Editor
+# Page Viewer
+
+## Overview
 
 This is an API first page renderer. There is no editor, nor editing API yet.
 
@@ -8,15 +10,15 @@ It has several endpoints that allow to assemble pages.
 
 It has a nested approach to page creation. Basic mode is just using
 builtin blocks, passing some data, and rendering the result. The
-elements can be nested themselves. The page is rendered as a single HTML
-page, with the elements rendered as if they were in the page.
+blocks can be nested themselves. The page is rendered as a single HTML
+page, with the blocks rendered as if they were in the page.
 
 On a more advanced level, the blocks can be requested to be rendered by
 remote endpoints, and the result will be rendered as if it were a builtin
 block.
 
-This is structure in stores, which can return HTML with jinja templating,
-or raw HTML. Each store has diferent configuration, and can be mixed.
+This is structured in stores, which can return HTML with jinja templating,
+or raw HTML. Each store has different configuration, and can be mixed.
 
 Stores have several functions:
 
@@ -24,7 +26,7 @@ Stores have several functions:
 - Blocks
 - Templates
 
-## Builtin Elements
+## Builtin Blocks Templates
 
 - Section
 - Block
@@ -38,10 +40,10 @@ Stores have several functions:
 - Menu
 - Paragraph
 
-## External Elements
+## External Blocks Templates
 
-To add external elements edit the config.yaml and add the endpoints for the external elements. It
-must have thse format:
+To add external blocks edit the config.yaml and add the endpoints for the external blocks. It
+must have these format:
 
 ```yaml
 stores:
@@ -52,24 +54,16 @@ stores:
       - pages
       - blocks
       - templates
-
-blocks:
-  - name: Login Button
-    store: myremote
-    html: login-button/view.html
-    css: login-button/style.css
-    tags:
-      - jinja2
 ```
 
 ## Config structure and data flow
 
-In the config there are several stores configured, each store is a loader hat can get data in a way, from filesystem, database, or HTTP.
+In the config there are several stores configured, each store is a loader that can get data in a way, from filesystem, database, or HTTP.
 
-When viewing a page all stores in order are queried for the given page,first to answer is used.
+When viewing a page all stores in order are queried for the given page, first to answer is used.
 
 The page has blocks, for the block we follow the same idea, but first we
-heck into the config one, and then maybe on the store.
+check into the config one, and then maybe on the store.
 
 Each store has its own configuration and may not have blocks pages or
 whatever. We use tags to filter out when not needed.
@@ -89,8 +83,8 @@ sequenceDiagram
   Loader <<->>- Store: Load page from store
   Renderer <<->>+ Loader: Load block
   Loader <<->>- Store: Load block from store
-  Renderer <<->>+ Loader: Load element
-  Loader <<->>- Store: Load element from store
+  Renderer <<->>+ Loader: Load block
+  Loader <<->>- Store: Load block from store
   Renderer <<->>+ Loader: Load template
   Loader <<->>- Store: Load template from store
   Renderer ->>- User: Render response
@@ -101,3 +95,38 @@ jinja templating, or nothing.
 
 The loader can actually use the block data to render it itself and do not
 require any more templating.
+
+## Terminology
+
+### Store
+
+Its a repository for block templates, pages and other resources.
+
+### BlockTemplate
+
+Its the blueprint of a block. They contains some HTML, CSS, and may add a context.
+
+### Block
+
+Its a definition of a block of a page, using a BlockTemplate, giving some specific properties.
+For example a title will set the exact title, and maybe some CSS properties.
+
+### RenderedBlock
+
+Its the rendered result of a block.
+
+### Page
+
+Its the definition of a specific page. It contains many Blocks that will use BlockTemplates
+to render themselves.
+
+They can be recursive via templates, so a page decides the important blocks at that level,
+and the template wraps it all inside a template. For example you can create
+a blog page using the blog template, and a product page using the product template.
+
+Templates can use templates themselves, and finally are just rendered to an html using
+a template. this allows even to create a full html based template where you put your blocks.
+
+### RenderedPage
+
+Its the rendered result of a page template.

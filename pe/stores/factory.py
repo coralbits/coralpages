@@ -10,7 +10,7 @@ from pe.stores.types import StoreBase
 from pe.stores.file import FileStore
 from pe.stores.http import HttpStore
 from pe.stores.db import DbStore
-from pe.types import PageDefinition, StoreConfig
+from pe.types import Page, StoreConfig
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +65,7 @@ class StoreFactory:
         """
         return self._stores
 
-    async def load_page_definition_all_stores(self, path: str) -> PageDefinition:
+    async def load_page_definition_all_stores(self, path: str) -> Page:
         """
         Load a page definition from all stores.
 
@@ -77,7 +77,7 @@ class StoreFactory:
                 return page_definition
         return None
 
-    async def save_page_definition(self, path: str, data: PageDefinition) -> None:
+    async def save_page_definition(self, path: str, data: Page) -> None:
         """
         Save a page definition to all stores.
         """

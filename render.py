@@ -11,7 +11,7 @@ import yaml
 
 from pe.config import Config
 from pe.renderer.renderer import Renderer
-from pe.types import PageDefinition
+from pe.types import Page
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -69,7 +69,7 @@ async def render(args, finput: TextIO, foutput: TextIO):
     """
     renderer = Renderer(prepare_config(args.input))
 
-    page = PageDefinition.from_dict(yaml.safe_load(finput))
+    page = Page.from_dict(yaml.safe_load(finput))
     output = await renderer.render(page)
     foutput.write(str(output))
 

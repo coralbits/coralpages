@@ -1,7 +1,7 @@
 import logging
 from typing import Any
 
-from pe.types import ElementDefinition, PageDefinition, StoreConfig
+from pe.types import BlockTemplate, Page, StoreConfig
 
 
 logger = logging.getLogger(__name__)
@@ -43,26 +43,26 @@ class StoreBase:
         """
         return None
 
-    async def load_page_definition(self, *, path: str) -> PageDefinition | None:
+    async def load_page_definition(self, *, path: str) -> Page | None:
         """
         Load a page from the store.
         """
         raise NotImplementedError("load_page_definition not implemented")
 
-    async def save_page_definition(self, *, path: str, data: PageDefinition) -> None:
+    async def save_page_definition(self, *, path: str, data: Page) -> None:
         """
         Save a page to the store.
         """
         raise NotImplementedError("save_page_definition not implemented")
 
-    async def get_element_list(self) -> list[ElementDefinition]:
+    async def get_element_list(self) -> list[BlockTemplate]:
         """
         Get a list of all elements in the store.
         """
         logger.debug("Getting element list for store: %s", self.config.name)
         return []
 
-    async def get_element_definition(self, path: str) -> ElementDefinition | None:
+    async def get_element_definition(self, path: str) -> BlockTemplate | None:
         """
         Get an element definition from the store.
         """
