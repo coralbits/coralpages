@@ -124,6 +124,39 @@ class Page:
 
 
 @dataclass
+class PageInfo:
+    """
+    A page info, with a title, and a url
+    """
+
+    id: str
+    title: str
+    url: str
+    store: str = ""
+
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert the page info to a JSON-serializable dictionary.
+        """
+        return {
+            "id": self.id,
+            "title": self.title,
+            "url": self.url,
+            "store": self.store,
+        }
+
+
+@dataclass
+class PageListResult:
+    """
+    A page list result, with a list of pages and a total count
+    """
+
+    count: int  # total count on this store. It might return less elements, which means that we are at the end.
+    results: list[PageInfo]
+
+
+@dataclass
 class FieldDefinition:
     """
     A field definition, with a name, a type, and a value

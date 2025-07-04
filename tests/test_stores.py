@@ -1,8 +1,9 @@
 import logging
 
 from pe.renderer.renderer import Renderer
+from pe.stores.db import DbStore
 from pe.stores.http import HttpStore
-from pe.types import StoreConfig
+from pe.types import Page, StoreConfig
 from tests.base import TestCase
 
 logger = logging.getLogger(__name__)
@@ -65,3 +66,32 @@ class TestStores(TestCase):
         )
         self.assertIsNotNone(css)
         logger.debug("css=%s", len(css))
+
+    async def test_store_page_list(self):
+        renderer = Renderer(config=self.get_full_config())
+        await renderer.store.delete_page_definition(
+            "test_store_page_list", ok_if_not_found=True
+        )
+
+        pages = await renderer.store.get_page_list()
+        logger.debug("pages=%s", pages)
+        self.assertIsNotNone(pages)
+        self.assertGreater(pages.count, 0)
+        self.assertGreater(len(pages.results), 0)
+        pre_count = pages.count
+
+        # add a page to the db store
+        db_store = renderer.store.get_store("default")
+        self.assertIsNotNone(db_store)
+        logger.debug("db_store=%s type=%s", db_store, type(db_store))
+        self.assertTrue(isinstance(db_store, DbStore))
+        await db_store.save_page_definition(
+            path="test_store_page_list", data=Page(title="Test", url="", data=[])
+        )
+
+        pages = await renderer.store.get_page_list()
+        logger.debug("pages=%s", pages)
+        self.assertIsNotNone(pages)
+        self.assertGreater(pages.count, pre_count)
+
+        await renderer.store.delete_page_definition("test_store_page_list")

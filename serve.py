@@ -2,23 +2,18 @@
 
 import argparse
 import json
-import logging
-from pathlib import Path
 import traceback
-from typing import Any
-import yaml
-from pe.config import Config
-from pe.renderer.renderer import Renderer
-from pe.stores.factory import StoreFactory
-from pe.types import Block, BlockTemplate, Page
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse, Response
 from fastapi.requests import Request
-
-
-logging.basicConfig(level=logging.DEBUG)
+from fastapi.responses import RedirectResponse, Response
+from pe.config import Config
+from pe.renderer.renderer import Renderer
+from pe.setup import setup_logging
+from pe.stores.factory import StoreFactory
+from pe.types import Block, Page
 
 
 def create_app(args: argparse.Namespace):
@@ -46,6 +41,21 @@ def create_app(args: argparse.Namespace):
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    @app.get("/api/v1/page/")
+    async def list_pages(request: Request):
+        offset = int(request.query_params.get("offset", 0))
+        limit = int(request.query_params.get("limit", 10))
+        pages = await store.get_page_list(offset=offset, limit=limit)
+        return Response(
+            content=json.dumps(
+                {
+                    "count": pages.count,
+                    "results": [page.to_dict() for page in pages.results],
+                }
+            ),
+            media_type="application/json",
+        )
 
     @app.get("/api/v1/view/{page_name}")
     async def read_page(request: Request, page_name: str):
@@ -190,6 +200,7 @@ def parse_args():
     return parser.parse_args()
 
 
+setup_logging()
 app = create_app(parse_args())
 
 

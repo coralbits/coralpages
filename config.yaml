@@ -19,7 +19,7 @@ stores:
   - name: default
     type: db
     url: sqlite://./data/pe.db
-    types:
+    tags:
       - pages
       - templates
   - name: docs

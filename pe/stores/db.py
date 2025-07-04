@@ -4,11 +4,11 @@ Database store implementation.
 
 import json
 import logging
-from typing import Any
+from typing import Any, List
 import sqlite3
 
 from pe.stores.types import StoreBase
-from pe.types import Page, StoreConfig
+from pe.types import Page, PageInfo, PageListResult, StoreConfig
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +84,7 @@ class DbStore(StoreBase):
                     "INSERT INTO pages (path, data) VALUES (?, ?)", (path, page_def)
                 )
             self.conn.commit()
+            logger.info("Saved page_id=%s", path)
 
     def make_migrations(self) -> None:
         """
@@ -97,3 +98,43 @@ class DbStore(StoreBase):
             cursor.execute(
                 "CREATE TABLE IF NOT EXISTS elements (path TEXT PRIMARY KEY, html TEXT, css TEXT, data JSON)"
             )
+
+    async def get_page_list(
+        self, *, offset: int = 0, limit: int = 10
+    ) -> PageListResult:
+        """
+        Get a list of all pages.
+        """
+        if "pages" not in self.config.tags:
+            return PageListResult(count=0, results=[])
+
+        with self.conn:
+            cursor = self.conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM pages")
+            count = cursor.fetchone()[0]
+            results = []
+            if limit > 0:
+                cursor.execute(
+                    "SELECT path, data FROM pages LIMIT ? OFFSET ?", (limit, offset)
+                )
+                for row in cursor.fetchall():
+                    jsondata = json.loads(row["data"])
+                    results.append(
+                        PageInfo(id=row["path"], title=jsondata["title"], url="")
+                    )
+
+            return PageListResult(count=count, results=results)
+
+    async def delete_page_definition(
+        self, path: str, *, ok_if_not_found: bool = False
+    ) -> None:
+        """
+        Delete a page definition from the database store.
+        """
+        with self.conn:
+            cursor = self.conn.cursor()
+            cursor.execute("DELETE FROM pages WHERE path = ?", (path,))
+            if cursor.rowcount == 0 and not ok_if_not_found:
+                raise ValueError(f"Page definition not found: {path}")
+            self.conn.commit()
+            logger.info("Deleted page_id=%s", path)

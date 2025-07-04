@@ -3,14 +3,14 @@ Store factory for creating store instances.
 """
 
 import logging
-from typing import Dict
+from typing import Dict, List
 
 from pe.config import Config
 from pe.stores.types import StoreBase
 from pe.stores.file import FileStore
 from pe.stores.http import HttpStore
 from pe.stores.db import DbStore
-from pe.types import Page, StoreConfig
+from pe.types import Page, PageInfo, PageListResult, StoreConfig
 
 logger = logging.getLogger(__name__)
 
@@ -89,3 +89,52 @@ class StoreFactory:
         if not store:
             raise ValueError(f"Store {store_name} not found")
         await store.save_page_definition(path=path, data=data)
+
+    async def delete_page_definition(
+        self, path: str, *, ok_if_not_found: bool = False
+    ) -> None:
+        """
+        Delete a page definition from all stores.
+        """
+        if "://" in path:
+            store_name, path = path.split("://", 1)
+        else:
+            store_name = "default"
+        store = self.get_store(store_name)
+        if not store:
+            raise ValueError(f"Store {store_name} not found")
+        await store.delete_page_definition(path=path, ok_if_not_found=ok_if_not_found)
+
+    async def get_page_list(
+        self, *, offset: int = 0, limit: int = 10
+    ) -> PageListResult:
+        """
+        Get a list of all pages.
+
+        It asks each store for the pages. We need to ask all to get the proper count.
+        If the pending is 0 we just get the count of pages in that store.
+
+        """
+        res = PageListResult(count=0, results=[])
+        pending = limit
+        for store in self.get_all_stores().values():
+            store_res = await store.get_page_list(offset=offset, limit=pending)
+            logger.debug(
+                "get_page_list store=%s offset=%s limit=%s add_count=%s response_count=%s",
+                store,
+                offset,
+                pending,
+                store_res.count,
+                len(store_res.results),
+            )
+
+            for item in store_res.results:
+                item.store = store.config.name
+            res.results.extend(store_res.results)
+            res.count += store_res.count
+            offset = max(0, offset - store_res.count)
+            if len(store_res.results) < pending:
+                pending -= len(store_res.results)
+            else:
+                pending = 0
+        return res

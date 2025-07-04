@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from pe.types import Block, BlockTemplate, Page, StoreConfig
+from pe.types import Block, BlockTemplate, Page, PageInfo, PageListResult, StoreConfig
 from pe.stores.types import StoreBase
 
 logger = logging.getLogger(__name__)
@@ -151,3 +151,52 @@ class FileStore(StoreBase):
         Get an element definition from the file store.
         """
         return self.blocks.get(path)
+
+    async def get_page_list(
+        self, *, offset: int = 0, limit: int = 10
+    ) -> PageListResult:
+        """
+        Get a list of all pages.
+        """
+        if "pages" not in self.config.tags:
+            return PageListResult(count=0, results=[])
+
+        count = 0
+        results = []
+        logger.debug("Loading pages from file store from path=%s", self.base_path)
+        for path in self.base_path.glob("**.yaml"):
+            if path.is_file():
+                name = self.clean_name(path)
+
+                count += 1
+                # just count, no read the file
+                if limit == 0 or count < offset:
+                    continue
+
+                limit -= 1
+                # read the file data
+                with open(path, "r", encoding="utf-8") as file:
+                    page_data = yaml.safe_load(file)
+
+                    results.append(PageInfo(id=name, title=page_data["title"], url=""))
+
+        return PageListResult(count=count, results=results)
+
+    def clean_name(self, path: Path) -> str:
+        """
+        Clean a name from the file store.
+        """
+        base_path_str = str(self.base_path)
+        name = str(path)
+        if name.startswith(base_path_str):
+            name = name[len(base_path_str) :]
+        while name.startswith("/"):
+            name = name[1:]
+        if name.endswith(".yaml"):
+            name = name[:-5]
+        if name.endswith(".html"):
+            name = name[:-5]
+        if name.endswith(".md"):
+            name = name[:-3]
+
+        return name

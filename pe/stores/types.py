@@ -1,7 +1,7 @@
 import logging
-from typing import Any
+from typing import Any, List
 
-from pe.types import BlockTemplate, Page, StoreConfig
+from pe.types import BlockTemplate, Page, PageInfo, PageListResult, StoreConfig
 
 
 logger = logging.getLogger(__name__)
@@ -18,6 +18,9 @@ class StoreBase:
     def __init__(self, config: StoreConfig):
         self.config = config
         self.tags = config.tags
+
+    def __repr__(self) -> str:
+        return f"<{self.__class__.__name__} name={self.config.name} tags={self.tags}>"
 
     async def load_html(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]
@@ -85,3 +88,19 @@ class StoreBase:
             path = path[len(store_prefix) :]
 
         return path
+
+    async def get_page_list(
+        self, *, offset: int = 0, limit: int = 10
+    ) -> PageListResult:
+        """
+        Get a list of all pages.
+        """
+        return PageListResult(count=0, results=[])
+
+    async def delete_page_definition(
+        self, path: str, *, ok_if_not_found: bool = False
+    ) -> None:
+        """
+        Delete a page definition from the store.
+        """
+        raise NotImplementedError("delete_page_definition not implemented")
