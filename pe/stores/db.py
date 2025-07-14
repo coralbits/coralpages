@@ -6,6 +6,8 @@ import json
 import logging
 from typing import Any, List
 import sqlite3
+import os
+from pathlib import Path
 
 from pe.stores.types import StoreBase
 from pe.types import Page, PageInfo, PageListResult, StoreConfig
@@ -24,6 +26,7 @@ class DbStore(StoreBase):
         if not config.url.startswith("sqlite://"):
             raise ValueError("Database URL must start with sqlite://")
         path = config.url.replace("sqlite://", "")
+        os.makedirs(Path(path).parent, exist_ok=True)
         self.conn = sqlite3.connect(path)
         self.conn.row_factory = sqlite3.Row
 
