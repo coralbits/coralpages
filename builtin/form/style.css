@@ -1,0 +1,29 @@
+.form {
+    background: var(--background-color);
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--border-radius);
+    padding: 12px;
+    gap: 12px;
+}
+
+.form .input {
+    gap: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.form .input input {
+    border: 1px solid var(--button-border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size);
+    line-height: 2rem;
+    padding-left: 12px;
+    padding-right: 12px;
+    width: calc(100% - 24px);
+}
+
+.form .input label {
+    font-weight: bold;
+    margin-bottom: var(--margin-bottom);
+}

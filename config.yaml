@@ -6,8 +6,10 @@ server:
   allow_origins: # CORS
     - http://localhost:1234
     - http://localhost:3000
+    - http://localhost:8005
     - http://127.0.0.1:1234
     - http://127.0.0.1:3000
+    - http://127.0.0.1:8005
 
   render: true
 

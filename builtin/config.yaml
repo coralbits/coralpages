@@ -103,6 +103,17 @@ blocks:
         label: Text
         name: text
         placeholder: Enter text
+      - type: select
+        label: Type
+        name: type
+        options:
+          - label: Nothing
+            value:
+          - label: Submit
+            value: submit
+          - label: Onclick
+            value: onclick
+        default: onclick
       - type: textarea
         label: Onclick
         name: onclick
@@ -168,3 +179,70 @@ blocks:
     editor:
       - type: html
         label: HTML
+
+  - name: form
+    description: A Form
+    icon: form
+    html: form/form.html
+    css: form/style.css
+    editor:
+      - type: text
+        label: URL
+        description: URL to POST data to
+      - type: select
+        label: Method
+        name: method
+        options:
+          - label: GET
+            value: GET
+            icon: get
+          - label: POST
+            value: POST
+            icon: post
+        default: POST
+      - type: select
+        label: Encoding
+        name: encoding
+        options:
+          - label: URL
+            value: url
+            icon: url
+          - label: Form
+            value: form
+            icon: form
+        default: form
+
+  - name: form_input
+    description: A Form Input
+    icon: form_input
+    html: form/input.html
+    editor:
+      - type: text
+        label: Label
+        name: label
+        description: Label of the input
+      - type: text
+        label: Name
+        name: name
+        description: Internal name of the input
+      - type: select
+        label: Type
+        name: type
+        options:
+          - label: Text
+            value: text
+            icon: text
+          - label: Email
+            value: email
+            icon: email
+          - label: Hidden
+            value: hidden
+            icon: hidden
+          - label: Password
+            value: password
+            icon: password
+        default: text
+      - type: text
+        name: default_value
+        label: Default Value
+        description: Default value of the input
