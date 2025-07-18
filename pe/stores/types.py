@@ -28,7 +28,9 @@ class StoreBase:
         """
         Load a page from the store.
         """
-        raise NotImplementedError("load_html not implemented")
+        raise NotImplementedError(
+            f"load_html not implemented in {self.__class__.__name__}"
+        )
 
     async def load_css(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]
@@ -36,7 +38,9 @@ class StoreBase:
         """
         Load a CSS file from the store.
         """
-        raise NotImplementedError("load_css not implemented")
+        raise NotImplementedError(
+            f"load_css not implemented in {self.__class__.__name__}"
+        )
 
     async def load_context(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]
@@ -50,13 +54,17 @@ class StoreBase:
         """
         Load a page from the store.
         """
-        raise NotImplementedError("load_page_definition not implemented")
+        raise NotImplementedError(
+            f"load_page_definition not implemented in {self.__class__.__name__}"
+        )
 
     async def save_page_definition(self, *, path: str, data: Page) -> None:
         """
         Save a page to the store.
         """
-        raise NotImplementedError("save_page_definition not implemented")
+        raise NotImplementedError(
+            f"save_page_definition not implemented in {self.__class__.__name__}"
+        )
 
     async def get_element_list(self) -> list[BlockTemplate]:
         """
@@ -103,4 +111,6 @@ class StoreBase:
         """
         Delete a page definition from the store.
         """
-        raise NotImplementedError("delete_page_definition not implemented")
+        raise NotImplementedError(
+            f"delete_page_definition not implemented in {self.__class__.__name__}"
+        )

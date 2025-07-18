@@ -72,9 +72,12 @@ class StoreFactory:
         This is for pages which do not have a proper schema, so we try them all in order
         """
         for store in self.get_all_stores().values():
-            page_definition = await store.load_page_definition(path=path)
-            if page_definition:
-                return page_definition
+            try:
+                page_definition = await store.load_page_definition(path=path)
+                if page_definition:
+                    return page_definition
+            except NotImplementedError:
+                pass
         return None
 
     async def save_page_definition(self, path: str, data: Page) -> None:
