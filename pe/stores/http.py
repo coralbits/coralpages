@@ -8,7 +8,7 @@ from typing import Any
 import httpx
 
 from pe.stores.types import StoreBase
-from pe.types import BlockTemplate, FieldDefinition, StoreConfig
+from pe.types import Widget, FieldDefinition, StoreConfig
 
 logger = logging.getLogger(__name__)
 
@@ -119,12 +119,12 @@ class HttpStore(StoreBase):
         element = self.get_element_impl(path, data, context)
         return await element.load_context()
 
-    async def get_element_list(self) -> list[BlockTemplate]:
+    async def get_element_list(self) -> list[Widget]:
         """
         Load the element list from the HTTP store.
         """
         return [
-            BlockTemplate(
+            Widget(
                 name="apicontext",
                 description="Point to a JSON API endpoint, and children can use the data to render. It can itself use some context data as well.",
                 icon="server",
@@ -150,7 +150,7 @@ class HttpStore(StoreBase):
                     ),
                 ],
             ),
-            BlockTemplate(
+            Widget(
                 name="embed",
                 description="Embed a URL, and children can use the data to render. It can itself use some context data as well.",
                 icon="html",

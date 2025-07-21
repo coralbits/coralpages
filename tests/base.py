@@ -3,7 +3,7 @@ from unittest import IsolatedAsyncioTestCase
 
 from pe.config import Config
 from pe.setup import setup_logging
-from pe.types import BlockTemplate, StoreConfig
+from pe.types import Widget, StoreConfig
 
 setup_logging()
 
@@ -21,7 +21,7 @@ class TestCase(IsolatedAsyncioTestCase):
                 path="builtin",
                 tags=["jinja2", "blocks"],
                 blocks=[
-                    BlockTemplate(
+                    Widget(
                         name="text",
                         html="text/view.html",
                         css="text/style.css",

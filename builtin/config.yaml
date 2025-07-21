@@ -1,6 +1,6 @@
-blocks:
+widgets:
   - name: text
-    description: A text element
+    description: A text widget
     icon: text
     html: text/view.html
     css: text/style.css
@@ -10,7 +10,7 @@ blocks:
         name: text
         placeholder: Enter text
   - name: image
-    description: An image element
+    description: An image widget
     icon: image
     html: image/view.html
     css: image/style.css
@@ -28,7 +28,7 @@ blocks:
         name: caption
         placeholder: Enter caption
   - name: header
-    description: A header element
+    description: A header widget
     icon: header
     html: header/view.html
     css: header/style.css
@@ -38,7 +38,7 @@ blocks:
         name: text
         placeholder: Enter text
   - name: section
-    description: A section element
+    description: A section widget
     icon: section
     html: section/view.html
     css: section/style.css
@@ -48,7 +48,7 @@ blocks:
         name: text
         placeholder: Enter text
   - name: tag-cloud
-    description: A tag cloud element
+    description: A tag cloud widget
     icon: tag
     html: tag-cloud/view.html
     css: tag-cloud/style.css
@@ -58,7 +58,7 @@ blocks:
         name: tags
         placeholder: Enter tags
   - name: paragraph
-    description: A paragraph element
+    description: A paragraph widget
     icon: paragraph
     html: text/view.html
     css: text/style.css
@@ -68,12 +68,12 @@ blocks:
         name: text
         placeholder: Enter text
   - name: menu
-    description: A menu element
+    description: A menu widget
     icon: menu
     html: menu/view.html
     css: menu/style.css
   - name: markdown
-    description: A markdown element
+    description: A markdown widget
     icon: markdown
     html: markdown/view.html
     css: markdown/style.css
@@ -89,12 +89,12 @@ blocks:
         placeholder: Enter markdown text
         required: true
   - name: children
-    description: A children element
+    description: A children widget
     icon: children
     html: children/view.html
     css: children/style.css
   - name: button
-    description: A button element
+    description: A button widget
     icon: button
     html: button/view.html
     css: button/style.css
@@ -119,7 +119,7 @@ blocks:
         name: onclick
         placeholder: Enter onclick javascript
   - name: div
-    description: A div element
+    description: A div widget
     icon: div
     html: div/view.html
     css: div/style.css.j2
@@ -173,7 +173,7 @@ blocks:
         default: 0
 
   - name: html
-    description: A HTML element
+    description: A HTML widget
     icon: html
     html: html/view.html
     editor:

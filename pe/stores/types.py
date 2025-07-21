@@ -1,7 +1,7 @@
 import logging
 from typing import Any, List
 
-from pe.types import BlockTemplate, Page, PageInfo, PageListResult, StoreConfig
+from pe.types import Widget, Page, PageInfo, PageListResult, StoreConfig
 
 
 logger = logging.getLogger(__name__)
@@ -66,23 +66,23 @@ class StoreBase:
             f"save_page_definition not implemented in {self.__class__.__name__}"
         )
 
-    async def get_element_list(self) -> list[BlockTemplate]:
+    async def get_widget_list(self) -> list[Widget]:
         """
-        Get a list of all elements in the store.
+        Get a list of all widgets in the store.
         """
-        logger.debug("Getting element list for store: %s", self.config.name)
+        logger.debug("Getting widget list for store: %s", self.config.name)
         return []
 
-    async def get_element_definition(self, path: str) -> BlockTemplate | None:
+    async def get_widget_definition(self, path: str) -> Widget | None:
         """
-        Get an element definition from the store.
+        Get an widget definition from the store.
         """
-        for block in await self.get_element_list():
+        for block in await self.get_widget_list():
             if block.name == path:
                 return block
 
         raise ValueError(
-            f"Element definition not found for path: {path}. Available elements: {list(block.name for block in await self.get_element_list())}"
+            f"Element definition not found for path: {path}. Available widgets: {list(block.name for block in await self.get_widget_list())}"
         )
 
     def clean_path(self, path: str) -> str:

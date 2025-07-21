@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import Self
 from pathlib import Path
 
 import yaml
@@ -21,7 +20,7 @@ class ServerConfig:
     render: bool = False
 
     @staticmethod
-    def from_dict(data: dict) -> Self:
+    def from_dict(data: dict) -> "ServerConfig":
         """
         Load the server configuration from a dictionary.
         """
@@ -48,7 +47,7 @@ class Config:
     server: ServerConfig = field(default_factory=ServerConfig)
 
     @staticmethod
-    def read(path: str) -> Self:
+    def read(path: str) -> "Config":
         """
         Read the configuration from a file.
         """
@@ -57,7 +56,7 @@ class Config:
             return Config.from_dict(data)
 
     @staticmethod
-    def from_dict(data: dict) -> Self:
+    def from_dict(data: dict) -> "Config":
         """
         Load the configuration from a dictionary.
         """

@@ -21,9 +21,9 @@ class TestStores(TestCase):
         logger.debug(
             "http_store=%s element_id=%s",
             http_store,
-            [e.name for e in await http_store.get_element_list()],
+            [e.name for e in await http_store.get_widget_list()],
         )
-        element = await http_store.get_element_definition("apicontext")
+        element = await http_store.get_widget_definition("apicontext")
         self.assertIsNotNone(element)
 
         context = await http_store.load_context(
@@ -46,9 +46,9 @@ class TestStores(TestCase):
         logger.debug(
             "http_store=%s element_id=%s",
             http_store,
-            [e.name for e in await http_store.get_element_list()],
+            [e.name for e in await http_store.get_widget_list()],
         )
-        element = await http_store.get_element_definition("embed")
+        element = await http_store.get_widget_definition("embed")
         self.assertIsNotNone(element)
 
         html = await http_store.load_html(
@@ -86,7 +86,7 @@ class TestStores(TestCase):
         logger.debug("db_store=%s type=%s", db_store, type(db_store))
         self.assertTrue(isinstance(db_store, DbStore))
         await db_store.save_page_definition(
-            path="test_store_page_list", data=Page(title="Test", url="", data=[])
+            path="test_store_page_list", data=Page(title="Test", url="", children=[])
         )
 
         pages = await renderer.store.get_page_list()

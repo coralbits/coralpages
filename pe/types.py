@@ -32,7 +32,7 @@ class MetaDefinition:
 
 
 @dataclass
-class Block:
+class Element:
     """
     Each block definition, with content, and maybe more children
     """
@@ -52,7 +52,7 @@ class Block:
             id=data.get("id", None) or f"_{uuid.uuid4()}",
             type=data["type"],
             data=data.get("data", {}),
-            children=[Block.from_dict(child) for child in data.get("children", [])],
+            children=[Element.from_dict(child) for child in data.get("children", [])],
             style=data.get("style", {}),
         )
 
@@ -78,7 +78,7 @@ class Page:
     title: str = ""
     url: str | None = None
     template: str | None = None
-    data: list[Block] = field(default_factory=list)
+    children: list[Element] = field(default_factory=list)
     cache: list[str] = field(default_factory=list)
     last_modified: datetime.datetime | None = None
     meta: list[MetaDefinition] = field(default_factory=list)
@@ -98,7 +98,7 @@ class Page:
             title=data["title"],
             url=data.get("url", None),
             template=data["template"],
-            data=[Block.from_dict(block) for block in data["data"]],
+            children=[Element.from_dict(block) for block in data["data"]],
             cache=data.get("cache", []),
             last_modified=last_modified,
             meta=[MetaDefinition.from_dict(meta) for meta in data.get("meta", [])],
@@ -114,7 +114,7 @@ class Page:
             "url": self.url,
             "template": self.template,
             "cache": self.cache,
-            "data": [block.to_dict() for block in self.data],
+            "children": [child.to_dict() for child in self.children],
             "last_modified": (
                 self.last_modified.isoformat() if self.last_modified else None
             ),
@@ -204,7 +204,7 @@ def clean_dict(data: dict[str, Any]) -> dict[str, Any]:
 
 
 @dataclass
-class BlockTemplate:
+class Widget:
     """
     Each block definition, with content, and maybe more children
     """
@@ -265,7 +265,7 @@ class StoreConfig:
     base_url: str | None = None
     url: str | None = None
     tags: list[str] = field(default_factory=list)
-    blocks: list[BlockTemplate] = field(default_factory=list)
+    blocks: list[Widget] = field(default_factory=list)
     config: dict[str, Any] = field(default_factory=dict)
 
     def get(self, key: str, default: Any = None) -> Any:
@@ -281,7 +281,7 @@ class StoreConfig:
         """
         tags = data.get("tags", [])
 
-        blocks = [BlockTemplate.from_dict(block) for block in data.get("blocks", [])]
+        blocks = [Widget.from_dict(block) for block in data.get("blocks", [])]
         for block in blocks:
             block.store = data["name"]
             block.tags.extend(tags)

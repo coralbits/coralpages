@@ -8,7 +8,7 @@ from typing import Any
 
 import yaml
 
-from pe.types import Block, BlockTemplate, Page, PageInfo, PageListResult, StoreConfig
+from pe.types import Element, Widget, Page, PageInfo, PageListResult, StoreConfig
 from pe.stores.types import StoreBase
 
 logger = logging.getLogger(__name__)
@@ -22,37 +22,37 @@ class FileStore(StoreBase):
     def __init__(self, config: StoreConfig):
         super().__init__(config)
         self.base_path = Path(config.path) if config.path else Path(".")
-        self.blocks = {}
-        self.load_blocks()
+        self.widgets = {}
+        self.load_widgets()
 
-    def load_blocks(self) -> dict[str, BlockTemplate]:
+    def load_widgets(self) -> dict[str, Widget]:
         """
         Load the blocks from the file store.
         """
-        if "blocks" not in self.config.tags:
+        if "widgets" not in self.config.tags:
             logger.debug(
-                "No blocks tag in config.yaml for store=%s, skipping load blocks",
+                "No widgets tag in config.yaml for store=%s, skipping load widgets",
                 self.config.name,
             )
-            return
+            return {}
         with open(self.base_path / "config.yaml", "r", encoding="utf-8") as fd:
             yamlconfig = yaml.safe_load(fd)
 
-        block_data = yamlconfig.get("blocks", [])
+        block_data = yamlconfig.get("widgets", [])
         if not block_data:
-            logger.warning("No blocks found in file store from path=%s", self.base_path)
-            return
+            logger.warning("No widgets found in file store from path=%s", self.base_path)
+            return {}
 
-        blocks = [BlockTemplate.from_dict(x) for x in block_data]
-        self.blocks = {x.name: x for x in blocks}
-        if len(self.blocks) == 0:
-            logger.warning("No blocks found in file store from path=%s", self.base_path)
+        widgets = [Widget.from_dict(x) for x in block_data]
+        self.widgets = {x.name: x for x in widgets}
+        if len(self.widgets) == 0:
+            logger.warning("No widgets found in file store from path=%s", self.base_path)
         logger.debug(
-            "Loaded count=%d blocks from file store from path=%s",
-            len(self.blocks),
+            "Loaded count=%d widgets from file store from path=%s",
+            len(self.widgets),
             self.base_path,
         )
-        return self.blocks
+        return self.widgets
 
     async def load_html(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]
@@ -63,36 +63,36 @@ class FileStore(StoreBase):
         if path == "html":  # html is special internal for top level html
             return data.get("html", "")
 
-        element_definition = await self.get_element_definition(path)
-        if element_definition is None:
+        widget = await self.get_widget_definition(path)
+        if widget is None:
             raise ValueError(
-                f"Element definition not found for path={path}, known elements={list(self.blocks.keys())}"
+                f"Element definition not found for path={path}, known elements={list(self.widgets.keys())}"
             )
 
-        if not element_definition.html:
+        if not widget.html:
             return None
 
         return await self.load_generic(
-            path=element_definition.html, data=data, context=context
+            path=widget.html, data=data, context=context
         )
 
     async def load_css(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]
     ) -> str | None:
         """
-        Load an element from the file store.
+        Load an widget from the file store.
 
         CSS is plain CSS data
         """
-        element_definition = await self.get_element_definition(path)
-        if element_definition is None:
+        widget_definition = await self.get_widget_definition(path)
+        if widget_definition is None:
             return None
 
-        if not element_definition.css:
+        if not widget_definition.css:
             return None
 
         return await self.load_generic(
-            path=element_definition.css, data=data, context=context
+            path=widget_definition.css, data=data, context=context
         )
 
     async def load_page_definition(self, *, path: str) -> Page | None:
@@ -123,7 +123,7 @@ class FileStore(StoreBase):
         with open(filepath, "r", encoding="utf-8") as file:
             html = file.read()
 
-        return Page(data=[Block(type="builtin://html", data={"html": html})])
+        return Page(children=[Element(type="builtin://html", data={"html": html})])
 
     async def load_generic(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]  # type: ignore
@@ -140,17 +140,18 @@ class FileStore(StoreBase):
         with open(filepath, "r", encoding="utf-8") as file:
             return file.read()
 
-    async def get_element_list(self) -> list[BlockTemplate]:
+    async def get_widget_list(self) -> list[Widget]:
         """
-        Get a list of all elements in the file store.
+        Get a list of all widgets in the file store.
         """
-        return list(self.blocks.values())
+        logger.info("Get widget list from file store count=%s", len(self.widgets))
+        return list(self.widgets.values())
 
-    async def get_element_definition(self, path: str) -> BlockTemplate | None:
+    async def get_widget_definition(self, path: str) -> Widget | None:
         """
-        Get an element definition from the file store.
+        Get an widget definition from the file store.
         """
-        return self.blocks.get(path)
+        return self.widgets.get(path)
 
     async def get_page_list(
         self, *, offset: int = 0, limit: int = 10

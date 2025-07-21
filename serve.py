@@ -13,7 +13,7 @@ from pe.config import Config
 from pe.renderer.renderer import Renderer
 from pe.setup import setup_logging
 from pe.stores.factory import StoreFactory
-from pe.types import Block, Page
+from pe.types import Element, Page
 
 
 def create_app(args: argparse.Namespace):
@@ -103,27 +103,27 @@ def create_app(args: argparse.Namespace):
         await store.save_page_definition(path=path, data=page)
         return Response(content="OK", status_code=200)
 
-    @app.get("/api/v1/element/")
-    async def list_known_elements():
-        elements_dict = []
+    @app.get("/api/v1/widget/")
+    async def list_known_widgets():
+        widgets_dict = []
         for store_item in store.get_all_stores().values():
-            for element in await store_item.get_element_list():
-                eldef = element.to_dict()
+            for widget in await store_item.get_widget_list():
+                eldef = widget.to_dict()
                 eldef["store"] = store_item.config.name
-                eldef["name"] = f"{store_item.config.name}://{element.name}"
-                elements_dict.append(eldef)
+                eldef["name"] = f"{store_item.config.name}://{widget.name}"
+                widgets_dict.append(eldef)
         return Response(
-            content=json.dumps(elements_dict), media_type="application/json"
+            content=json.dumps(widgets_dict), media_type="application/json"
         )
 
-    @app.get("/api/v1/element/{element_name}/html")
-    async def read_element_html(request: Request, element_name: str):
+    @app.get("/api/v1/widget/{widget_name}/html")
+    async def read_widget_html(request: Request, widget_name: str):
         data = dict(request.query_params)
 
-        element_name = f"builtin://{element_name}"
+        widget_name = f"builtin://{widget_name}"
 
-        block = Block(
-            type=element_name,
+        block = Element(
+            type=widget_name,
             data=data,
             children=[],
             style={},
@@ -132,14 +132,14 @@ def create_app(args: argparse.Namespace):
         html, _ = await renderer.render_block(page, block)
         return Response(content=html, media_type="text/html")
 
-    @app.get("/api/v1/element/{element_name}/css")
-    async def read_element_css(request: Request, element_name: str):
+    @app.get("/api/v1/widget/{widget_name}/css")
+    async def read_widget_css(request: Request, widget_name: str):
         data = dict(request.query_params)
 
-        element_name = f"builtin://{element_name}"
+        widget_name = f"builtin://{widget_name}"
 
-        block = Block(
-            type=element_name,
+        block = Element(
+            type=widget_name,
             data=data,
             children=[],
             style={},

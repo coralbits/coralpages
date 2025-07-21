@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 
 from pe.renderer.renderer import Renderer, RenderedPage
-from pe.types import Block, Page
+from pe.types import Element, Page
 from tests.base import TestCase
 
 logger = logging.getLogger(__name__)
@@ -19,8 +19,8 @@ class TestRenderer(TestCase):
         page = await renderer.render(
             page_def=Page(
                 title="Test test_render_text",
-                data=[
-                    Block(
+                children=[
+                    Element(
                         type="default://text",
                         data={"text": "Hello, world!"},
                     )
@@ -39,16 +39,16 @@ class TestRenderer(TestCase):
         page: RenderedPage = await renderer.render(
             page_def=Page(
                 title="Test test_render_html",
-                data=[
-                    Block(
+                children=[
+                    Element(
                         type="http://apicontext",
                         data={"url": "test", "name": "test"},
                         children=[
-                            Block(
+                            Element(
                                 type="default://text",
                                 data={"text": "{{context.test.title}}"},
                             ),
-                            Block(
+                            Element(
                                 type="default://text",
                                 data={
                                     "text": "{% for item in context.test.array %}* {{item.name}}\n{% endfor %}"

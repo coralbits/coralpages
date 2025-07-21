@@ -34,7 +34,7 @@ stores:
     type: file
     path: ./builtin/
     tags:
-      - blocks
+      - widgets
       - jinja2
   # allow HTTP based stores
   - name: http

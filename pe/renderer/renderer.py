@@ -11,7 +11,7 @@ import markdown
 
 from pe.config import Config
 from pe.stores.factory import StoreFactory
-from pe.types import Block, MetaDefinition, Page
+from pe.types import Element, MetaDefinition, Page
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +23,7 @@ class PageError:
     """
 
     error: Exception
-    block: Block
+    block: Element
 
 
 @dataclass
@@ -79,7 +79,7 @@ class RenderedPage:
             **page_def.css_variables,
         }
 
-    def get_current_id(self, block: Block) -> int:
+    def get_current_id(self, block: Element) -> int:
         """
         Get the current id.
         """
@@ -112,7 +112,7 @@ class RenderedPage:
         """
         return len(self.errors) > 0
 
-    def add_error(self, *, error: Exception, block: Block):
+    def add_error(self, *, error: Exception, block: Element):
         """
         Add an error to the page.
         """
@@ -192,7 +192,7 @@ class Renderer:
         page = await self.render(page_definition)
         logger.debug(
             "Page rendered block_count=%s, page_size=%s",
-            len(page_definition.data),
+            len(page_definition.children),
             len(page.content),
         )
 
@@ -249,8 +249,8 @@ class Renderer:
         for meta in page_def.meta:
             page.append_meta(meta)
 
-        logger.debug("Rendering page, %d blocks", len(page_def.data))
-        for block in page_def.data:
+        logger.debug("Rendering page, %d blocks", len(page_def.children))
+        for block in page_def.children:
             logger.debug("Rendering block: %s", block.type)
             try:
                 html = await self.render_block(page, block, context=page.context)
@@ -304,7 +304,7 @@ class Renderer:
             )
 
     async def render_block(
-        self, page: RenderedPage, block: Block, context: dict[str, Any]
+        self, page: RenderedPage, block: Element, context: dict[str, Any]
     ) -> str:
         """
         Render a block asynchronously.
