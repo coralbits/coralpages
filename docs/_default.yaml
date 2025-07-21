@@ -32,7 +32,7 @@ css_variables:
   "--button-border-color-hover": "#556ee5"
   "--button-background-color-active": "#4455d4"
 
-data:
+children:
   - type: builtin://header
     id: "header"
     style:

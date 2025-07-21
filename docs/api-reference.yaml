@@ -6,11 +6,11 @@ cache:
   - etag
   - last-modified
 
-data:
+children:
   - type: builtin://markdown
     data:
       text: |
-        The Coralbits Page Editor provides a RESTful API for page rendering, editing, and management. 
+        The Coralbits Page Editor provides a RESTful API for page rendering, editing, and management.
         The API is designed to be stateless, cacheable, and easily integrable with any web application.
 
         ## Base URL
@@ -21,7 +21,7 @@ data:
 
         ## Authentication
 
-        Currently, the API does not require authentication for basic operations. 
+        Currently, the API does not require authentication for basic operations.
         Future versions will support JWT tokens and API keys for secure access.
 
         ## Response Format
@@ -125,7 +125,7 @@ data:
               "data": { ... }
             },
             {
-              "name": "page2", 
+              "name": "page2",
               "data": { ... }
             }
           ]

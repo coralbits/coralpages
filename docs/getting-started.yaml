@@ -3,7 +3,7 @@
 title: "Getting Started"
 template: "docs://_default"
 
-data:
+children:
   - type: builtin://markdown
     data:
       title: "Quick Start Guide"
@@ -56,7 +56,7 @@ data:
               color: white
               text-align: center
               padding: 20px
-          
+
           - type: builtin://text
             data:
               text: "Welcome to Coralbits Page Editor!"

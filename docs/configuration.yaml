@@ -3,12 +3,12 @@
 title: "Configuration"
 template: "docs://_default"
 
-data:
+children:
   - type: builtin://markdown
     data:
       title: "Configuration Overview"
       text: |
-        The Coralbits Page Editor is highly configurable through YAML configuration files and environment variables. 
+        The Coralbits Page Editor is highly configurable through YAML configuration files and environment variables.
         This allows you to customize the behavior, appearance, and functionality to match your specific needs.
 
         ## Configuration Files
@@ -217,9 +217,9 @@ data:
         <!-- templates/text/editor.html -->
         <div class="text-editor" data-component="text">
           <label for="text-content">Text Content:</label>
-          <textarea 
-            id="text-content" 
-            name="text" 
+          <textarea
+            id="text-content"
+            name="text"
             class="rich-text-editor"
             data-component-field="text">
             \{\{ data.text \}\}
@@ -383,7 +383,7 @@ data:
             enabled: true
             config:
               tracking_id: "UA-123456789-1"
-          
+
           - name: seo
             enabled: true
             config:
@@ -398,7 +398,7 @@ data:
         class AnalyticsPlugin:
             def __init__(self, config):
                 self.tracking_id = config['tracking_id']
-            
+
             def inject_head(self, page_data):
                 return f'<script>gtag("config", "{self.tracking_id}");</script>'
         ```
@@ -413,7 +413,7 @@ data:
           backend: redis  # memory, redis, memcached
           ttl: 3600
           key_prefix: "page_editor:"
-          
+
           redis:
             host: "localhost"
             port: 6379
@@ -497,7 +497,7 @@ data:
               filename: logs/app.log
               max_bytes: 10485760
               backup_count: 5
-            
+
             - type: builtin://console
               level: DEBUG
         ```

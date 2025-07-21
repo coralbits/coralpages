@@ -3,7 +3,7 @@
 title: "Local Development"
 template: "docs://_default"
 
-data:
+children:
   - type: builtin://markdown
     data:
       title: "Development Environment Setup"
@@ -71,7 +71,7 @@ data:
               color: white
               text-align: center
               padding: 20px
-          
+
           - type: builtin://text
             data:
               text: "Welcome to my new page!"
@@ -230,7 +230,7 @@ data:
         def test_renderer_basic():
             from pe.renderer import render_page
             from pe.types import PageData
-            
+
             page_data = PageData(
                 data=[
                     {
@@ -240,7 +240,7 @@ data:
                     }
                 ]
             )
-            
+
             result = render_page(page_data)
             assert "Hello World" in result
             assert "color: blue" in result

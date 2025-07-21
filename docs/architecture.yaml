@@ -2,13 +2,13 @@
 title: "Architecture"
 template: "docs://_default"
 
-data:
+children:
   - type: builtin://markdown
     data:
       title: "System Architecture Overview"
       text: |
-        The Coralbits Page Editor follows a **microservices-first** architecture designed for scalability, 
-        maintainability, and flexibility. The system is built around the principle that each component 
+        The Coralbits Page Editor follows a **microservices-first** architecture designed for scalability,
+        maintainability, and flexibility. The system is built around the principle that each component
         should be independent and replaceable.
 
         ## Core Principles

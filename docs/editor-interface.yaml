@@ -3,13 +3,13 @@
 title: "Editor Interface"
 template: "docs://_default"
 
-data:
+children:
   - type: builtin://markdown
     data:
       title: "Visual Page Editor"
       text: |
-        The Coralbits Page Editor provides a powerful visual interface for creating and editing pages. 
-        The editor is designed as an embedded Single Page Application (SPA) that can be integrated 
+        The Coralbits Page Editor provides a powerful visual interface for creating and editing pages.
+        The editor is designed as an embedded Single Page Application (SPA) that can be integrated
         into any web application.
 
         ## Key Features
@@ -297,11 +297,11 @@ data:
             this.data = data;
             this.onUpdate = onUpdate;
           }
-          
+
           render() {
             // Return editor HTML
           }
-          
+
           getData() {
             // Return component data
           }

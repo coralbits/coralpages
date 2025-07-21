@@ -4,12 +4,12 @@
 title: "Coralbits Page Editor Documentation"
 template: "docs://_default"
 
-data:
+children:
   - type: builtin://markdown
     data:
       title: "Welcome to Coralbits Page Editor"
       text: |
-        The Coralbits Page Editor is a powerful, API-first page editor and renderer designed for modern web development. 
+        The Coralbits Page Editor is a powerful, API-first page editor and renderer designed for modern web development.
         It provides a flexible, component-based approach to creating dynamic web pages with an embedded Single Page Application (SPA) interface.
 
         ## Key Features
@@ -23,7 +23,7 @@ data:
 
         ## Philosophy
 
-        The Coralbits Page Editor follows a **microservices-first** approach, where each component is treated as an independent service. 
+        The Coralbits Page Editor follows a **microservices-first** approach, where each component is treated as an independent service.
         This design philosophy enables:
 
         - **Scalability**: Components can be scaled independently

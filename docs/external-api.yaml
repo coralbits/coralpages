@@ -2,7 +2,7 @@
 title: "API get example"
 template: "docs://_default"
 
-data:
+children:
   - type: builtin://markdown
     data:
       text: |

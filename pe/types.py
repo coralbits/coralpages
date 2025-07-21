@@ -98,7 +98,7 @@ class Page:
             title=data["title"],
             url=data.get("url", None),
             template=data["template"],
-            children=[Element.from_dict(block) for block in data["data"]],
+            children=[Element.from_dict(block) for block in data.get("children", [])],
             cache=data.get("cache", []),
             last_modified=last_modified,
             meta=[MetaDefinition.from_dict(meta) for meta in data.get("meta", [])],

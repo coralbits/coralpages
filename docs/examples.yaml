@@ -3,12 +3,12 @@
 title: "Examples"
 template: "docs://_default"
 
-data:
+children:
   - type: builtin://markdown
     data:
       title: "Example Pages"
       text: |
-        This section provides practical examples of how to use the Coralbits Page Editor. 
+        This section provides practical examples of how to use the Coralbits Page Editor.
         Each example demonstrates different features and use cases to help you get started.
 
         ## Example Categories
@@ -76,9 +76,9 @@ data:
                 data:
                   text: |
                     <h2>Our Story</h2>
-                    <p>We are a passionate team dedicated to creating amazing experiences for our customers. 
+                    <p>We are a passionate team dedicated to creating amazing experiences for our customers.
                     Our mission is to deliver innovative solutions that make a difference.</p>
-                    
+
                     <h2>Our Values</h2>
                     <ul>
                       <li>Innovation and creativity</li>
@@ -126,23 +126,23 @@ data:
                       <span class="author">by John Doe</span>
                       <span class="category">Tutorial</span>
                     </div>
-                    
+
                     <div class="blog-content">
                       <p>In this tutorial, we'll explore how to get started with the Coralbits Page Editor...</p>
-                      
+
                       <h2>Installation</h2>
                       <p>First, let's install the Coralbits Page Editor...</p>
-                      
+
                       <h2>Creating Your First Page</h2>
                       <p>Now that we have it installed, let's create our first page...</p>
-                      
+
                       <h2>Conclusion</h2>
                       <p>Congratulations! You've successfully created your first page...</p>
                     </div>
                 style:
                   line-height: 1.8
                   color: #333
-                  
+
               - type: builtin://tag-cloud
                 data:
                   tags:
@@ -218,10 +218,10 @@ data:
                     <div class="about-content">
                       <div class="about-text">
                         <h2>Hello, I'm John</h2>
-                        <p>I'm a full-stack developer with over 5 years of experience creating 
-                        beautiful and functional web applications. I specialize in modern web 
+                        <p>I'm a full-stack developer with over 5 years of experience creating
+                        beautiful and functional web applications. I specialize in modern web
                         technologies and user experience design.</p>
-                        
+
                         <h3>Skills</h3>
                         <ul>
                           <li>Frontend: React, Vue.js, HTML5, CSS3, JavaScript</li>
@@ -257,7 +257,7 @@ data:
                           <span class="tech">MongoDB</span>
                         </div>
                       </div>
-                      
+
                       <div class="portfolio-item">
                         <h3>Task Management App</h3>
                         <p>Collaborative task management with real-time updates</p>
@@ -267,7 +267,7 @@ data:
                           <span class="tech">PostgreSQL</span>
                         </div>
                       </div>
-                      
+
                       <div class="portfolio-item">
                         <h3>Weather Dashboard</h3>
                         <p>Real-time weather information with beautiful visualizations</p>
@@ -322,32 +322,32 @@ data:
                           </ul>
                         </nav>
                       </aside>
-                      
+
                       <main class="main-content">
                         <div class="dashboard-header">
                           <h1>Dashboard Overview</h1>
                           <p>Welcome back, Admin!</p>
                         </div>
-                        
+
                         <div class="dashboard-grid">
                           <div class="dashboard-card">
                             <h3>Total Users</h3>
                             <div class="card-value">1,234</div>
                             <div class="card-change positive">+12%</div>
                           </div>
-                          
+
                           <div class="dashboard-card">
                             <h3>Active Sessions</h3>
                             <div class="card-value">567</div>
                             <div class="card-change positive">+8%</div>
                           </div>
-                          
+
                           <div class="dashboard-card">
                             <h3>Revenue</h3>
                             <div class="card-value">$45,678</div>
                             <div class="card-change positive">+15%</div>
                           </div>
-                          
+
                           <div class="dashboard-card">
                             <h3>Errors</h3>
                             <div class="card-value">23</div>
@@ -406,7 +406,7 @@ data:
                           <strong>Address:</strong> 123 Main St, City, State 12345
                         </div>
                       </div>
-                      
+
                       <div class="contact-form">
                         <h3>Send us a Message</h3>
                         <form class="contact-form-element">
@@ -414,12 +414,12 @@ data:
                             <label for="name">Name:</label>
                             <input type="text" id="name" name="name" required>
                           </div>
-                          
+
                           <div class="form-group">
                             <label for="email">Email:</label>
                             <input type="email" id="email" name="email" required>
                           </div>
-                          
+
                           <div class="form-group">
                             <label for="subject">Subject:</label>
                             <select id="subject" name="subject">
@@ -430,12 +430,12 @@ data:
                               <option value="other">Other</option>
                             </select>
                           </div>
-                          
+
                           <div class="form-group">
                             <label for="message">Message:</label>
                             <textarea id="message" name="message" rows="5" required></textarea>
                           </div>
-                          
+
                           <button type="submit" class="submit-btn">Send Message</button>
                         </form>
                       </div>
@@ -482,40 +482,40 @@ data:
                           <span class="faq-toggle">+</span>
                         </div>
                         <div class="faq-answer">
-                          <p>Getting started is easy! Simply install the package, create a YAML file 
+                          <p>Getting started is easy! Simply install the package, create a YAML file
                           with your page content, and use the render command to generate HTML.</p>
                         </div>
                       </div>
-                      
+
                       <div class="faq-item">
                         <div class="faq-question">
                           <h3>Can I create custom components?</h3>
                           <span class="faq-toggle">+</span>
                         </div>
                         <div class="faq-answer">
-                          <p>Yes! You can create custom components by defining them in the config.yaml 
+                          <p>Yes! You can create custom components by defining them in the config.yaml
                           file and creating the corresponding HTML templates.</p>
                         </div>
                       </div>
-                      
+
                       <div class="faq-item">
                         <div class="faq-question">
                           <h3>Is the editor responsive?</h3>
                           <span class="faq-toggle">+</span>
                         </div>
                         <div class="faq-answer">
-                          <p>Absolutely! All components are designed to be responsive and work 
+                          <p>Absolutely! All components are designed to be responsive and work
                           well on desktop, tablet, and mobile devices.</p>
                         </div>
                       </div>
-                      
+
                       <div class="faq-item">
                         <div class="faq-question">
                           <h3>How do I deploy my pages?</h3>
                           <span class="faq-toggle">+</span>
                         </div>
                         <div class="faq-answer">
-                          <p>You can deploy your rendered HTML pages to any web server, CDN, or 
+                          <p>You can deploy your rendered HTML pages to any web server, CDN, or
                           static hosting service like Netlify, Vercel, or GitHub Pages.</p>
                         </div>
                       </div>
@@ -566,32 +566,32 @@ data:
                     <div class="app-hero">
                       <div class="app-content">
                         <h2>Transform Your Experience</h2>
-                        <p>Our mobile app provides a seamless experience across all your devices. 
+                        <p>Our mobile app provides a seamless experience across all your devices.
                         Download now and discover what makes us different.</p>
-                        
+
                         <div class="app-features">
                           <div class="feature">
                             <h3>🚀 Fast Performance</h3>
                             <p>Lightning-fast loading times and smooth animations</p>
                           </div>
-                          
+
                           <div class="feature">
                             <h3>🔒 Secure</h3>
                             <p>Enterprise-grade security to protect your data</p>
                           </div>
-                          
+
                           <div class="feature">
                             <h3>📱 Cross-Platform</h3>
                             <p>Works seamlessly on iOS, Android, and web</p>
                           </div>
                         </div>
-                        
+
                         <div class="download-buttons">
                           <a href="#" class="download-btn ios">Download for iOS</a>
                           <a href="#" class="download-btn android">Download for Android</a>
                         </div>
                       </div>
-                      
+
                       <div class="app-preview">
                         <img src="/images/app-preview.png" alt="App Preview" class="app-screenshot">
                       </div>
@@ -626,13 +626,13 @@ data:
                   <div class="nav-brand">
                     <a href="/">My Website</a>
                   </div>
-                  
+
                   <div class="nav-toggle">
                     <span></span>
                     <span></span>
                     <span></span>
                   </div>
-                  
+
                   <ul class="nav-menu">
                     <li><a href="/">Home</a></li>
                     <li><a href="/about">About</a></li>
@@ -689,7 +689,7 @@ data:
                           <div class="description">Partly Cloudy</div>
                         </div>
                       </div>
-                      
+
                       <div class="widget social-widget">
                         <h3>Social Media Feed</h3>
                         <div class="social-feed">
@@ -708,7 +708,7 @@ data:
                           </div>
                         </div>
                       </div>
-                      
+
                       <div class="widget chart-widget">
                         <h3>Analytics Chart</h3>
                         <div class="chart-container">

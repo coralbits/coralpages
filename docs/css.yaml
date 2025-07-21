@@ -1,7 +1,7 @@
 title: "Configuration"
 template: "docs://_default"
 
-data:
+children:
   - type: builtin://markdown
     data:
       title: "CSS"
@@ -10,7 +10,7 @@ data:
 
         ## CSS Variables
 
-        For CSS try please to use thse varaibles, so we can change the look and feel easily from 
+        For CSS try please to use thse varaibles, so we can change the look and feel easily from
         the config of the page / template.
 
         ```css

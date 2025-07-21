@@ -3,12 +3,12 @@
 title: "Components"
 template: "docs://_default"
 
-data:
+children:
   - type: builtin://markdown
     data:
       title: "Component Overview"
       text: |
-        The Coralbits Page Editor comes with a comprehensive set of built-in components that cover most common web page needs. 
+        The Coralbits Page Editor comes with a comprehensive set of built-in components that cover most common web page needs.
         Each component is designed to be flexible, customizable, and easy to use.
 
         ## Component Categories
