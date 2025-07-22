@@ -95,9 +95,9 @@ class Page:
                 last_modified = datetime.datetime.fromisoformat(last_modified)
 
         return cls(
-            title=data["title"],
+            title=data.get("title", ""),
             url=data.get("url", None),
-            template=data["template"],
+            template=data.get("template", None),
             children=[Element.from_dict(block) for block in data.get("children", [])],
             cache=data.get("cache", []),
             last_modified=last_modified,

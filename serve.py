@@ -3,6 +3,8 @@
 import argparse
 import json
 import traceback
+import logging
+import uuid
 
 import uvicorn
 from fastapi import FastAPI
@@ -11,9 +13,11 @@ from fastapi.requests import Request
 from fastapi.responses import RedirectResponse, Response
 from pe.config import Config
 from pe.renderer.renderer import Renderer
-from pe.setup import setup_logging
+from pe.setup import setup_logging, trace_id_var
 from pe.stores.factory import StoreFactory
 from pe.types import Element, Page
+
+logger = logging.getLogger(__name__)
 
 
 def create_app(args: argparse.Namespace):
@@ -41,6 +45,15 @@ def create_app(args: argparse.Namespace):
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    @app.middleware("http")
+    async def set_trace_id(request: Request, call_next):
+        trace_id = request.headers.get("x-trace-id") or uuid.uuid4().hex
+        request.state.trace_id = trace_id
+        trace_id_var.set(trace_id)
+        response = await call_next(request)
+        trace_id_var.set(None)
+        return response
 
     @app.get("/api/v1/page/")
     async def list_pages(request: Request):
@@ -112,9 +125,7 @@ def create_app(args: argparse.Namespace):
                 eldef["store"] = store_item.config.name
                 eldef["name"] = f"{store_item.config.name}://{widget.name}"
                 widgets_dict.append(eldef)
-        return Response(
-            content=json.dumps(widgets_dict), media_type="application/json"
-        )
+        return Response(content=json.dumps(widgets_dict), media_type="application/json")
 
     @app.get("/api/v1/widget/{widget_name}/html")
     async def read_widget_html(request: Request, widget_name: str):

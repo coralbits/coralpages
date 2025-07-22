@@ -391,9 +391,9 @@ class Renderer:
 
         # add the css to the page and content. The idea is to avoid repetition of the same css.
         # This is a very simple approach, but it works.
-        css_md5 = hashlib.md5(
-            css.encode()
-        ).hexdigest()  # md5 is not crypto secure, but much faster, and very low risk of collission
+        css_md5 = (
+            hashlib.md5(css.encode()).hexdigest()
+        )  # md5 is not crypto secure, but much faster, and very low risk of collission
         page.classes.update({css_md5: css})
 
         return html

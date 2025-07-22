@@ -40,13 +40,17 @@ class FileStore(StoreBase):
 
         block_data = yamlconfig.get("widgets", [])
         if not block_data:
-            logger.warning("No widgets found in file store from path=%s", self.base_path)
+            logger.warning(
+                "No widgets found in file store from path=%s", self.base_path
+            )
             return {}
 
         widgets = [Widget.from_dict(x) for x in block_data]
         self.widgets = {x.name: x for x in widgets}
         if len(self.widgets) == 0:
-            logger.warning("No widgets found in file store from path=%s", self.base_path)
+            logger.warning(
+                "No widgets found in file store from path=%s", self.base_path
+            )
         logger.debug(
             "Loaded count=%d widgets from file store from path=%s",
             len(self.widgets),
@@ -72,9 +76,7 @@ class FileStore(StoreBase):
         if not widget.html:
             return None
 
-        return await self.load_generic(
-            path=widget.html, data=data, context=context
-        )
+        return await self.load_generic(path=widget.html, data=data, context=context)
 
     async def load_css(
         self, *, path: str, data: dict[str, Any], context: dict[str, Any]
@@ -126,7 +128,11 @@ class FileStore(StoreBase):
         return Page(children=[Element(type="builtin://html", data={"html": html})])
 
     async def load_generic(
-        self, *, path: str, data: dict[str, Any], context: dict[str, Any]  # type: ignore
+        self,
+        *,
+        path: str,
+        data: dict[str, Any],
+        context: dict[str, Any],  # type: ignore
     ) -> str | None:
         """
         Load raw content from the file store.
