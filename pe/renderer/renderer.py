@@ -118,6 +118,18 @@ class RenderedPage:
         """
         self.errors.append(PageError(error=error, block=block))
 
+    def to_dict(self) -> dict[str, Any]:
+        """
+        Convert the page to a dictionary.
+        """
+        return {
+            "title": self.title,
+            "content": self.content,
+            "classes": self.classes,
+            "headers": self.headers,
+            "meta": [meta.to_dict() for meta in self.meta],
+            "css_variables": self.css_variables,
+        }
 
 class Renderer:
     """
@@ -150,7 +162,7 @@ class Renderer:
         return RenderedPage(title="")
 
     async def render_page(
-        self, page_name: str, *, headers: dict[str, str] = {}
+        self, page_name: str, *, headers: dict[str, str] = {}, template: str | None = None
     ) -> RenderedPage:
         """
         Render a page asynchronously.
@@ -163,6 +175,11 @@ class Renderer:
         )
         if not page_definition:
             raise ValueError(f"Page definition not found: {page_name}")
+
+        if template == "none":
+            page_definition.template = None
+        elif template:
+            page_definition.template = template
 
         new_etag = None
         new_last_modified = None

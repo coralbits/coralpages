@@ -7,10 +7,10 @@ import logging
 import uuid
 
 import uvicorn
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.requests import Request
-from fastapi.responses import RedirectResponse, Response
+import fastapi
+import fastapi.responses
+import fastapi.middleware.cors
+
 from pe.config import Config
 from pe.renderer.renderer import Renderer
 from pe.setup import setup_logging, trace_id_var
@@ -24,7 +24,7 @@ def create_app(args: argparse.Namespace):
     """
     Create the FastAPI app.
     """
-    app = FastAPI()  # type: ignore
+    app = fastapi.FastAPI()  # type: ignore
 
     def prepare_config() -> Config:
         """
@@ -39,7 +39,7 @@ def create_app(args: argparse.Namespace):
 
     # Add CORS middleware
     app.add_middleware(
-        CORSMiddleware,
+        fastapi.middleware.cors.CORSMiddleware,
         allow_origins=config.server.allow_origins,
         allow_credentials=True,
         allow_methods=["*"],
@@ -47,7 +47,7 @@ def create_app(args: argparse.Namespace):
     )
 
     @app.middleware("http")
-    async def set_trace_id(request: Request, call_next):
+    async def set_trace_id(request: fastapi.Request, call_next):
         trace_id = request.headers.get("x-trace-id") or uuid.uuid4().hex
         request.state.trace_id = trace_id
         trace_id_var.set(trace_id)
@@ -56,11 +56,11 @@ def create_app(args: argparse.Namespace):
         return response
 
     @app.get("/api/v1/page/")
-    async def list_pages(request: Request):
+    async def list_pages(request: fastapi.Request):
         offset = int(request.query_params.get("offset", 0))
         limit = int(request.query_params.get("limit", 10))
         pages = await store.get_page_list(offset=offset, limit=limit)
-        return Response(
+        return fastapi.responses.Response(
             content=json.dumps(
                 {
                     "count": pages.count,
@@ -71,17 +71,23 @@ def create_app(args: argparse.Namespace):
         )
 
     @app.get("/api/v1/view/{page_name}")
-    async def read_page(request: Request, page_name: str):
+    async def read_page(request: fastapi.Request, page_name: str, template: str | None = fastapi.Query(None), as_json: bool = fastapi.Query(False)):
         if page_name.startswith("_") or ".." in page_name:
-            return Response(content="Forbidden", status_code=403)
+            return fastapi.responses.Response(content="Forbidden", status_code=403)
 
         if page_name == "":
             page_name = "index"
 
         try:
-            page = await renderer.render_page(page_name, headers=request.headers)
-            return Response(
-                content=str(page),
+            page = await renderer.render_page(page_name, headers=request.headers, template=template)
+            if as_json:
+                return fastapi.responses.Response(
+                    content=json.dumps(page.to_dict()),
+                    media_type="application/json",
+                )
+            else:
+                return fastapi.responses.Response(
+                    content=str(page),
                 media_type="text/html",
                 status_code=page.response_code,
                 headers=page.headers,
@@ -90,31 +96,31 @@ def create_app(args: argparse.Namespace):
             traceback.print_exc()
             if config.debug:
                 exception_str = traceback.format_exc()
-                return Response(
+                return fastapi.responses.Response(
                     content=f"Internal Server Error: {exception_str}",
                     status_code=500,
                 )
             else:
-                return Response(content="Internal Server Error", status_code=500)
+                return fastapi.responses.Response(content="Internal Server Error", status_code=500)
 
     @app.get("/api/v1/page/{page_name}/json")
-    async def read_page_json(request: Request, page_name: str):
+    async def read_page_json(request: fastapi.Request, page_name: str):
         page = await store.load_page_definition_all_stores(page_name)
         page.url = (
             f"{request.url.scheme}://{request.url.netloc}/api/v1/view/{page_name}"
         )
-        return Response(
+        return fastapi.responses.Response(
             content=json.dumps(page.to_dict()), media_type="application/json"
         )
 
     @app.post("/api/v1/page/{page_name}/json")
-    async def save_page_json(request: Request, page_name: str):
+    async def save_page_json(request: fastapi.Request, page_name: str):
         data = await request.json()
         store_name = data.get("store", "default")
         path = f"{store_name}://{page_name}"
         page = Page.from_dict(data)
         await store.save_page_definition(path=path, data=page)
-        return Response(content="OK", status_code=200)
+        return fastapi.responses.Response(content="OK", status_code=200)
 
     @app.get("/api/v1/widget/")
     async def list_known_widgets():
@@ -125,10 +131,10 @@ def create_app(args: argparse.Namespace):
                 eldef["store"] = store_item.config.name
                 eldef["name"] = f"{store_item.config.name}://{widget.name}"
                 widgets_dict.append(eldef)
-        return Response(content=json.dumps(widgets_dict), media_type="application/json")
+        return fastapi.responses.Response(content=json.dumps(widgets_dict), media_type="application/json")
 
     @app.get("/api/v1/widget/{widget_name}/html")
-    async def read_widget_html(request: Request, widget_name: str):
+    async def read_widget_html(request: fastapi.Request, widget_name: str):
         data = dict(request.query_params)
 
         widget_name = f"builtin://{widget_name}"
@@ -141,10 +147,10 @@ def create_app(args: argparse.Namespace):
         )
         page = renderer.new_page()
         html, _ = await renderer.render_block(page, block)
-        return Response(content=html, media_type="text/html")
+        return fastapi.responses.Response(content=html, media_type="text/html")
 
     @app.get("/api/v1/widget/{widget_name}/css")
-    async def read_widget_css(request: Request, widget_name: str):
+    async def read_widget_css(request: fastapi.Request, widget_name: str):
         data = dict(request.query_params)
 
         widget_name = f"builtin://{widget_name}"
@@ -157,17 +163,17 @@ def create_app(args: argparse.Namespace):
         )
         page = renderer.new_page()
         _, css = await renderer.render_block(page, block)
-        return Response(content=css, media_type="text/css")
+        return fastapi.responses.Response(content=css, media_type="text/css")
 
     @app.post("/api/v1/render/")
-    async def render_page(request: Request):
+    async def render_page(request: fastapi.Request):
         if not config.server.render:
-            return Response(content="Not enabled", status_code=500)
+            return fastapi.responses.Response(content="Not enabled", status_code=500)
 
         data = await request.json()
         page = Page.from_dict(data)
         page = await renderer.render(page)
-        return Response(
+        return fastapi.responses.Response(
             content=str(page),
             media_type="text/html",
             status_code=page.response_code,
@@ -176,7 +182,7 @@ def create_app(args: argparse.Namespace):
 
     @app.get("/")
     def redirect_to_index():
-        return RedirectResponse(url="/api/v1/view/index")
+        return fastapi.responses.RedirectResponse(url="/api/v1/view/index")
 
     return app
 

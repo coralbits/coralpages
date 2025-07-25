@@ -61,7 +61,7 @@ children:
   - type: builtin://div
     id: "header-full-width"
     style:
-      width: 100vw
+      width: 100%
       margin: auto
       background-color: var(--primary-color)
     children:
