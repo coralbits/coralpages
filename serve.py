@@ -106,6 +106,8 @@ def create_app(args: argparse.Namespace):
     @app.get("/api/v1/page/{page_name}/json")
     async def read_page_json(request: fastapi.Request, page_name: str):
         page = await store.load_page_definition_all_stores(page_name)
+        if not page:
+            return fastapi.responses.JSONResponse({"content": "Page not found"}, status_code=404)
         page.url = (
             f"{request.url.scheme}://{request.url.netloc}/api/v1/view/{page_name}"
         )
