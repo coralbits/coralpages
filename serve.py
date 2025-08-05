@@ -4,7 +4,7 @@ import argparse
 import json
 import traceback
 import logging
-import uuid
+import random
 
 import uvicorn
 import fastapi
@@ -53,7 +53,10 @@ def create_app(args: argparse.Namespace):
 
     @app.middleware("http")
     async def set_trace_id(request: fastapi.Request, call_next):
-        trace_id = request.headers.get("x-trace-id") or uuid.uuid4().hex
+        def trace_id():
+            return f"{random.getrandbits(64):016x}"
+
+        trace_id = request.headers.get("x-trace-id") or trace_id()
         request.state.trace_id = trace_id
         trace_id_var.set(trace_id)
         response = await call_next(request)
@@ -103,14 +106,14 @@ def create_app(args: argparse.Namespace):
     @app.post("/api/v1/page/{store_name:str}/{page_name:path}")
     async def save_page_json(request: fastapi.Request, store_name: str, page_name: str):
         data = await request.json()
-        path = f"{store_name}://{page_name}"
+        path = f"{store_name}/{page_name}"
         page = Page.from_dict(data)
         await store.save_page_definition(path=path, data=page)
         return fastapi.responses.Response(content="OK", status_code=200)
 
     @app.delete("/api/v1/page/{store_name:str}/{page_name:path}")
     async def delete_page(store_name: str, page_name: str):
-        path = f"{store_name}://{page_name}"
+        path = f"{store_name}/{page_name}"
         try:
             if await store.delete_page_definition(path=path):
                 return fastapi.responses.JSONResponse(
@@ -135,7 +138,7 @@ def create_app(args: argparse.Namespace):
             for widget in await store_item.get_widget_list():
                 eldef = widget.to_dict()
                 eldef["store"] = store_item.config.name
-                eldef["name"] = f"{store_item.config.name}://{widget.name}"
+                eldef["name"] = f"{store_item.config.name}/{widget.name}"
                 widgets_dict.append(eldef)
         return fastapi.responses.Response(
             content=json.dumps(widgets_dict), media_type="application/json"
@@ -145,7 +148,7 @@ def create_app(args: argparse.Namespace):
     async def read_widget_html(request: fastapi.Request, widget_name: str):
         data = dict(request.query_params)
 
-        widget_name = f"builtin://{widget_name}"
+        widget_name = f"builtin/{widget_name}"
 
         block = Element(
             type=widget_name,
@@ -161,7 +164,7 @@ def create_app(args: argparse.Namespace):
     async def read_widget_css(request: fastapi.Request, widget_name: str):
         data = dict(request.query_params)
 
-        widget_name = f"builtin://{widget_name}"
+        widget_name = f"builtin/{widget_name}"
 
         block = Element(
             type=widget_name,

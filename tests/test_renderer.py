@@ -21,7 +21,7 @@ class TestRenderer(TestCase):
                 title="Test test_render_text",
                 children=[
                     Element(
-                        type="default://text",
+                        type="default/text",
                         data={"text": "Hello, world!"},
                     )
                 ],
@@ -41,15 +41,15 @@ class TestRenderer(TestCase):
                 title="Test test_render_html",
                 children=[
                     Element(
-                        type="http://apicontext",
+                        type="http/apicontext",
                         data={"url": "test", "name": "test"},
                         children=[
                             Element(
-                                type="default://text",
+                                type="default/text",
                                 data={"text": "{{context.test.title}}"},
                             ),
                             Element(
-                                type="default://text",
+                                type="default/text",
                                 data={
                                     "text": "{% for item in context.test.array %}* {{item.name}}\n{% endfor %}"
                                 },

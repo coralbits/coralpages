@@ -45,8 +45,8 @@ class StoreFactory:
         """
         Get a store instance by name.
         """
-        if "://" in store_name:
-            store_name = store_name.split("://", 1)[0]
+        if "/" in store_name:
+            store_name = store_name.split("/", 1)[0]
 
         store = self._stores.get(store_name)
         if not store:
@@ -85,8 +85,8 @@ class StoreFactory:
         """
         Save a page definition to all stores.
         """
-        if "://" in path:
-            store_name, path = path.split("://", 1)
+        if "/" in path:
+            store_name, path = path.split("/", 1)
         else:
             store_name = "default"
         store = self.get_store(store_name)
@@ -101,8 +101,8 @@ class StoreFactory:
         """
         Delete a page definition from all stores.
         """
-        if "://" in path:
-            store_name, path = path.split("://", 1)
+        if "/" in path:
+            store_name, path = path.split("/", 1)
         else:
             store_name = "default"
         store = self.get_store(store_name)

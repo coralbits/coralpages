@@ -2,7 +2,7 @@
 # This template provides a consistent layout with navigation menu
 
 title: "Coralbits Page Editor - Template"
-template: "docs://_base.html"
+template: "docs/_base.html"
 
 meta:
   - name: viewport
@@ -33,7 +33,7 @@ css_variables:
   "--button-background-color-active": "#4455d4"
 
 children:
-  - type: builtin://header
+  - type: builtin/header
     id: "header"
     style:
       max-width: 1200px
@@ -41,7 +41,7 @@ children:
       background-color: var(--primary-color)
       justify-content: space-between
     children:
-      - type: builtin://text
+      - type: builtin/text
         id: "header-title-base"
         data:
           text: "Coralbits Page Editor Documentation"
@@ -49,7 +49,7 @@ children:
           font-size: 48px
           font-weight: bold
           color: var(--primary-color)
-      - type: builtin://image
+      - type: builtin/image
         id: "header-logo"
         data:
           src: "http://localhost:8004/default/logo.png"
@@ -58,14 +58,14 @@ children:
           max-height: 100px
           margin-left: 20px
 
-  - type: builtin://div
+  - type: builtin/div
     id: "header-full-width"
     style:
       width: 100%
       margin: auto
       background-color: var(--primary-color)
     children:
-      - type: builtin://div
+      - type: builtin/div
         id: "header-content"
         style:
           display: flex
@@ -76,7 +76,7 @@ children:
           margin: auto
           position: relative
         children:
-          - type: builtin://header
+          - type: builtin/header
             id: "header-title"
             data:
               text: "{{page.title}}"
@@ -84,13 +84,13 @@ children:
               color: white
               -webkit-text-fill-color: white
 
-          - type: builtin://button
+          - type: builtin/button
             id: "header-menu-button"
             data:
               text: "☰"
               link: "./getting-started"
               onclick: toggle_show("#menu", "flex")
-          - type: builtin://menu
+          - type: builtin/menu
             id: "menu"
             style:
               display: none
@@ -124,7 +124,7 @@ children:
                 - label: "External API"
                   link: "./external-api"
 
-  - type: builtin://section
+  - type: builtin/section
     id: "main"
     style:
       max-width: 1200px
@@ -133,9 +133,9 @@ children:
       padding: 20px
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1)
     children:
-      - type: builtin://children
+      - type: builtin/children
 
-  - type: builtin://section
+  - type: builtin/section
     id: "footer"
     data:
       text: "(C) 2025 Coralbits"

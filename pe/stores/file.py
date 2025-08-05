@@ -101,8 +101,8 @@ class FileStore(StoreBase):
         """
         Load a page definition from the file store.
         """
-        if "://" in path:
-            path = path.split("://", 1)[1]
+        if "/" in path:
+            path = path.split("/", 1)[1]
 
         if path.endswith(".html"):
             return await self.load_html_definition(path=path)
@@ -125,7 +125,7 @@ class FileStore(StoreBase):
         with open(filepath, "r", encoding="utf-8") as file:
             html = file.read()
 
-        return Page(children=[Element(type="builtin://html", data={"html": html})])
+        return Page(children=[Element(type="builtin/html", data={"html": html})])
 
     async def load_generic(
         self,

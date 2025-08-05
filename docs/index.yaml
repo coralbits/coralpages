@@ -2,10 +2,10 @@
 # Main documentation index page
 
 title: "Coralbits Page Editor Documentation"
-template: "docs://_default_embed"
+template: "docs/_default_embed"
 
 children:
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Welcome to Coralbits Page Editor"
       text: |

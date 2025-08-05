@@ -1,10 +1,10 @@
 # Built-in Components Documentation
 
 title: "Components"
-template: "docs://_default"
+template: "docs/_default"
 
 children:
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Component Overview"
       text: |
@@ -34,7 +34,7 @@ children:
         Every component follows this structure:
 
         ```yaml
-        - type: builtin://component_name
+        - type: builtin/component_name
           data:
             # Component-specific data
           style:
@@ -42,7 +42,7 @@ children:
           children:
             # Nested components (if supported)
         ```
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Layout Components"
       text: |
@@ -57,7 +57,7 @@ children:
 
         **Example:**
         ```yaml
-        - type: builtin://section
+        - type: builtin/section
           data:
             title: "About Us"
             text: "Learn more about our company"
@@ -68,7 +68,7 @@ children:
             background: #f9f9f9
             border-radius: 8px
           children:
-            - type: builtin://text
+            - type: builtin/text
               data:
                 text: "Content goes here"
         ```
@@ -82,7 +82,7 @@ children:
 
         **Example:**
         ```yaml
-        - type: builtin://header
+        - type: builtin/header
           data:
             text: "Welcome to Our Website"
           style:
@@ -94,7 +94,7 @@ children:
             padding: 30px
             margin: 0
         ```
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Content Components"
       text: |
@@ -107,7 +107,7 @@ children:
 
         **Example:**
         ```yaml
-        - type: builtin://text
+        - type: builtin/text
           data:
             text: "<h2>Rich Text Content</h2><p>This supports <strong>HTML formatting</strong> and <em>styling</em>.</p>"
           style:
@@ -125,7 +125,7 @@ children:
 
         **Example:**
         ```yaml
-        - type: builtin://paragraph
+        - type: builtin/paragraph
           data:
             text: "This is a simple paragraph of text."
           style:

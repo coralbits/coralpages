@@ -1,10 +1,10 @@
 # Local Development Guide
 
 title: "Local Development"
-template: "docs://_default"
+template: "docs/_default"
 
 children:
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Development Environment Setup"
       text: |
@@ -52,7 +52,7 @@ children:
         ```
 
         The server will start on `http://localhost:8000` by default.
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Working with Pages"
       text: |
@@ -63,7 +63,7 @@ children:
         ```yaml
         # my-page.yaml
         data:
-          - type: builtin://header
+          - type: builtin/header
             data:
               text: "My New Page"
             style:
@@ -72,7 +72,7 @@ children:
               text-align: center
               padding: 20px
 
-          - type: builtin://text
+          - type: builtin/text
             data:
               text: "Welcome to my new page!"
             style:
@@ -101,7 +101,7 @@ children:
         3. **View in browser** by opening the generated HTML
         4. **Iterate and refine** your page design
         5. **Use the editor** for visual editing (if available)
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Directory Structure"
       text: |
@@ -138,7 +138,7 @@ children:
         - **`templates/`**: HTML templates for each component
         - **`docs/`**: Documentation pages in YAML format
         - **`config.yaml`**: Component definitions and configuration
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Development Tools"
       text: |
@@ -198,7 +198,7 @@ children:
         chmod +x run.sh
         chmod +x render.py
         ```
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Testing"
       text: |
@@ -245,7 +245,7 @@ children:
             assert "Hello World" in result
             assert "color: blue" in result
         ```
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Configuration"
       text: |
@@ -270,8 +270,8 @@ children:
         ```yaml
         elements:
           - name: text
-            viewer: builtin://text/view.html
-            css: builtin://text/style.css
+            viewer: builtin/text/view.html
+            css: builtin/text/style.css
             editor:
               - id: text
                 type: rich-text

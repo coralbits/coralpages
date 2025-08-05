@@ -91,7 +91,7 @@ class StoreBase:
 
         Removes the protocol part of the path, if its the same as the store's name.
         """
-        store_prefix = f"{self.config.name}://"
+        store_prefix = f"{self.config.name}/"
         if path.startswith(store_prefix):
             path = path[len(store_prefix) :]
 

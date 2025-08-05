@@ -2,7 +2,7 @@
 # This template provides a consistent layout with navigation menu
 
 title: "Coralbits Page Editor - Embedded Template"
-template: "docs://_embed.html"
+template: "docs/_embed.html"
 
 meta:
   - name: viewport
@@ -33,8 +33,8 @@ css_variables:
   "--button-background-color-active": "#4455d4"
 
 children:
-  - type: builtin://section
+  - type: builtin/section
     id: "main"
     style: {}
     children:
-      - type: builtin://children
+      - type: builtin/children

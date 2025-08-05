@@ -1,10 +1,10 @@
 # Editor Interface Documentation
 
 title: "Editor Interface"
-template: "docs://_default"
+template: "docs/_default"
 
 children:
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Visual Page Editor"
       text: |
@@ -31,7 +31,7 @@ children:
         - **Style Panel**: CSS property editing
         - **Preview Pane**: Live preview of the page
         - **Component Library**: Available components sidebar
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Getting Started with the Editor"
       text: |
@@ -70,7 +70,7 @@ children:
         4. **Style**: Use the style panel to customize appearance
         5. **Preview**: See changes in real-time
         6. **Save**: Save your changes to the page
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Component Editors"
       text: |
@@ -140,7 +140,7 @@ children:
         | [+ Add Menu Item]      |
         +------------------------+
         ```
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Style Editor"
       text: |
@@ -181,7 +181,7 @@ children:
         - **Mobile-First**: Design for mobile, enhance for desktop
         - **Media Queries**: Conditional styling for different screens
         - **Touch-Friendly**: Optimize for touch interfaces
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Layout Management"
       text: |
@@ -222,7 +222,7 @@ children:
         - **Snap to Grid**: Align components to grid
         - **Distribute**: Evenly space multiple components
         - **Group/Ungroup**: Group related components
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Preview and Testing"
       text: |
@@ -261,7 +261,7 @@ children:
         - **CSS Export**: Export component styles
         - **JSON Export**: Export page data
         - **PDF Export**: Generate PDF version
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "Advanced Features"
       text: |

@@ -331,7 +331,7 @@ class Renderer:
 
         It is like rendering a page, but the previour content is set at the "children" elements.
 
-        Template names use a simplified syntax: type://resource.
+        Template names use a simplified syntax: type/resource.
 
         Where types are the normal types around the app:
          - http
@@ -365,7 +365,7 @@ class Renderer:
         """
         Render a block asynchronously.
         """
-        store, eltype = block.type.split("://", 1)
+        store, eltype = block.type.split("/", 1)
         element_loader = self.store.get_store(store)
         if element_loader is None:
             raise ValueError(f"Element loader not found for block: {block.type}")

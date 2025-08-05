@@ -1,9 +1,9 @@
 # API get example
 title: "API get example"
-template: "docs://_default"
+template: "docs/_default"
 
 children:
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       text: |
         # next is data directly from an external API

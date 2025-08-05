@@ -1,8 +1,8 @@
 title: "Configuration"
-template: "docs://_default"
+template: "docs/_default"
 
 children:
-  - type: builtin://markdown
+  - type: builtin/markdown
     data:
       title: "CSS"
       text: |
