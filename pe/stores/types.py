@@ -98,7 +98,7 @@ class StoreBase:
         return path
 
     async def get_page_list(
-        self, *, offset: int = 0, limit: int = 10
+        self, *, offset: int = 0, limit: int = 10, filter: dict | None = None
     ) -> PageListResult:
         """
         Get a list of all pages.

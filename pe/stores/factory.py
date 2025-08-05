@@ -11,6 +11,7 @@ from pe.stores.file import FileStore
 from pe.stores.http import HttpStore
 from pe.stores.db import DbStore
 from pe.types import Page, PageInfo, PageListResult, StoreConfig
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +110,7 @@ class StoreFactory:
         await store.delete_page_definition(path=path, ok_if_not_found=ok_if_not_found)
 
     async def get_page_list(
-        self, *, offset: int = 0, limit: int = 10
+        self, *, offset: int = 0, limit: int = 10, filter: dict | None = None
     ) -> PageListResult:
         """
         Get a list of all pages.
@@ -121,14 +122,15 @@ class StoreFactory:
         res = PageListResult(count=0, results=[])
         pending = limit
         for store in self.get_all_stores().values():
-            store_res = await store.get_page_list(offset=offset, limit=pending)
+            store_res = await store.get_page_list(offset=offset, limit=pending, filter=filter)
             logger.debug(
-                "get_page_list store=%s offset=%s limit=%s add_count=%s response_count=%s",
+                "get_page_list store=%s offset=%s limit=%s add_count=%s response_count=%s filter=%s",
                 store,
                 offset,
                 pending,
                 store_res.count,
                 len(store_res.results),
+                json.dumps(filter),
             )
 
             for item in store_res.results:

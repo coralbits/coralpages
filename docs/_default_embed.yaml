@@ -1,7 +1,7 @@
 # Default template for documentation pages
 # This template provides a consistent layout with navigation menu
 
-title: "Coralbits Page Editor - Template"
+title: "Coralbits Page Editor - Embedded Template"
 template: "docs://_embed.html"
 
 meta:
@@ -33,7 +33,6 @@ css_variables:
   "--button-background-color-active": "#4455d4"
 
 children:
-
   - type: builtin://section
     id: "main"
     style: {}

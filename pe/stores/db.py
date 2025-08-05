@@ -103,7 +103,7 @@ class DbStore(StoreBase):
             )
 
     async def get_page_list(
-        self, *, offset: int = 0, limit: int = 10
+        self, *, offset: int = 0, limit: int = 10, filter: dict | None = None
     ) -> PageListResult:
         """
         Get a list of all pages.
@@ -111,14 +111,24 @@ class DbStore(StoreBase):
         if "pages" not in self.config.tags:
             return PageListResult(count=0, results=[])
 
+        sql_filter = []
+        if filter and filter.get("type") == "template":
+            sql_filter.append("path LIKE '\\_%'")
+
+
+        if sql_filter:
+            sql_filter = "WHERE " + " AND ".join(sql_filter)
+        else:
+            sql_filter = ""
+
         with self.conn:
             cursor = self.conn.cursor()
-            cursor.execute("SELECT COUNT(*) FROM pages")
+            cursor.execute(f"SELECT COUNT(*) FROM pages {sql_filter}")
             count = cursor.fetchone()[0]
             results = []
             if limit > 0:
                 cursor.execute(
-                    "SELECT path, data FROM pages LIMIT ? OFFSET ?", (limit, offset)
+                    f"SELECT path, data FROM pages {sql_filter} LIMIT ? OFFSET ?", (limit, offset)
                 )
                 for row in cursor.fetchall():
                     jsondata = json.loads(row["data"])

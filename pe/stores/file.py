@@ -160,7 +160,7 @@ class FileStore(StoreBase):
         return self.widgets.get(path)
 
     async def get_page_list(
-        self, *, offset: int = 0, limit: int = 10
+        self, *, offset: int = 0, limit: int = 10, filter: dict | None = None
     ) -> PageListResult:
         """
         Get a list of all pages.
@@ -168,24 +168,36 @@ class FileStore(StoreBase):
         if "pages" not in self.config.tags:
             return PageListResult(count=0, results=[])
 
+        filter_f = None
+        print(filter)
+        if filter and filter["type"] == "template":
+            filter_f = lambda x: x.id.startswith("_")
+
         count = 0
         results = []
         logger.debug("Loading pages from file store from path=%s", self.base_path)
         for path in self.base_path.glob("**.yaml"):
             if path.is_file():
+                # read the file data, needed for filtering
                 name = self.clean_name(path)
-
-                count += 1
-                # just count, no read the file
-                if limit == 0 or count < offset:
-                    continue
-
-                limit -= 1
-                # read the file data
                 with open(path, "r", encoding="utf-8") as file:
                     page_data = yaml.safe_load(file)
 
-                    results.append(PageInfo(id=name, title=page_data["title"], url=""))
+                pi = PageInfo(id=name, title=page_data["title"], url="")
+                if filter_f:
+                    logger.debug("Filtering page %s", name)
+                if filter_f and not filter_f(pi):
+                    logger.debug("Skipping page %s", name)
+                    continue
+
+                # pagination, checking if must be returned or not
+                limit -= 1
+                count += 1
+                if limit == 0 or count < offset:
+                    continue
+
+                # If it must be returned, add it to the results
+                results.append(pi)
 
         return PageListResult(count=count, results=results)
 

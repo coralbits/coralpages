@@ -1,1 +1,3 @@
-<div id="@@id@@" class="markdown-content">{{data.text | markdown}}</div>
+<div id="@@id@@" class="markdown-content">
+    {{data.text|default("") | markdown}}
+</div>

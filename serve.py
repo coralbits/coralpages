@@ -57,9 +57,16 @@ def create_app(args: argparse.Namespace):
 
     @app.get("/api/v1/page/")
     async def list_pages(request: fastapi.Request):
+        """
+        List of all pages. Can have filters:
+
+            - `offset`: Offset of the first page to return.
+            - `limit`: Maximum number of pages to return.
+            - `type`: `template`
+        """
         offset = int(request.query_params.get("offset", 0))
         limit = int(request.query_params.get("limit", 10))
-        pages = await store.get_page_list(offset=offset, limit=limit)
+        pages = await store.get_page_list(offset=offset, limit=limit, filter={"type": "template"})
         return fastapi.responses.Response(
             content=json.dumps(
                 {
