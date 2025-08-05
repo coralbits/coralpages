@@ -173,19 +173,16 @@ def create_app(args: argparse.Namespace):
         return fastapi.responses.Response(content=css, media_type="text/css")
 
     @app.post("/api/v1/render/")
-    async def render_page(request: fastapi.Request):
+    async def render_page(request: fastapi.Request, format: Literal[None, "html", "json"] = fastapi.Query(None)):
         if not config.server.render:
             return fastapi.responses.Response(content="Not enabled", status_code=500)
 
         data = await request.json()
         page = Page.from_dict(data)
-        page = await renderer.render(page)
-        return fastapi.responses.Response(
-            content=str(page),
-            media_type="text/html",
-            status_code=page.response_code,
-            headers=page.headers,
-        )
+        rendered_page = await renderer.render(page)
+
+        return render_page_by_format(rendered_page, format or "json")
+
 
     @app.get("/api/v1/render/{store:str}/{path:path}")
     async def read_page(
@@ -213,8 +210,6 @@ def create_app(args: argparse.Namespace):
         - js: Returns all the page's JavaScript.
 
         Can also set the format indicating an extension.
-
-        If format is not html the template is always none.
         """
 
         if path.startswith("_") or ".." in path:
@@ -224,8 +219,6 @@ def create_app(args: argparse.Namespace):
             path = "index"
 
         format, path = guess_format(format, path, request)
-        if format != "html":
-            template = "none"
         try:
             page: RenderedPage = await renderer.render_page(
                 path, headers=request.headers, template=template
@@ -243,6 +236,9 @@ def create_app(args: argparse.Namespace):
                     content="Internal Server Error", status_code=500
                 )
 
+        return render_page_by_format(page, format)
+
+    def render_page_by_format(page: RenderedPage, format: Literal["html", "json", "css", "js"]) -> fastapi.responses.Response:
         if format == "html":
             return render_page_html(page)
         elif format == "json":

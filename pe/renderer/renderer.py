@@ -164,7 +164,7 @@ class RenderedPage:
         """
         Get the JavaScript for the page.
         """
-        return "// not implemented yet"
+        return ""
 
 class Renderer:
     """
