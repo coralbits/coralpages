@@ -89,15 +89,15 @@ def create_app(args: argparse.Namespace):
             media_type="application/json",
         )
 
-    @app.get("/api/v1/page/{store_name:str}/{page_name:path}")
-    async def read_page_json(request: fastapi.Request, store_name: str, page_name: str):
-        page = await store.load_page_definition_all_stores(page_name)
+    @app.get("/api/v1/page/{store_name:str}/{path:path}")
+    async def read_page_json(request: fastapi.Request, store_name: str, path: str):
+        page = await store.load_page_definition_all_stores(path)
         if not page:
             return fastapi.responses.JSONResponse(
                 {"content": "Page not found"}, status_code=404
             )
         page.url = (
-            f"{request.url.scheme}://{request.url.netloc}/api/v1/page/{page_name}"
+            f"{request.url.scheme}://{request.url.netloc}/api/v1/render/{store_name}/{path}"
         )
         return fastapi.responses.Response(
             content=json.dumps(page.to_dict()), media_type="application/json"
