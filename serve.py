@@ -16,6 +16,10 @@ from pe.renderer.renderer import Renderer
 from pe.setup import setup_logging, trace_id_var
 from pe.stores.factory import StoreFactory
 from pe.types import Element, Page
+from pe.renderer.renderer import RenderedPage
+from typing import Literal
+import os
+from typing import Union
 
 logger = logging.getLogger(__name__)
 
@@ -81,71 +85,44 @@ def create_app(args: argparse.Namespace):
             media_type="application/json",
         )
 
-    @app.get("/api/v1/view/{page_name}")
-    async def read_page(request: fastapi.Request, page_name: str, template: str | None = fastapi.Query(None), as_json: bool = fastapi.Query(False)):
-        if page_name.startswith("_") or ".." in page_name:
-            return fastapi.responses.Response(content="Forbidden", status_code=403)
-
-        if page_name == "":
-            page_name = "index"
-
-        try:
-            page = await renderer.render_page(page_name, headers=request.headers, template=template)
-            if as_json:
-                return fastapi.responses.Response(
-                    content=json.dumps(page.to_dict()),
-                    media_type="application/json",
-                )
-            else:
-                return fastapi.responses.Response(
-                    content=str(page),
-                media_type="text/html",
-                status_code=page.response_code,
-                headers=page.headers,
-            )
-        except Exception:  # pylint: disable=broad-exception-caught
-            traceback.print_exc()
-            if config.debug:
-                exception_str = traceback.format_exc()
-                return fastapi.responses.Response(
-                    content=f"Internal Server Error: {exception_str}",
-                    status_code=500,
-                )
-            else:
-                return fastapi.responses.Response(content="Internal Server Error", status_code=500)
-
-    @app.get("/api/v1/page/{page_name}/json")
-    async def read_page_json(request: fastapi.Request, page_name: str):
+    @app.get("/api/v1/page/{store_name:str}/{page_name:path}")
+    async def read_page_json(request: fastapi.Request, store_name: str, page_name: str):
         page = await store.load_page_definition_all_stores(page_name)
         if not page:
-            return fastapi.responses.JSONResponse({"content": "Page not found"}, status_code=404)
+            return fastapi.responses.JSONResponse(
+                {"content": "Page not found"}, status_code=404
+            )
         page.url = (
-            f"{request.url.scheme}://{request.url.netloc}/api/v1/view/{page_name}"
+            f"{request.url.scheme}://{request.url.netloc}/api/v1/page/{page_name}"
         )
         return fastapi.responses.Response(
             content=json.dumps(page.to_dict()), media_type="application/json"
         )
 
-    @app.post("/api/v1/page/{page_name}/json")
-    async def save_page_json(request: fastapi.Request, page_name: str):
+    @app.post("/api/v1/page/{store_name:str}/{page_name:path}")
+    async def save_page_json(request: fastapi.Request, store_name: str, page_name: str):
         data = await request.json()
-        store_name = data.get("store", "default")
         path = f"{store_name}://{page_name}"
         page = Page.from_dict(data)
         await store.save_page_definition(path=path, data=page)
         return fastapi.responses.Response(content="OK", status_code=200)
 
-    @app.delete("/api/v1/page/{page_name}/json")
-    async def delete_page(page_name: str):
-        store_name = "default"
+    @app.delete("/api/v1/page/{store_name:str}/{page_name:path}")
+    async def delete_page(store_name: str, page_name: str):
         path = f"{store_name}://{page_name}"
         try:
             if await store.delete_page_definition(path=path):
-                return fastapi.responses.JSONResponse({"details": "ok"}, status_code=200)
+                return fastapi.responses.JSONResponse(
+                    {"details": "ok"}, status_code=200
+                )
             else:
-                return fastapi.responses.JSONResponse({"details": "Failed - check logs"}, status_code=400)
+                return fastapi.responses.JSONResponse(
+                    {"details": "Failed - check logs"}, status_code=400
+                )
         except NotImplementedError:
-            return fastapi.responses.JSONResponse({"details": "Not implemented"}, status_code=400)
+            return fastapi.responses.JSONResponse(
+                {"details": "Not implemented"}, status_code=400
+            )
         except Exception as e:
             logger.error(f"Failed to delete page {page_name}: {e}")
             return fastapi.responses.JSONResponse({"details": str(e)}, status_code=500)
@@ -159,7 +136,9 @@ def create_app(args: argparse.Namespace):
                 eldef["store"] = store_item.config.name
                 eldef["name"] = f"{store_item.config.name}://{widget.name}"
                 widgets_dict.append(eldef)
-        return fastapi.responses.Response(content=json.dumps(widgets_dict), media_type="application/json")
+        return fastapi.responses.Response(
+            content=json.dumps(widgets_dict), media_type="application/json"
+        )
 
     @app.get("/api/v1/widget/{widget_name}/html")
     async def read_widget_html(request: fastapi.Request, widget_name: str):
@@ -208,9 +187,145 @@ def create_app(args: argparse.Namespace):
             headers=page.headers,
         )
 
+    @app.get("/api/v1/render/{store:str}/{path:path}")
+    async def read_page(
+        request: fastapi.Request,
+        store: str,
+        path: str,
+        template: str | None = fastapi.Query(
+            None,
+            description="The template to use for rendering the page. "
+            "Set to 'none' to avoid using templates. "
+            "By default uses the one set at the page json.",
+        ),
+        format: Literal[None, "html", "json", "css", "js"] | None = fastapi.Query(None),
+    ):
+        """
+
+        Renders a page from a given store, returning the rendered HTML content.
+
+        If ?format=json, returns the page as JSON {body: str, head: {css: str[], js: str[], meta: str[]}}
+
+        Formats:
+        - html: Returns the full page as HTML.
+        - json: Returns the page as JSON.
+        - css: Returns all the page's CSS.
+        - js: Returns all the page's JavaScript.
+
+        Can also set the format indicating an extension.
+
+        If format is not html the template is always none.
+        """
+
+        if path.startswith("_") or ".." in path:
+            return fastapi.responses.Response(content="Forbidden", status_code=403)
+
+        if path == "":
+            path = "index"
+
+        format, path = guess_format(format, path, request)
+        if format != "html":
+            template = "none"
+        try:
+            page: RenderedPage = await renderer.render_page(
+                path, headers=request.headers, template=template
+            )
+        except Exception:  # pylint: disable=broad-exception-caught
+            traceback.print_exc()
+            if config.debug:
+                exception_str = traceback.format_exc()
+                return fastapi.responses.Response(
+                    content=f"Internal Server Error: {exception_str}",
+                    status_code=500,
+                )
+            else:
+                return fastapi.responses.Response(
+                    content="Internal Server Error", status_code=500
+                )
+
+        if format == "html":
+            return render_page_html(page)
+        elif format == "json":
+            return render_page_json(page)
+        elif format == "css":
+            return render_page_css(page)
+        elif format == "js":
+            return render_page_js(page)
+        elif format == "markdown":
+            return render_page_markdown(page)
+        else:
+            return fastapi.responses.Response(
+                content="Unsupported format",
+                status_code=400,
+            )
+
+    def guess_format(format: str | None, path: str, request: fastapi.Request) -> tuple[Literal["html", "json", "css", "js"], str]:
+        if format in ["html", "json", "css", "js"]:
+            return format, path
+        if '.' in path:
+            ext = os.path.splitext(path)[1]
+            path = path[:-len(ext)]
+            if ext == ".html":
+                format = "html"
+            elif ext == ".json":
+                format = "json"
+            elif ext == ".css":
+                format = "css"
+            elif ext == ".js":
+                format = "js"
+
+        if not format:
+            content_type = request.headers.get("Accept", "text/html")
+            if content_type == "application/json":
+                format = "json"
+            elif content_type == "text/html":
+                format = "html"
+            elif content_type == "text/css":
+                format = "css"
+            elif content_type == "text/javascript":
+                format = "js"
+            else:
+                logger.warning(
+                    f"Unsupported content type: {content_type}, returning HTML"
+                )
+                format = "html"
+        return format, path
+
+    def render_page_html(page: RenderedPage) -> fastapi.responses.Response:
+        return fastapi.responses.Response(
+                content=str(page),
+            media_type="text/html",
+            status_code=page.response_code,
+            headers=page.headers,
+        )
+
+    def render_page_json(page: RenderedPage) -> fastapi.responses.Response:
+        return fastapi.responses.Response(
+            content=json.dumps(page.to_dict()),
+            media_type="application/json",
+            status_code=page.response_code,
+            headers=page.headers,
+        )
+
+    def render_page_css(page: RenderedPage) -> fastapi.responses.Response:
+        return fastapi.responses.Response(
+            content=str(page.get_css()),
+            media_type="text/css",
+            status_code=page.response_code,
+            headers=page.headers,
+        )
+
+    def render_page_js(page: RenderedPage) -> fastapi.responses.Response:
+        return fastapi.responses.Response(
+            content=str(page.get_js()),
+            media_type="text/javascript",
+            status_code=page.response_code,
+            headers=page.headers,
+        )
+
     @app.get("/")
     def redirect_to_index():
-        return fastapi.responses.RedirectResponse(url="/api/v1/view/index")
+        return fastapi.responses.RedirectResponse(url="/api/v1/page/index")
 
     return app
 

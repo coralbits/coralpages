@@ -106,7 +106,8 @@ class StoreBase:
         return PageListResult(count=0, results=[])
 
     async def delete_page_definition(
-        self, path: str,
+        self,
+        path: str,
     ) -> bool:
         """
         Delete a page definition from the store.

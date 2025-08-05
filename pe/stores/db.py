@@ -115,7 +115,6 @@ class DbStore(StoreBase):
         if filter and filter.get("type") == "template":
             sql_filter.append("path LIKE '\\_%'")
 
-
         if sql_filter:
             sql_filter = "WHERE " + " AND ".join(sql_filter)
         else:
@@ -128,7 +127,8 @@ class DbStore(StoreBase):
             results = []
             if limit > 0:
                 cursor.execute(
-                    f"SELECT path, data FROM pages {sql_filter} LIMIT ? OFFSET ?", (limit, offset)
+                    f"SELECT path, data FROM pages {sql_filter} LIMIT ? OFFSET ?",
+                    (limit, offset),
                 )
                 for row in cursor.fetchall():
                     jsondata = json.loads(row["data"])
@@ -139,7 +139,8 @@ class DbStore(StoreBase):
             return PageListResult(count=count, results=results)
 
     async def delete_page_definition(
-        self, path: str,
+        self,
+        path: str,
     ) -> bool:
         """
         Delete a page definition from the database store.
@@ -147,8 +148,10 @@ class DbStore(StoreBase):
         with self.conn:
             cursor = self.conn.cursor()
             cursor.execute("DELETE FROM pages WHERE path = ?", (path,))
-            if cursor.rowcount == 0 :
-                logger.error(f"Failed to delete page page={path}, maybe does not exist in db?")
+            if cursor.rowcount == 0:
+                logger.error(
+                    f"Failed to delete page page={path}, maybe does not exist in db?"
+                )
                 return False
             self.conn.commit()
             logger.info("Deleted page_id=%s", path)

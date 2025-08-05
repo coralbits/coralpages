@@ -124,12 +124,47 @@ class RenderedPage:
         """
         return {
             "title": self.title,
-            "content": self.content,
-            "classes": self.classes,
-            "headers": self.headers,
-            "meta": [meta.to_dict() for meta in self.meta],
-            "css_variables": self.css_variables,
+            "body": self.get_body(),
+            "head": {
+                "css": self.get_css(),
+                "js": self.get_js(),
+                "meta": self.get_meta(),
+            },
+            "http": {
+                "headers": self.get_headers(),
+                "response_code": self.response_code
+            }
         }
+
+    def get_body(self) -> str:
+        """
+        Get the body of the page.
+        """
+        return self.content
+
+    def get_headers(self) -> dict[str,str]:
+        return {}
+
+    def get_meta(self) -> list[dict[str,str]]:
+        return [meta.to_dict() for meta in self.meta]
+
+    def get_css(self) -> str:
+        """
+        Get the CSS for the page.
+        """
+        vars = self.css_variables
+        ret = ":root {\n"
+        ret += "\n".join(f"{key}: {value};" for key, value in vars.items())
+        ret += "\n}\n\n"
+
+        ret += "\n\n".join(self.classes.values())
+        return ret
+
+    def get_js(self) -> str:
+        """
+        Get the JavaScript for the page.
+        """
+        return "// not implemented yet"
 
 class Renderer:
     """
@@ -162,7 +197,11 @@ class Renderer:
         return RenderedPage(title="")
 
     async def render_page(
-        self, page_name: str, *, headers: dict[str, str] = {}, template: str | None = None
+        self,
+        page_name: str,
+        *,
+        headers: dict[str, str] = {},
+        template: str | None = None,
     ) -> RenderedPage:
         """
         Render a page asynchronously.
@@ -178,7 +217,7 @@ class Renderer:
 
         if template == "none":
             page_definition.template = None
-        elif template:
+        elif template is not None:
             page_definition.template = template
 
         new_etag = None
@@ -259,7 +298,7 @@ class Renderer:
 
         return page
 
-    async def render_page_data(self, *, page: RenderedPage, page_def: Page) -> str:
+    async def render_page_data(self, *, page: RenderedPage, page_def: Page):
         """
         Render the page data asynchronously.
         """
@@ -284,7 +323,7 @@ class Renderer:
 
     async def render_in_template(
         self, *, page: RenderedPage, template_name: str
-    ) -> str:
+    ):
         """
         Render the template asynchronously.
 

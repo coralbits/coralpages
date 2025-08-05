@@ -95,7 +95,8 @@ class StoreFactory:
         await store.save_page_definition(path=path, data=data)
 
     async def delete_page_definition(
-        self, path: str,
+        self,
+        path: str,
     ) -> bool:
         """
         Delete a page definition from all stores.
@@ -122,7 +123,9 @@ class StoreFactory:
         res = PageListResult(count=0, results=[])
         pending = limit
         for store in self.get_all_stores().values():
-            store_res = await store.get_page_list(offset=offset, limit=pending, filter=filter)
+            store_res = await store.get_page_list(
+                offset=offset, limit=pending, filter=filter
+            )
             logger.debug(
                 "get_page_list store=%s offset=%s limit=%s add_count=%s response_count=%s filter=%s",
                 store,
