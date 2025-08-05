@@ -20,6 +20,7 @@ from pe.renderer.renderer import RenderedPage
 from typing import Literal
 import os
 from typing import Union
+from pe.stores.types import StoreBase
 
 logger = logging.getLogger(__name__)
 
@@ -318,6 +319,20 @@ def create_app(args: argparse.Namespace):
             status_code=page.response_code,
             headers=page.headers,
         )
+
+    @app.get("/api/v1/store")
+    def get_store_list(tags: str|None=None):
+        tagsl = tags.split(",") if tags else []
+        stores: list[StoreBase] = list(store.get_all_stores().values())
+
+        for tag in tagsl:
+            tag = tag.strip()
+            stores = [store for store in stores if tag in store.config.tags]
+
+        return fastapi.responses.JSONResponse({
+            "count": len(stores),
+            "results": [{"id": store.config.name, "name": store.config.name} for store in stores]
+        })
 
     @app.get("/")
     def redirect_to_index():

@@ -22,6 +22,7 @@ stores:
     type: db
     url: sqlite://./data/pe.db
     tags:
+      - writable
       - pages
       - templates
   - name: docs

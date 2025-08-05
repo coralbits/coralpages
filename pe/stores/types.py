@@ -115,3 +115,9 @@ class StoreBase:
         raise NotImplementedError(
             f"delete_page_definition not implemented in {self.__class__.__name__}"
         )
+
+    def is_writable(self) -> bool:
+        """
+        Check if the store is writable.
+        """
+        return False
