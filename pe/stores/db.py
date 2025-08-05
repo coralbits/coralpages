@@ -139,15 +139,17 @@ class DbStore(StoreBase):
             return PageListResult(count=count, results=results)
 
     async def delete_page_definition(
-        self, path: str, *, ok_if_not_found: bool = False
-    ) -> None:
+        self, path: str,
+    ) -> bool:
         """
         Delete a page definition from the database store.
         """
         with self.conn:
             cursor = self.conn.cursor()
             cursor.execute("DELETE FROM pages WHERE path = ?", (path,))
-            if cursor.rowcount == 0 and not ok_if_not_found:
-                raise ValueError(f"Page definition not found: {path}")
+            if cursor.rowcount == 0 :
+                logger.error(f"Failed to delete page page={path}, maybe does not exist in db?")
+                return False
             self.conn.commit()
             logger.info("Deleted page_id=%s", path)
+            return True

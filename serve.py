@@ -64,9 +64,13 @@ def create_app(args: argparse.Namespace):
             - `limit`: Maximum number of pages to return.
             - `type`: `template`
         """
-        offset = int(request.query_params.get("offset", 0))
-        limit = int(request.query_params.get("limit", 10))
-        pages = await store.get_page_list(offset=offset, limit=limit, filter={"type": "template"})
+        qs = request.query_params
+        offset = int(qs.get("offset", 0))
+        limit = int(qs.get("limit", 10))
+        filter = {}
+        if qs.get("type"):
+            filter["type"] = qs.get("type")
+        pages = await store.get_page_list(offset=offset, limit=limit, filter=filter)
         return fastapi.responses.Response(
             content=json.dumps(
                 {
@@ -130,6 +134,21 @@ def create_app(args: argparse.Namespace):
         page = Page.from_dict(data)
         await store.save_page_definition(path=path, data=page)
         return fastapi.responses.Response(content="OK", status_code=200)
+
+    @app.delete("/api/v1/page/{page_name}/json")
+    async def delete_page(page_name: str):
+        store_name = "default"
+        path = f"{store_name}://{page_name}"
+        try:
+            if await store.delete_page_definition(path=path):
+                return fastapi.responses.JSONResponse({"details": "ok"}, status_code=200)
+            else:
+                return fastapi.responses.JSONResponse({"details": "Failed - check logs"}, status_code=400)
+        except NotImplementedError:
+            return fastapi.responses.JSONResponse({"details": "Not implemented"}, status_code=400)
+        except Exception as e:
+            logger.error(f"Failed to delete page {page_name}: {e}")
+            return fastapi.responses.JSONResponse({"details": str(e)}, status_code=500)
 
     @app.get("/api/v1/widget/")
     async def list_known_widgets():

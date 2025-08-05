@@ -95,8 +95,8 @@ class StoreFactory:
         await store.save_page_definition(path=path, data=data)
 
     async def delete_page_definition(
-        self, path: str, *, ok_if_not_found: bool = False
-    ) -> None:
+        self, path: str,
+    ) -> bool:
         """
         Delete a page definition from all stores.
         """
@@ -107,7 +107,7 @@ class StoreFactory:
         store = self.get_store(store_name)
         if not store:
             raise ValueError(f"Store {store_name} not found")
-        await store.delete_page_definition(path=path, ok_if_not_found=ok_if_not_found)
+        return await store.delete_page_definition(path=path)
 
     async def get_page_list(
         self, *, offset: int = 0, limit: int = 10, filter: dict | None = None
