@@ -3,14 +3,14 @@ Store factory for creating store instances.
 """
 
 import logging
-from typing import Dict, List
+from typing import Dict
 
 from pe.config import Config
 from pe.stores.types import StoreBase
 from pe.stores.file import FileStore
 from pe.stores.http import HttpStore
 from pe.stores.db import DbStore
-from pe.types import Page, PageInfo, PageListResult, StoreConfig
+from pe.types import Page, PageListResult, StoreConfig
 import json
 
 logger = logging.getLogger(__name__)
