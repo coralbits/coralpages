@@ -107,12 +107,15 @@ class FileStore(StoreBase):
         if path.endswith(".html"):
             return await self.load_html_definition(path=path)
 
-        path = f"{path}.yaml"
+        basepath = path
+        path = f"{basepath}.yaml"
 
         yamldata = await self.load_generic(path=path, data={}, context={})
         if not yamldata:
             return None
-        return Page.from_dict(yaml.safe_load(yamldata))
+        page = Page.from_dict(yaml.safe_load(yamldata))
+        page.path = f"{self.config.name}/{basepath}"
+        return page
 
     async def load_html_definition(self, *, path: str) -> Page | None:
         """

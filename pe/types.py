@@ -76,6 +76,7 @@ class Page:
     """
 
     title: str = ""
+    path: str = ""
     url: str | None = None
     template: str | None = None
     children: list[Element] = field(default_factory=list)

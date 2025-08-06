@@ -34,7 +34,7 @@ def setup_logging():
         format="\033[94m[%(levelname)s\t]\033[0m \033[92m[%(name)24s]\033[0m%(trace_id)s %(message)s",
         level=logging.DEBUG,
     )
-    ALLOWED_NAME_PREFIX = ["pe.", "tests.", "server"]
+    ALLOWED_NAME_PREFIX = ["pe.", "tests.", "serve"]
     trace_filter = TraceIdFilter()
 
     for handler in logging.root.handlers:

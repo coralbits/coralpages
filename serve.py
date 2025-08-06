@@ -91,7 +91,12 @@ def create_app(args: argparse.Namespace):
 
     @app.get("/api/v1/page/{store_name:str}/{path:path}")
     async def read_page_json(request: fastapi.Request, store_name: str, path: str):
-        page = await store.load_page_definition_all_stores(path)
+        page_store = store.get_store(store_name)
+        if not page_store:
+            return fastapi.responses.JSONResponse(
+                {"content": "Store not found"}, status_code=404
+            )
+        page = await page_store.load_page_definition(path=path)
         if not page:
             return fastapi.responses.JSONResponse(
                 {"content": "Page not found"}, status_code=404
@@ -191,8 +196,8 @@ def create_app(args: argparse.Namespace):
     @app.get("/api/v1/render/{store:str}/{path:path}")
     async def read_page(
         request: fastapi.Request,
-        store: str,
-        path: str,
+        store: str = fastapi.Path(description="The store to use for rendering the page. Can use '|' to mark several in order."),
+        path: str = fastapi.Path(description="The path to the page to render."),
         template: str | None = fastapi.Query(
             None,
             description="The template to use for rendering the page. "
@@ -222,10 +227,15 @@ def create_app(args: argparse.Namespace):
         if path == "":
             path = "index"
 
+        logger.debug("Rendering page=%s/%s template=%s", store, path, template)
+
         format, path = guess_format(format, path, request)
         try:
-            page: RenderedPage = await renderer.render_page(
-                path, headers=request.headers, template=template
+            page: RenderedPage | None = await renderer.render_page(
+                store=store,
+                path=path,
+                headers=request.headers,
+                template=template
             )
         except Exception:  # pylint: disable=broad-exception-caught
             traceback.print_exc()
@@ -239,6 +249,10 @@ def create_app(args: argparse.Namespace):
                 return fastapi.responses.Response(
                     content="Internal Server Error", status_code=500
                 )
+        if not page:
+            return fastapi.responses.Response(
+                content="Page not found", status_code=404
+            )
 
         return render_page_by_format(page, format)
 
@@ -251,8 +265,6 @@ def create_app(args: argparse.Namespace):
             return render_page_css(page)
         elif format == "js":
             return render_page_js(page)
-        elif format == "markdown":
-            return render_page_markdown(page)
         else:
             return fastapi.responses.Response(
                 content="Unsupported format",

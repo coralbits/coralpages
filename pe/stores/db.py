@@ -70,7 +70,9 @@ class DbStore(StoreBase):
             result = cursor.fetchone()
         if result:
             page_def = json.loads(result["data"])
-            return Page.from_dict(page_def)
+            page = Page.from_dict(page_def)
+            page.path = f"{self.config.name}/{path}"
+            return page
         return None
 
     async def save_page_definition(self, *, path: str, data: Page) -> None:

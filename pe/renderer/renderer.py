@@ -198,27 +198,34 @@ class Renderer:
 
     async def render_page(
         self,
-        page_name: str,
         *,
+        store: str,
+        path: str,
         headers: dict[str, str] = {},
         template: str | None = None,
-    ) -> RenderedPage:
+    ) -> RenderedPage | None:
         """
         Render a page asynchronously.
 
         Might use headers to check caches and so on
         """
-        logger.debug("Rendering page: %s", page_name)
-        page_definition = await self.store.load_page_definition_all_stores(
-            path=page_name
-        )
+        page_definition = None
+        for storei in store.split("|"):
+            store_obj = self.store.get_store(storei)
+            page_definition = store_obj and await store_obj.load_page_definition(path=path)
+            if page_definition:
+                # logger.debug("Rendering page: %s/%s", storei, path)
+                break
         if not page_definition:
-            raise ValueError(f"Page definition not found: {page_name}")
+            logger.warning("Page definition not found: %s/%s", store, path)
+            return None
 
         if template == "none":
             page_definition.template = None
         elif template is not None:
             page_definition.template = template
+
+        logger.debug("Set template to %s", page_definition.template)
 
         new_etag = None
         new_last_modified = None
@@ -244,7 +251,7 @@ class Renderer:
                 logger.debug("Page not modified, returning 304")
                 return page
 
-        logger.debug("Rendering page")
+        # logger.debug("Rendering page")
         page = await self.render(page_definition)
         logger.debug(
             "Page rendered block_count=%s, page_size=%s",
@@ -257,7 +264,7 @@ class Renderer:
         if new_last_modified:
             page.headers["Last-Modified"] = new_last_modified
 
-        logger.debug("Returning page")
+        # logger.debug("Returning page")
         return page
 
     def calculate_last_modified(self, page_definition: Page) -> str:
@@ -290,7 +297,7 @@ class Renderer:
         page = self.new_page()
         page.update_from_definition(page_def)
 
-        logger.debug("Rendering page data")
+        # logger.debug("Rendering page data")
         await self.render_page_data(page=page, page_def=page_def)
         if page_def.template:
             logger.debug("Rendering in template %s", page_def.template)
@@ -305,9 +312,9 @@ class Renderer:
         for meta in page_def.meta:
             page.append_meta(meta)
 
-        logger.debug("Rendering page, %d blocks", len(page_def.children))
+        logger.debug("Rendering page=%s, block_count=%d blocks", page_def.path, len(page_def.children))
         for block in page_def.children:
-            logger.debug("Rendering block: %s", block.type)
+            # logger.debug("Rendering block: %s", block.type)
             try:
                 html = await self.render_block(page, block, context=page.context)
             except Exception as e:  # pylint: disable=broad-exception-caught
@@ -351,7 +358,7 @@ class Renderer:
             "children": page.content,
         }
         page.content = ""
-        logger.debug("Rendering template data")
+        # logger.debug("Rendering template data")
         await self.render_page_data(page=page, page_def=template_def)
         if template_def.template:
             logger.debug("Rendering in template %s", template_def.template)

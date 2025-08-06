@@ -2,7 +2,7 @@
 # Main documentation index page
 
 title: "Coralbits Page Editor Documentation"
-template: "docs/_default_embed"
+template: "docs/_default"
 
 children:
   - type: builtin/markdown
