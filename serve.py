@@ -101,9 +101,7 @@ def create_app(args: argparse.Namespace):
             return fastapi.responses.JSONResponse(
                 {"content": "Page not found"}, status_code=404
             )
-        page.url = (
-            f"{request.url.scheme}://{request.url.netloc}/api/v1/render/{store_name}/{path}"
-        )
+        page.url = f"{request.url.scheme}://{request.url.netloc}/api/v1/render/{store_name}/{path}"
         return fastapi.responses.Response(
             content=json.dumps(page.to_dict()), media_type="application/json"
         )
@@ -182,7 +180,10 @@ def create_app(args: argparse.Namespace):
         return fastapi.responses.Response(content=css, media_type="text/css")
 
     @app.post("/api/v1/render/")
-    async def render_page(request: fastapi.Request, format: Literal[None, "html", "json"] = fastapi.Query(None)):
+    async def render_page(
+        request: fastapi.Request,
+        format: Literal[None, "html", "json"] = fastapi.Query(None),
+    ):
         if not config.server.render:
             return fastapi.responses.Response(content="Not enabled", status_code=500)
 
@@ -193,11 +194,12 @@ def create_app(args: argparse.Namespace):
 
         return render_page_by_format(rendered_page, format or "json")
 
-
     @app.get("/api/v1/render/{store:str}/{path:path}")
     async def read_page(
         request: fastapi.Request,
-        store: str = fastapi.Path(description="The store to use for rendering the page. Can use '|' to mark several in order."),
+        store: str = fastapi.Path(
+            description="The store to use for rendering the page. Can use '|' to mark several in order."
+        ),
         path: str = fastapi.Path(description="The path to the page to render."),
         template: str | None = fastapi.Query(
             None,
@@ -233,10 +235,7 @@ def create_app(args: argparse.Namespace):
         format, path = guess_format(format, path, request)
         try:
             page: RenderedPage | None = await renderer.render_page(
-                store=store,
-                path=path,
-                headers=request.headers,
-                template=template
+                store=store, path=path, headers=request.headers, template=template
             )
         except Exception:  # pylint: disable=broad-exception-caught
             traceback.print_exc()
@@ -251,13 +250,13 @@ def create_app(args: argparse.Namespace):
                     content="Internal Server Error", status_code=500
                 )
         if not page:
-            return fastapi.responses.Response(
-                content="Page not found", status_code=404
-            )
+            return fastapi.responses.Response(content="Page not found", status_code=404)
 
         return render_page_by_format(page, format)
 
-    def render_page_by_format(page: RenderedPage, format: Literal["html", "json", "css", "js"]) -> fastapi.responses.Response:
+    def render_page_by_format(
+        page: RenderedPage, format: Literal["html", "json", "css", "js"]
+    ) -> fastapi.responses.Response:
         if format == "html":
             return render_page_html(page)
         elif format == "json":
@@ -272,12 +271,14 @@ def create_app(args: argparse.Namespace):
                 status_code=400,
             )
 
-    def guess_format(format: str | None, path: str, request: fastapi.Request) -> tuple[Literal["html", "json", "css", "js"], str]:
+    def guess_format(
+        format: str | None, path: str, request: fastapi.Request
+    ) -> tuple[Literal["html", "json", "css", "js"], str]:
         if format in ["html", "json", "css", "js"]:
             return format, path
-        if '.' in path:
+        if "." in path:
             ext = os.path.splitext(path)[1]
-            path = path[:-len(ext)]
+            path = path[: -len(ext)]
             if ext == ".html":
                 format = "html"
             elif ext == ".json":
@@ -306,7 +307,7 @@ def create_app(args: argparse.Namespace):
 
     def render_page_html(page: RenderedPage) -> fastapi.responses.Response:
         return fastapi.responses.Response(
-                content=str(page),
+            content=str(page),
             media_type="text/html",
             status_code=page.response_code,
             headers=page.headers,
@@ -337,7 +338,7 @@ def create_app(args: argparse.Namespace):
         )
 
     @app.get("/api/v1/store")
-    def get_store_list(tags: str|None=None):
+    def get_store_list(tags: str | None = None):
         tagsl = tags.split(",") if tags else []
         stores: list[StoreBase] = list(store.get_all_stores().values())
 
@@ -345,10 +346,15 @@ def create_app(args: argparse.Namespace):
             tag = tag.strip()
             stores = [store for store in stores if tag in store.config.tags]
 
-        return fastapi.responses.JSONResponse({
-            "count": len(stores),
-            "results": [{"id": store.config.name, "name": store.config.name} for store in stores]
-        })
+        return fastapi.responses.JSONResponse(
+            {
+                "count": len(stores),
+                "results": [
+                    {"id": store.config.name, "name": store.config.name}
+                    for store in stores
+                ],
+            }
+        )
 
     @app.get("/")
     def redirect_to_index():

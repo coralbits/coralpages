@@ -132,8 +132,8 @@ class RenderedPage:
             },
             "http": {
                 "headers": self.get_headers(),
-                "response_code": self.response_code
-            }
+                "response_code": self.response_code,
+            },
         }
 
     def get_body(self) -> str:
@@ -142,10 +142,10 @@ class RenderedPage:
         """
         return self.content
 
-    def get_headers(self) -> dict[str,str]:
+    def get_headers(self) -> dict[str, str]:
         return {}
 
-    def get_meta(self) -> list[dict[str,str]]:
+    def get_meta(self) -> list[dict[str, str]]:
         return [meta.to_dict() for meta in self.meta]
 
     def get_css(self) -> str:
@@ -165,6 +165,7 @@ class RenderedPage:
         Get the JavaScript for the page.
         """
         return ""
+
 
 class Renderer:
     """
@@ -212,7 +213,9 @@ class Renderer:
         page_definition = None
         for storei in store.split("|"):
             store_obj = self.store.get_store(storei)
-            page_definition = store_obj and await store_obj.load_page_definition(path=path)
+            page_definition = store_obj and await store_obj.load_page_definition(
+                path=path
+            )
             if page_definition:
                 # logger.debug("Rendering page: %s/%s", storei, path)
                 break
@@ -290,7 +293,9 @@ class Renderer:
             + salt.encode()
         ).hexdigest()
 
-    async def render(self, page_def: Page, *, context: dict | None = None) -> RenderedPage:
+    async def render(
+        self, page_def: Page, *, context: dict | None = None
+    ) -> RenderedPage:
         """
         Render a page asynchronously.
         """
@@ -313,7 +318,11 @@ class Renderer:
         for meta in page_def.meta:
             page.append_meta(meta)
 
-        logger.debug("Rendering page=%s, block_count=%d blocks", page_def.path, len(page_def.children))
+        logger.debug(
+            "Rendering page=%s, block_count=%d blocks",
+            page_def.path,
+            len(page_def.children),
+        )
         for block in page_def.children:
             # logger.debug("Rendering block: %s", block.type)
             try:
@@ -329,9 +338,7 @@ class Renderer:
             page.append_content(html)
             page.increment_id()
 
-    async def render_in_template(
-        self, *, page: RenderedPage, template_name: str
-    ):
+    async def render_in_template(self, *, page: RenderedPage, template_name: str):
         """
         Render the template asynchronously.
 
