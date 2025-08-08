@@ -188,7 +188,8 @@ def create_app(args: argparse.Namespace):
 
         data = await request.json()
         page = Page.from_dict(data)
-        rendered_page = await renderer.render(page)
+        context = dict(request.query_params)
+        rendered_page = await renderer.render(page, context=context)
 
         return render_page_by_format(rendered_page, format or "json")
 

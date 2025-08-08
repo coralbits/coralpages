@@ -290,12 +290,13 @@ class Renderer:
             + salt.encode()
         ).hexdigest()
 
-    async def render(self, page_def: Page) -> RenderedPage:
+    async def render(self, page_def: Page, *, context: dict | None = None) -> RenderedPage:
         """
         Render a page asynchronously.
         """
         page = self.new_page()
         page.update_from_definition(page_def)
+        page.context = context or {}
 
         # logger.debug("Rendering page data")
         await self.render_page_data(page=page, page_def=page_def)
