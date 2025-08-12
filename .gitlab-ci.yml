@@ -1,0 +1,58 @@
+stages:
+  - build
+  - test
+  - deploy
+
+# No custom variables needed - using GitLab's built-in variables
+
+# Build stage - creates Docker container and uploads to GitLab registry
+build:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA .
+    - docker build -t $CI_REGISTRY_IMAGE:latest .
+    - docker push $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+    - docker push $CI_REGISTRY_IMAGE:latest
+  only:
+    - main
+    - develop
+    - merge_requests
+  tags:
+    - docker
+
+# Test stage - runs tests in the Docker container
+test:
+  stage: test
+  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
+  before_script:
+    - echo "Running tests in Docker container"
+  script:
+    - uv run pytest
+  dependencies:
+    - build
+  only:
+    - main
+    - develop
+    - merge_requests
+  tags:
+    - docker
+
+# Deploy stage - placeholder for future deployment
+deploy:
+  stage: deploy
+  image: alpine:latest
+  script:
+    - echo "Deploy stage - not implemented yet"
+    - echo "Future deployment logic will go here"
+  dependencies:
+    - test
+  only:
+    - main
+  when: manual
+  tags:
+    - docker

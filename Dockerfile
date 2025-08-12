@@ -13,7 +13,7 @@ RUN rm -rf .venv
 RUN uv sync
 
 # Expose the port the app runs on
-EXPOSE 8004
+EXPOSE 8006
 
 # Command to run the application
 CMD ["./run.sh"]
