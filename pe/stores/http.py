@@ -119,7 +119,7 @@ class HttpStore(StoreBase):
         element = self.get_element_impl(path, data, context)
         return await element.load_context()
 
-    async def get_element_list(self) -> list[Widget]:
+    async def get_widget_list(self) -> list[Widget]:
         """
         Load the element list from the HTTP store.
         """

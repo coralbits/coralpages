@@ -70,7 +70,7 @@ class TestStores(TestCase):
     async def test_store_page_list(self):
         renderer = Renderer(config=self.get_full_config())
         await renderer.store.delete_page_definition(
-            "test_store_page_list", ok_if_not_found=True
+            "test_store_page_list",
         )
 
         pages = await renderer.store.get_page_list()

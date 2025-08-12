@@ -70,7 +70,10 @@ class StoreBase:
         """
         Get a list of all widgets in the store.
         """
-        logger.debug("Getting widget list for store: %s", self.config.name)
+        logger.warning(
+            "Getting widget list for store=%s. This list is not implemented!",
+            self.config.name,
+        )
         return []
 
     async def get_widget_definition(self, path: str) -> Widget | None:
@@ -78,7 +81,9 @@ class StoreBase:
         Get an widget definition from the store.
         """
         for block in await self.get_widget_list():
+            logger.debug("Comparing path=%s with block=%s", path, block.name)
             if block.name == path:
+                logger.debug("Found widget definition for path=%s", path)
                 return block
 
         raise ValueError(

@@ -19,7 +19,7 @@ class TestCase(IsolatedAsyncioTestCase):
                 name="default",
                 type="file",
                 path="builtin",
-                tags=["jinja2", "blocks"],
+                tags=["jinja2", "widgets"],
                 blocks=[
                     Widget(
                         name="text",

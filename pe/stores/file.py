@@ -153,6 +153,7 @@ class FileStore(StoreBase):
         """
         Get a list of all widgets in the file store.
         """
+        self.load_widgets()
         logger.info("Get widget list from file store count=%s", len(self.widgets))
         return list(self.widgets.values())
 
@@ -172,7 +173,6 @@ class FileStore(StoreBase):
             return PageListResult(count=0, results=[])
 
         filter_f = None
-        print(filter)
         if filter and filter["type"] == "template":
             filter_f = lambda x: x.id.startswith("_")
 

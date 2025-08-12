@@ -293,23 +293,23 @@ class Renderer:
             + salt.encode()
         ).hexdigest()
 
-    async def render(
-        self, page_def: Page, *, context: dict | None = None
-    ) -> RenderedPage:
+    async def render(self, page: Page, *, context: dict | None = None) -> RenderedPage:
         """
         Render a page asynchronously.
         """
-        page = self.new_page()
-        page.update_from_definition(page_def)
-        page.context = context or {}
+        rendered_page = self.new_page()
+        rendered_page.update_from_definition(page)
+        rendered_page.context = context or {}
 
         # logger.debug("Rendering page data")
-        await self.render_page_data(page=page, page_def=page_def)
-        if page_def.template:
-            logger.debug("Rendering in template %s", page_def.template)
-            await self.render_in_template(page=page, template_name=page_def.template)
+        await self.render_page_data(page=rendered_page, page_def=page)
+        if page.template:
+            logger.debug("Rendering in template %s", page.template)
+            await self.render_in_template(
+                page=rendered_page, template_name=page.template
+            )
 
-        return page
+        return rendered_page
 
     async def render_page_data(self, *, page: RenderedPage, page_def: Page):
         """
@@ -462,9 +462,9 @@ class Renderer:
 
         # add the css to the page and content. The idea is to avoid repetition of the same css.
         # This is a very simple approach, but it works.
-        css_md5 = (
-            hashlib.md5(css.encode()).hexdigest()
-        )  # md5 is not crypto secure, but much faster, and very low risk of collission
+        css_md5 = hashlib.md5(
+            css.encode()
+        ).hexdigest()  # md5 is not crypto secure, but much faster, and very low risk of collission
         page.classes.update({css_md5: css})
 
         return html

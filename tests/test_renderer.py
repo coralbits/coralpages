@@ -16,8 +16,8 @@ class TestRenderer(TestCase):
 
     async def test_render_text(self):
         renderer = Renderer(config=self.get_config())
-        page = await renderer.render(
-            page_def=Page(
+        rendered_page = await renderer.render(
+            page=Page(
                 title="Test test_render_text",
                 children=[
                     Element(
@@ -27,9 +27,9 @@ class TestRenderer(TestCase):
                 ],
             )
         )
-        self.assertIsNotNone(page)
-        self.assertEqual(page.title, "Test test_render_text")
-        self.assertIn("Hello, world!", page.content)
+        self.assertIsNotNone(rendered_page)
+        self.assertEqual(rendered_page.title, "Test test_render_text")
+        self.assertIn("Hello, world!", rendered_page.content)
 
     async def test_render_html(self):
         """
@@ -37,7 +37,7 @@ class TestRenderer(TestCase):
         """
         renderer = Renderer(config=self.get_config())
         page: RenderedPage = await renderer.render(
-            page_def=Page(
+            page=Page(
                 title="Test test_render_html",
                 children=[
                     Element(
