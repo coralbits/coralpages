@@ -32,7 +32,7 @@ test:
   before_script:
     - echo "Running tests in Docker container"
   script:
-    - uv run pytest
+    - uv run -m unittest
   dependencies:
     - build
   only:
