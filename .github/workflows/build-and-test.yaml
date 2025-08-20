@@ -1,0 +1,14 @@
+on: [push]
+
+jobs:
+  build:
+    runs-on: docker
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build
+        run: |
+          docker build -t pe-test .
+      - name: Test
+        run: |
+          docker run pe-test uv run -m unittest
