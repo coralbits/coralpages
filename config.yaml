@@ -25,15 +25,15 @@ stores:
       - writable
       - pages
       - templates
-  - name: docs
+  - name: pages
     type: file
-    path: ./docs/
+    path: ./builtin/pages/
     tags:
       - pages
       - templates
   - name: builtin
     type: file
-    path: ./builtin/
+    path: ./builtin/widgets/
     tags:
       - widgets
       - jinja2

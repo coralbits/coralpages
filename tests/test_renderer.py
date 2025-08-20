@@ -74,7 +74,12 @@ class TestRenderer(TestCase):
         page = await renderer.render(
             Page.from_dict(
                 yaml.safe_load(
-                    open(Path(__file__).parent.parent / "docs" / "index.yaml")
+                    open(
+                        Path(__file__).parent.parent
+                        / "builtin"
+                        / "pages"
+                        / "index.yaml"
+                    )
                 )
             )
         )

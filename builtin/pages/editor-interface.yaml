@@ -1,7 +1,7 @@
 # Editor Interface Documentation
 
 title: "Editor Interface"
-template: "docs/_default"
+template: "pages/_default"
 
 children:
   - type: builtin/markdown

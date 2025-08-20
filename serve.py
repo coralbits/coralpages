@@ -289,7 +289,7 @@ def create_app(args: argparse.Namespace):
                 format = "js"
 
         if not format:
-            content_type = request.headers.get("Accept", "text/html")
+            content_type = request.headers.get("Accept", "text/html").split(",")[0]
             if content_type == "application/json":
                 format = "json"
             elif content_type == "text/html":

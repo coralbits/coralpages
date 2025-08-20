@@ -18,7 +18,7 @@ class TestCase(IsolatedAsyncioTestCase):
             "default": StoreConfig(
                 name="default",
                 type="file",
-                path="builtin",
+                path="builtin/widgets",
                 tags=["jinja2", "widgets"],
                 blocks=[
                     Widget(

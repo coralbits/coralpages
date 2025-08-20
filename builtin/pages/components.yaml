@@ -1,7 +1,7 @@
 # Built-in Components Documentation
 
 title: "Components"
-template: "docs/_default"
+template: "pages/_default"
 
 children:
   - type: builtin/markdown

@@ -1,6 +1,6 @@
 # API get example
 title: "API get example"
-template: "docs/_default"
+template: "pages/_default"
 
 children:
   - type: builtin/markdown

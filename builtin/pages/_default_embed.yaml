@@ -2,7 +2,7 @@
 # This template provides a consistent layout with navigation menu
 
 title: "Coralbits Page Editor - Embedded Template"
-template: "docs/_embed.html"
+template: "pages/_embed.html"
 
 meta:
   - name: viewport

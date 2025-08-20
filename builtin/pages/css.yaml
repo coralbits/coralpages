@@ -1,5 +1,5 @@
 title: "Configuration"
-template: "docs/_default"
+template: "pages/_default"
 
 children:
   - type: builtin/markdown

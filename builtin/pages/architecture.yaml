@@ -1,6 +1,6 @@
 # Architecture Documentation
 title: "Architecture"
-template: "docs/_default"
+template: "pages/_default"
 
 children:
   - type: builtin/markdown

@@ -2,7 +2,7 @@
 # This template provides a consistent layout with navigation menu
 
 title: "Coralbits Page Editor - Template"
-template: "docs/_base.html"
+template: "pages/_base.html"
 
 meta:
   - name: viewport

@@ -26,7 +26,7 @@ Stores have several functions:
 - Blocks
 - Templates
 
-## Builtin Blocks Templates
+## Builtin Widget Templates
 
 - Section
 - Block
@@ -100,24 +100,24 @@ require any more templating.
 
 ### Store
 
-Its a repository for block templates, pages and other resources.
+Its a repository for widgets, pages and other resources.
 
-### BlockTemplate
+### Widget
 
-Its the blueprint of a block. They contains some HTML, CSS, and may add a context.
+Its the blueprint of an element. They contains some HTML, CSS, and may add a context.
 
-### Block
+### Element
 
-Its a definition of a block of a page, using a BlockTemplate, giving some specific properties.
+Its a definition of an element of a page, using a BlockTemplate, giving some specific properties.
 For example a title will set the exact title, and maybe some CSS properties.
 
-### RenderedBlock
+### RenderedElement
 
-Its the rendered result of a block.
+Its the rendered result of an element.
 
 ### Page
 
-Its the definition of a specific page. It contains many Blocks that will use BlockTemplates
+Its the definition of a specific page. It contains many Elements that will use Widgets
 to render themselves.
 
 They can be recursive via templates, so a page decides the important blocks at that level,

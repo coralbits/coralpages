@@ -1,7 +1,7 @@
 # Getting Started with Coralbits Page Editor
 
 title: "Getting Started"
-template: "docs/_default"
+template: "pages/_default"
 
 children:
   - type: builtin/markdown

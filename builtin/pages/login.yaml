@@ -1,4 +1,4 @@
 title: Login
-template: docs/_default
+template: "pages/_default"
 
 children: []
