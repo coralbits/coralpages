@@ -37,7 +37,9 @@ class RenderedPage:
     The classes are a dict of CSS classes, the key is to avoid repetition, all the css to be inserted is the value.
     """
 
-    title: str
+    store: str = ""
+    path: str = ""
+    title: str = ""
     content: str = ""
     classes: dict[str, str] = field(default_factory=dict)
     max_id: int = 1
@@ -123,6 +125,8 @@ class RenderedPage:
         Convert the page to a dictionary.
         """
         return {
+            "store": self.store,
+            "path": self.path,
             "title": self.title,
             "body": self.get_body(),
             "head": {
@@ -300,6 +304,10 @@ class Renderer:
         rendered_page = self.new_page()
         rendered_page.update_from_definition(page)
         rendered_page.context = context or {}
+
+        store, path = page.path.split("/", 1)
+        rendered_page.store = store
+        rendered_page.path = path
 
         # logger.debug("Rendering page data")
         await self.render_page_data(page=rendered_page, page_def=page)
