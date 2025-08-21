@@ -122,7 +122,14 @@ class StoreFactory:
         """
         res = PageListResult(count=0, results=[])
         pending = limit
-        for store in self.get_all_stores().values():
+
+        stores = self.get_all_stores().values()
+        store_filter = filter.get("store")
+        if store_filter:
+            store_filter = store_filter.split("|")
+            stores = [store for store in stores if store.config.name in store_filter]
+
+        for store in stores:
             store_res = await store.get_page_list(
                 offset=offset, limit=pending, filter=filter
             )
