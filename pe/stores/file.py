@@ -173,7 +173,7 @@ class FileStore(StoreBase):
             return PageListResult(count=0, results=[])
 
         filter_f = None
-        if filter and filter["type"] == "template":
+        if filter and filter.get("type") == "template":
             filter_f = lambda x: x.id.startswith("_")
 
         count = 0
