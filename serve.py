@@ -6,6 +6,7 @@ import traceback
 import logging
 import random
 
+from pydantic import Field
 import uvicorn
 import fastapi
 import fastapi.responses
@@ -17,7 +18,7 @@ from pe.setup import setup_logging, trace_id_var
 from pe.stores.factory import StoreFactory
 from pe.types import Element, Page
 from pe.renderer.renderer import RenderedPage
-from typing import Literal
+from typing import Annotated, Literal
 import os
 from typing import Union
 from pe.stores.types import StoreBase
@@ -64,20 +65,28 @@ def create_app(args: argparse.Namespace):
         return response
 
     @app.get("/api/v1/page/")
-    async def list_pages(request: fastapi.Request):
+    async def list_pages(
+        offset: int = 0,
+        limit: int = 10,
+        type_: Annotated[
+            Literal["template", "page"] | None, fastapi.Query(alias="type")
+        ] = None,
+        store_name: Annotated[
+            str | None,
+            fastapi.Query(alias="store"),
+            Field(
+                description="The store to use for rendering the page. Can use '|' to mark several in order."
+            ),
+        ] = None,
+    ):
         """
         List of all pages. Can have filters:
-
-            - `offset`: Offset of the first page to return.
-            - `limit`: Maximum number of pages to return.
-            - `type`: `template`
         """
-        qs = request.query_params
-        offset = int(qs.get("offset", 0))
-        limit = int(qs.get("limit", 10))
         filter = {}
-        if qs.get("type"):
-            filter["type"] = qs.get("type")
+        if type_:
+            filter["type"] = type_
+        if store_name:
+            filter["store"] = store_name
         pages = await store.get_page_list(offset=offset, limit=limit, filter=filter)
         return fastapi.responses.Response(
             content=json.dumps(
