@@ -305,7 +305,12 @@ class Renderer:
         rendered_page.update_from_definition(page)
         rendered_page.context = context or {}
 
-        store, path = page.path.split("/", 1)
+        if "/" in page.path:
+            store, path = page.path.split("/", 1)
+        else:
+            store = ""
+            path = page.path
+
         rendered_page.store = store
         rendered_page.path = path
 
