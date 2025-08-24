@@ -3,14 +3,12 @@ use clap::Parser;
 use minijinja::context;
 use page_viewer::{
     page::Page,
-    renderer::{renderedpage::RenderedPage, renderer::PageRenderer},
-    store::file::FileStore,
+    renderer::renderer::PageRenderer,
+    store::{file::FileStore, traits::Store},
 };
 use std::{fs, time::Instant};
 use tracing::{info, Level};
-use tracing_subscriber::util::SubscriberInitExt;
 use tracing_subscriber::FmtSubscriber;
-use tracing_subscriber::Layer;
 
 #[derive(Parser)]
 #[command(name = "page-viewer")]
@@ -18,7 +16,10 @@ use tracing_subscriber::Layer;
 struct Args {
     /// Render a YAML page file and output the rendered body to stdout
     #[arg(long, value_name = "FILENAME")]
-    render: Option<String>,
+    render_file: Option<String>,
+    /// Render all pages in the given directory
+    #[arg(long, value_name = "FILENAME")]
+    render_from_store: Option<String>,
 }
 
 fn main() -> Result<()> {
@@ -35,11 +36,18 @@ fn main() -> Result<()> {
 
     let args = Args::parse();
 
-    if let Some(filename) = args.render {
+    if let Some(filename) = args.render_file {
         // Read and render the YAML file
         info!("Rendering page file: {}", filename);
         let start = Instant::now();
         render_page_file(&filename)?;
+        let duration = start.elapsed();
+        info!("Rendered page file in {:?}", duration);
+    } else if let Some(pagename) = args.render_from_store {
+        // Read and render the YAML file
+        info!("Rendering page from store: {}", pagename);
+        let start = Instant::now();
+        render_from_store(&pagename)?;
         let duration = start.elapsed();
         info!("Rendered page file in {:?}", duration);
     } else {
@@ -60,12 +68,37 @@ fn render_page_file(filename: &str) -> Result<()> {
 
     let mut renderer = PageRenderer::new();
 
-    renderer.store.add_store(
-        "builtin",
-        Box::new(FileStore::new("builtin/widgets".to_string())?),
-    );
+    renderer
+        .store
+        .add_store("builtin", Box::new(FileStore::new("builtin/widgets")?));
 
     // Create a RenderedPage and render it
+    let ctx = context! {};
+    let rendered_page = renderer.render_page(&page, &ctx)?;
+
+    // Print the rendered body to stdout
+    print!("{}", rendered_page.body);
+
+    Ok(())
+}
+
+fn render_from_store(pagename: &str) -> Result<()> {
+    let mut renderer = PageRenderer::new();
+
+    renderer
+        .store
+        .add_store("builtin", Box::new(FileStore::new("builtin/widgets")?));
+    renderer
+        .store
+        .add_store("pages", Box::new(FileStore::new("builtin/pages")?));
+
+    let page = renderer
+        .store
+        .load_page_definition(pagename)?
+        .ok_or_else(|| anyhow::anyhow!("Page '{}' not found", pagename))?;
+
+    info!("Loaded page: {:?}", page);
+
     let ctx = context! {};
     let rendered_page = renderer.render_page(&page, &ctx)?;
 

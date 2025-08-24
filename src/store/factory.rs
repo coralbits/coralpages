@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use tracing::error;
+use tracing::{error, info};
 
 use crate::{
     page::types::{Page, PageListResult, Widget},
@@ -29,6 +29,7 @@ impl StoreFactory {
 
     pub fn add_store(&mut self, name: &str, store: Box<dyn Store>) {
         self.stores.insert(name.to_string(), store);
+        info!("Added store: {}", name);
     }
 
     fn split_path(&self, path: &str) -> Result<(String, String), anyhow::Error> {
