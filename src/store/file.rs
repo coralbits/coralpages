@@ -5,7 +5,7 @@ use std::{
 };
 
 use serde::Deserialize;
-use tracing::{debug, error, info};
+use tracing::{error, info};
 
 use crate::{
     page::types::{Page, Widget},

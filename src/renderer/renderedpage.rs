@@ -6,7 +6,6 @@ use crate::{
 };
 
 use minijinja::{context, Environment};
-use tracing::{debug, info, instrument};
 
 #[derive(Debug)]
 pub struct RenderedPage {

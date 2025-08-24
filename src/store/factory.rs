@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use tracing::{error, info};
 
 use crate::{
-    page::types::{Page, PageListResult, Widget},
+    page::types::{Page, Widget},
     store::{traits::Store, types::PageInfo},
     ResultI,
 };
