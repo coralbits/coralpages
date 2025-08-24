@@ -1,6 +1,25 @@
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Widget {
+    pub name: String,
+    pub description: String,
+    pub icon: String,
+    pub html: String,
+    pub css: String,
+    pub editor: Vec<WidgetEditor>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WidgetEditor {
+    #[serde(rename = "type")]
+    pub editor_type: String,
+    pub label: String,
+    pub name: String,
+    pub placeholder: String,
+}
+
 /// A meta definition for page metadata
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MetaDefinition {
@@ -8,13 +27,13 @@ pub struct MetaDefinition {
     pub content: String,
 }
 
-/// Each block definition, with content, and maybe more children
+/// Each widget use in a page, with content, and maybe more children
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Element {
     #[serde(default)]
     pub id: Option<String>,
     #[serde(rename = "type")]
-    pub element_type: String,
+    pub widget: String,
     #[serde(default)]
     pub data: serde_json::Value,
     #[serde(default)]
@@ -24,9 +43,9 @@ pub struct Element {
 }
 
 impl Element {
-    pub fn new(element_type: String, data: serde_json::Value) -> Self {
+    pub fn new(widget: String, data: serde_json::Value) -> Self {
         Self {
-            element_type,
+            widget,
             data,
             id: None,
             children: Vec::new(),
@@ -176,7 +195,7 @@ mod tests {
     fn test_element_creation() {
         let element = Element::new("div".to_string(), serde_json::json!({"text": "Hello"}));
 
-        assert_eq!(element.element_type, "div");
+        assert_eq!(element.widget, "div");
         assert_eq!(element.data["text"], "Hello");
         assert!(element.id.is_none());
         assert!(element.children.is_empty());
@@ -205,7 +224,7 @@ mod tests {
             .with_children(vec![element]);
 
         assert_eq!(page.children.len(), 1);
-        assert_eq!(page.children[0].element_type, "div");
+        assert_eq!(page.children[0].widget, "div");
     }
 
     #[test]
