@@ -53,6 +53,9 @@ impl<'a> RenderedingPageData<'a> {
             self.render_element(element, ctx)?;
         }
 
+        // add the meta
+        self.rendered_page.meta.extend(self.page.meta.clone());
+
         Ok(())
     }
 
@@ -96,6 +99,11 @@ impl<'a> RenderedingPageData<'a> {
         let ctx = context! { ..ctx, ..context!{data => element.data.clone()} };
 
         let rendered_element = template.render(ctx)?;
+
+        // Add the CSS to the rendered page
+        self.rendered_page
+            .css_variables
+            .insert(widget.name.clone(), widget.css.clone());
 
         Ok(rendered_element)
     }
