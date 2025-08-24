@@ -17,6 +17,7 @@ pub struct WidgetEditor {
     pub editor_type: String,
     pub label: String,
     pub name: String,
+    #[serde(default)]
     pub placeholder: String,
 }
 

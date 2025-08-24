@@ -59,7 +59,7 @@ fn render_page_file(filename: &str) -> Result<()> {
 
     renderer.store.add_store(
         "builtin",
-        Box::new(FileStore::new("builtin/pages".to_string())),
+        Box::new(FileStore::new("builtin/widgets".to_string())?),
     );
 
     // Create a RenderedPage and render it

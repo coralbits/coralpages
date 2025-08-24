@@ -179,6 +179,7 @@ widgets:
     editor:
       - type: html
         label: HTML
+        name: html
 
   - name: form
     description: A Form
@@ -188,6 +189,7 @@ widgets:
     editor:
       - type: text
         label: URL
+        name: url
         description: URL to POST data to
       - type: select
         label: Method

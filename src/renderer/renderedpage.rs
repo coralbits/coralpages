@@ -34,14 +34,16 @@ impl RenderedPage {
 pub struct RenderedingPageData<'a> {
     page: &'a Page,
     store: &'a dyn Store,
+    env: &'a Environment<'a>,
     pub rendered_page: RenderedPage,
 }
 
 impl<'a> RenderedingPageData<'a> {
-    pub fn new(page: &'a Page, store: &'a dyn Store) -> Self {
+    pub fn new(page: &'a Page, store: &'a dyn Store, env: &'a Environment) -> Self {
         Self {
             page: page,
             store: store,
+            env: env,
             rendered_page: RenderedPage::new(),
         }
     }
@@ -68,8 +70,7 @@ impl<'a> RenderedingPageData<'a> {
     }
 
     pub fn render_widget(&mut self, widget: &Widget, element: &Element) -> anyhow::Result<String> {
-        let mut env = Environment::new();
-        let template = env.template_from_str(&widget.html)?;
+        let template = self.env.template_from_str(&widget.html)?;
 
         info!(
             "Rendering widget={} with data={:?}",
