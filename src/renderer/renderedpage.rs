@@ -84,6 +84,8 @@ impl<'a> RenderedingPageData<'a> {
 
 #[cfg(test)]
 mod tests {
+    use minijinja::Environment;
+
     use crate::store::factory::StoreFactory;
 
     use super::*;
@@ -94,7 +96,8 @@ mod tests {
             .with_title("Test Page".to_string())
             .with_path("/test".to_string());
         let mut store = StoreFactory::new();
-        let rendered_page = RenderedingPageData::new(&page, &store);
+        let env = Environment::new();
+        let rendered_page = RenderedingPageData::new(&page, &store, &env);
 
         println!("Rendered page: {:?}", rendered_page.rendered_page);
     }
