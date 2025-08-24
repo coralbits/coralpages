@@ -6,7 +6,7 @@ use crate::{
 };
 
 use minijinja::{context, Environment};
-use tracing::info;
+use tracing::{debug, info, instrument};
 
 #[derive(Debug)]
 pub struct RenderedPage {
@@ -92,10 +92,6 @@ impl<'a> RenderedingPageData<'a> {
     ) -> anyhow::Result<String> {
         let template = self.env.template_from_str(&widget.html)?;
 
-        info!(
-            "Rendering widget={} with data={:?}",
-            widget.name, element.data
-        );
         let ctx = context! { ..ctx, ..context!{data => element.data.clone()} };
 
         let rendered_element = template.render(ctx)?;
@@ -121,11 +117,22 @@ mod tests {
     fn test_rendered_page() {
         let page = Page::new()
             .with_title("Test Page".to_string())
-            .with_path("/test".to_string());
+            .with_path("/test".to_string())
+            .with_children(vec![Element::new(
+                "text".to_string(),
+                serde_json::json!({ "text": "Hello, world!" }),
+            )
+            .with_children(vec![Element::new(
+                "text".to_string(),
+                serde_json::json!({ "text": "Hello, child!" }),
+            )])]);
         let mut store = StoreFactory::new();
         let env = Environment::new();
         let rendered_page = RenderedingPageData::new(&page, &store, &env);
 
-        println!("Rendered page: {:?}", rendered_page.rendered_page);
+        info!(
+            "Rendered page: {:?}",
+            rendered_page.rendered_page.body.len()
+        );
     }
 }

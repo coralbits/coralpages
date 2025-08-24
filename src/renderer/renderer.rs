@@ -35,7 +35,7 @@ impl PageRenderer {
         Self { store, env }
     }
 
-    #[instrument]
+    #[instrument(skip(self, page, ctx), fields(page_path = page.path))]
     pub fn render_page(&self, page: &Page, ctx: &minijinja::Value) -> anyhow::Result<RenderedPage> {
         let mut rendering_page = RenderedingPageData::new(&page, &self.store, &self.env);
 
