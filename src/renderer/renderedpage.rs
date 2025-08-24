@@ -48,35 +48,54 @@ impl<'a> RenderedingPageData<'a> {
         }
     }
 
-    pub fn render(&mut self) -> anyhow::Result<()> {
+    pub fn render(&mut self, ctx: &minijinja::Value) -> anyhow::Result<()> {
         for element in &self.page.children {
-            self.render_element(element)?;
+            self.render_element(element, ctx)?;
         }
 
         Ok(())
     }
 
-    pub fn render_element(&mut self, element: &Element) -> anyhow::Result<()> {
+    pub fn render_element(
+        &mut self,
+        element: &Element,
+        ctx: &minijinja::Value,
+    ) -> anyhow::Result<()> {
         let widget = self.store.load_widget_definition(&element.widget)?;
         let widget = match widget {
             Some(widget) => widget,
             None => return Err(anyhow::anyhow!("Widget not found: {}", element.widget)),
         };
 
-        let rendered_element = self.render_widget(&widget, element)?;
+        // Render recursively all the children, and add to context.children as a list
+        let mut children = Vec::new();
+        for child in &element.children {
+            let rendered_child = self.render_element(child, &ctx)?;
+            children.push(rendered_child);
+        }
+        let new_ctx = context! { ..ctx.clone(), ..context!{children => children} };
+
+        let rendered_element = self.render_widget(&widget, element, new_ctx)?;
 
         self.rendered_page.body.push_str(&rendered_element);
         Ok(())
     }
 
-    pub fn render_widget(&mut self, widget: &Widget, element: &Element) -> anyhow::Result<String> {
+    pub fn render_widget(
+        &mut self,
+        widget: &Widget,
+        element: &Element,
+        ctx: minijinja::Value,
+    ) -> anyhow::Result<String> {
         let template = self.env.template_from_str(&widget.html)?;
 
         info!(
             "Rendering widget={} with data={:?}",
             widget.name, element.data
         );
-        let rendered_element = template.render(context!(data => element.data.clone()))?;
+        let ctx = context! { ..ctx, ..context!{data => element.data.clone()} };
+
+        let rendered_element = template.render(ctx)?;
 
         Ok(rendered_element)
     }

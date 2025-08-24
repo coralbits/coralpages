@@ -1,5 +1,6 @@
 use anyhow::Result;
 use clap::Parser;
+use minijinja::context;
 use page_viewer::{
     page::Page,
     renderer::{renderedpage::RenderedPage, renderer::PageRenderer},
@@ -63,7 +64,8 @@ fn render_page_file(filename: &str) -> Result<()> {
     );
 
     // Create a RenderedPage and render it
-    let rendered_page = renderer.render_page(&page)?;
+    let ctx = context! {};
+    let rendered_page = renderer.render_page(&page, &ctx)?;
 
     // Print the rendered body to stdout
     print!("{}", rendered_page.body);
