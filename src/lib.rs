@@ -2,6 +2,7 @@ pub mod page;
 pub mod renderer;
 pub mod store;
 pub mod types;
+pub mod utils;
 
 pub use page::*;
 pub use renderer::*;

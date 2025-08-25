@@ -23,7 +23,7 @@ impl StoreFactory {
     pub fn get_store(&self, name: &str) -> Option<&dyn Store> {
         let store = self.stores.get(name).map(|s| s.as_ref());
         if store.is_none() {
-            error!("Store not found: {}", name);
+            error!("Store not found name={}", name);
         }
         store
     }
@@ -36,7 +36,7 @@ impl StoreFactory {
     fn split_path(&self, path: &str) -> Result<(String, String), anyhow::Error> {
         let parts: Vec<&str> = path.splitn(2, '/').collect();
         if parts.len() < 2 {
-            return Err(anyhow::anyhow!("Invalid path"));
+            return Err(anyhow::anyhow!("Invalid path={}", path));
         }
         Ok((parts[0].to_string(), parts[1].to_string()))
     }
@@ -45,42 +45,52 @@ impl StoreFactory {
 #[async_trait]
 impl Store for StoreFactory {
     async fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
-        let (store, path) = self.split_path(path)?;
+        info!("Loading widget definition, path={}", path);
+        let (store, subpath) = self.split_path(path)?;
         let store = self.get_store(&store);
         if let Some(store) = store {
-            store.load_widget_definition(&path).await
+            store.load_widget_definition(&subpath).await
         } else {
-            Err(anyhow::anyhow!("Store not found"))
+            Err(anyhow::anyhow!("Store for widget not found, path={}", path))
         }
     }
 
     async fn load_page_definition(&self, path: &str) -> anyhow::Result<Option<Page>> {
-        let (store, path) = self.split_path(path)?;
+        let (store, subpath) = self.split_path(path)?;
         let store = self.get_store(&store);
         if let Some(store) = store {
-            store.load_page_definition(&path).await
+            store.load_page_definition(&subpath).await
         } else {
-            Err(anyhow::anyhow!("Store not found"))
+            Err(anyhow::anyhow!(
+                "Store for page read not found, path={}",
+                path
+            ))
         }
     }
 
     async fn save_page_definition(&self, path: &str, page: &Page) -> anyhow::Result<()> {
-        let (store, path) = self.split_path(path)?;
+        let (store, subpath) = self.split_path(path)?;
         let store = self.get_store(&store);
         if let Some(store) = store {
-            store.save_page_definition(&path, page).await
+            store.save_page_definition(&subpath, page).await
         } else {
-            Err(anyhow::anyhow!("Store not found"))
+            Err(anyhow::anyhow!(
+                "Store for page save not found, path={}",
+                path
+            ))
         }
     }
 
     async fn delete_page_definition(&self, path: &str) -> anyhow::Result<bool> {
-        let (store, path) = self.split_path(path)?;
+        let (store, subpath) = self.split_path(path)?;
         let store = self.get_store(&store);
         if let Some(store) = store {
-            store.delete_page_definition(&path).await
+            store.delete_page_definition(&subpath).await
         } else {
-            Err(anyhow::anyhow!("Store not found"))
+            Err(anyhow::anyhow!(
+                "Store for page delete not found, path={}",
+                path
+            ))
         }
     }
 

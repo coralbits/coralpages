@@ -109,24 +109,44 @@ mod tests {
     use minijinja::Environment;
     use tracing::info;
 
-    use crate::store::factory::StoreFactory;
+    use crate::{store::factory::StoreFactory, utils};
 
     use super::*;
 
+    struct TestStore {}
+
+    #[async_trait::async_trait]
+    impl Store for TestStore {
+        async fn load_widget_definition(&self, _path: &str) -> anyhow::Result<Option<Widget>> {
+            Ok(Some(Widget {
+                name: "test".to_string(),
+                html: "Hello, {{data.text}}!".to_string(),
+                css: "".to_string(),
+                editor: vec![],
+                description: "Test widget".to_string(),
+                icon: "".to_string(),
+            }))
+        }
+    }
+
     #[tokio::test]
     async fn test_rendered_page() {
+        utils::setup_logging();
+
         let page = Page::new()
             .with_title("Test Page".to_string())
             .with_path("/test".to_string())
             .with_children(vec![Element::new(
-                "text".to_string(),
+                "test/text".to_string(),
                 serde_json::json!({ "text": "Hello, world!" }),
             )
             .with_children(vec![Element::new(
-                "text".to_string(),
+                "test/text".to_string(),
                 serde_json::json!({ "text": "Hello, child!" }),
             )])]);
         let mut store = StoreFactory::new();
+        store.add_store("test", Box::new(TestStore {}));
+
         let env = Environment::new();
         let mut rendered_page = RenderedingPageData::new(&page, &store, &env);
 

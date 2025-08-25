@@ -5,10 +5,10 @@ use page_viewer::{
     page::Page,
     renderer::renderer::PageRenderer,
     store::{file::FileStore, traits::Store},
+    utils,
 };
 use std::{fs, time::Instant};
-use tracing::{info, Level};
-use tracing_subscriber::FmtSubscriber;
+use tracing::info;
 
 #[derive(Parser)]
 #[command(name = "page-viewer")]
@@ -24,16 +24,7 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let subscriber = FmtSubscriber::builder()
-        // all spans/events with a level higher than TRACE (e.g, debug, info, warn, etc.)
-        // will be written to stdout.
-        .with_max_level(Level::TRACE)
-        // trace to stderr
-        .with_writer(std::io::stderr)
-        // completes the builder.
-        .finish();
-
-    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+    utils::setup_logging();
 
     let args = Args::parse();
 
