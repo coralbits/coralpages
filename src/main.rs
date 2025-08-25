@@ -45,7 +45,6 @@ async fn main() -> Result<()> {
         info!("Rendered page file in {:?}", duration);
     } else if let Some(listen) = args.listen {
         // Start the server
-        info!("Starting server on {}", listen);
         start_server(&listen).await?;
     } else {
         // Default behavior - show info about the tool
@@ -108,6 +107,8 @@ async fn render_from_store(pagename: &str) -> Result<()> {
 
 async fn start_server(listen: &str) -> Result<()> {
     info!("Starting server on http://{}", listen);
+    info!("OpenAPI docs: http://{}/docs", listen);
+
     start(listen).await?;
     Ok(())
 }
