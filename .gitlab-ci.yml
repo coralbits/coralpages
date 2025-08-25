@@ -46,7 +46,6 @@ test-rust:
   stage: test
   image: rust:1.83.0
   script:
-    - cargo install --locked
     - cargo test --locked
 
 # Deploy stage - placeholder for future deployment
