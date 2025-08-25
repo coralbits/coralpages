@@ -7,12 +7,34 @@ use crate::file::FileStore;
 use crate::traits::Store;
 use crate::PageRenderer;
 use poem::{
-    listener::TcpListener, middleware::Tracing, EndpointExt, Error as PoemError, Route, Server,
+    listener::TcpListener, middleware::Tracing, EndpointExt, Error as PoemError, Request, Route,
+    Server,
 };
-use poem_openapi::{param::Path, payload::PlainText, OpenApi, OpenApiService};
+use poem_openapi::{
+    param::Path,
+    payload::{Json, PlainText},
+    ApiResponse, Object, OpenApi, OpenApiService,
+};
 
 pub struct Api {
     renderer: Arc<PageRenderer>,
+}
+
+#[derive(Object)]
+struct PageRenderResponseJson {
+    body: String,
+    css: Option<String>,
+    js: Option<String>,
+}
+
+#[derive(ApiResponse)]
+enum PageRenderResponse {
+    #[oai(status = 200, content_type = "application/json; charset=utf-8")]
+    Json(Json<PageRenderResponseJson>),
+    #[oai(status = 200, content_type = "text/html; charset=utf-8")]
+    Html(PlainText<String>),
+    #[oai(status = 200, content_type = "text/css; charset=utf-8")]
+    Css(PlainText<String>),
 }
 
 #[OpenApi]
@@ -33,9 +55,10 @@ impl Api {
     #[oai(path = "/render/:store/:path<.*>", method = "get")]
     async fn render(
         &self,
+        request: &Request,
         Path(store): Path<String>,
         Path(path): Path<String>,
-    ) -> Result<PlainText<String>, PoemError> {
+    ) -> Result<PageRenderResponse, PoemError> {
         let pagename = format!("{}/{}", store, path);
         let page = self
             .renderer
@@ -57,7 +80,24 @@ impl Api {
         let rendered = self.renderer.render_page(&page, &ctx).await.map_err(|e| {
             PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
         })?;
-        Ok(PlainText(rendered.body))
+        let accept_type_ = if let Some(accept) = request.headers().get("Accept") {
+            accept.to_str().unwrap().split(";").next().unwrap().trim()
+        } else {
+            "application/json"
+        };
+
+        info!("Accept: {}", accept_type_);
+
+        let response = match accept_type_ {
+            "text/html" => PageRenderResponse::Html(PlainText(rendered.body)),
+            "text/css" => PageRenderResponse::Css(PlainText("/** not yet **/".to_string())),
+            _ => PageRenderResponse::Json(Json(PageRenderResponseJson {
+                body: rendered.body,
+                css: None,
+                js: None,
+            })),
+        };
+        Ok(response)
     }
 }
 
