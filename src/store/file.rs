@@ -4,6 +4,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
+use async_trait::async_trait;
 use serde::Deserialize;
 use tracing::{error, info};
 
@@ -116,8 +117,9 @@ impl FileStore {
     }
 }
 
+#[async_trait]
 impl Store for FileStore {
-    fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
+    async fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
         // debug!(
         //     "Loading widget definition from path={} available_count={}",
         //     path,
@@ -134,7 +136,7 @@ impl Store for FileStore {
         Ok(widget)
     }
 
-    fn load_page_definition(&self, path: &str) -> anyhow::Result<Option<Page>> {
+    async fn load_page_definition(&self, path: &str) -> anyhow::Result<Option<Page>> {
         let path = Path::new(&self.path).join(format!("{}.yaml", path));
         // info!("Loading page definition from {}", path.display());
         let file = File::open(path)?;
@@ -142,14 +144,14 @@ impl Store for FileStore {
         Ok(Some(page))
     }
 
-    fn save_page_definition(&self, path: &str, page: &Page) -> anyhow::Result<()> {
+    async fn save_page_definition(&self, path: &str, page: &Page) -> anyhow::Result<()> {
         let path = Path::new(&self.path).join(format!("{}.yaml", path));
         let file = File::create(path)?;
         serde_yaml::to_writer(file, page)?;
         Ok(())
     }
 
-    fn delete_page_definition(&self, path: &str) -> anyhow::Result<bool> {
+    async fn delete_page_definition(&self, path: &str) -> anyhow::Result<bool> {
         let path = Path::new(&self.path).join(format!("{}.yaml", path));
         if path.exists() {
             std::fs::remove_file(path)?;
@@ -159,7 +161,7 @@ impl Store for FileStore {
         }
     }
 
-    fn get_page_list(
+    async fn get_page_list(
         &self,
         offset: usize,
         limit: usize,

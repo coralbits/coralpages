@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use async_trait::async_trait;
 use tracing::{error, info};
 
 use crate::{
@@ -41,48 +42,49 @@ impl StoreFactory {
     }
 }
 
+#[async_trait]
 impl Store for StoreFactory {
-    fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
+    async fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
         let (store, path) = self.split_path(path)?;
         let store = self.get_store(&store);
         if let Some(store) = store {
-            store.load_widget_definition(&path)
+            store.load_widget_definition(&path).await
         } else {
             Err(anyhow::anyhow!("Store not found"))
         }
     }
 
-    fn load_page_definition(&self, path: &str) -> anyhow::Result<Option<Page>> {
+    async fn load_page_definition(&self, path: &str) -> anyhow::Result<Option<Page>> {
         let (store, path) = self.split_path(path)?;
         let store = self.get_store(&store);
         if let Some(store) = store {
-            store.load_page_definition(&path)
+            store.load_page_definition(&path).await
         } else {
             Err(anyhow::anyhow!("Store not found"))
         }
     }
 
-    fn save_page_definition(&self, path: &str, page: &Page) -> anyhow::Result<()> {
+    async fn save_page_definition(&self, path: &str, page: &Page) -> anyhow::Result<()> {
         let (store, path) = self.split_path(path)?;
         let store = self.get_store(&store);
         if let Some(store) = store {
-            store.save_page_definition(&path, page)
+            store.save_page_definition(&path, page).await
         } else {
             Err(anyhow::anyhow!("Store not found"))
         }
     }
 
-    fn delete_page_definition(&self, path: &str) -> anyhow::Result<bool> {
+    async fn delete_page_definition(&self, path: &str) -> anyhow::Result<bool> {
         let (store, path) = self.split_path(path)?;
         let store = self.get_store(&store);
         if let Some(store) = store {
-            store.delete_page_definition(&path)
+            store.delete_page_definition(&path).await
         } else {
             Err(anyhow::anyhow!("Store not found"))
         }
     }
 
-    fn get_page_list(
+    async fn get_page_list(
         &self,
         offset: usize,
         limit: usize,
@@ -93,7 +95,7 @@ impl Store for StoreFactory {
             results: Vec::new(),
         };
         for store in self.stores.values() {
-            let store_result = store.get_page_list(offset, limit, filter)?;
+            let store_result = store.get_page_list(offset, limit, filter).await?;
             result.count += store_result.count;
             result.results.extend(store_result.results);
         }

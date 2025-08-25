@@ -36,10 +36,14 @@ impl PageRenderer {
     }
 
     #[instrument(skip(self, page, ctx), fields(page_path = page.path))]
-    pub fn render_page(&self, page: &Page, ctx: &minijinja::Value) -> anyhow::Result<RenderedPage> {
+    pub async fn render_page(
+        &self,
+        page: &Page,
+        ctx: &minijinja::Value,
+    ) -> anyhow::Result<RenderedPage> {
         let mut rendering_page = RenderedingPageData::new(&page, &self.store, &self.env);
 
-        rendering_page.render(ctx)?;
+        rendering_page.render(ctx).await?;
         let rendered_page = rendering_page.rendered_page;
         Ok(rendered_page)
     }

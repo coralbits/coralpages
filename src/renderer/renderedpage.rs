@@ -47,9 +47,9 @@ impl<'a> RenderedingPageData<'a> {
         }
     }
 
-    pub fn render(&mut self, ctx: &minijinja::Value) -> anyhow::Result<()> {
+    pub async fn render(&mut self, ctx: &minijinja::Value) -> anyhow::Result<()> {
         for element in &self.page.children {
-            self.render_element(element, ctx)?;
+            self.render_element(element, ctx).await?;
         }
 
         // add the meta
@@ -58,12 +58,12 @@ impl<'a> RenderedingPageData<'a> {
         Ok(())
     }
 
-    pub fn render_element(
+    pub async fn render_element(
         &mut self,
         element: &Element,
         ctx: &minijinja::Value,
     ) -> anyhow::Result<()> {
-        let widget = self.store.load_widget_definition(&element.widget)?;
+        let widget = self.store.load_widget_definition(&element.widget).await?;
         let widget = match widget {
             Some(widget) => widget,
             None => return Err(anyhow::anyhow!("Widget not found: {}", element.widget)),
@@ -72,18 +72,18 @@ impl<'a> RenderedingPageData<'a> {
         // Render recursively all the children, and add to context.children as a list
         let mut children = Vec::new();
         for child in &element.children {
-            let rendered_child = self.render_element(child, &ctx)?;
+            let rendered_child = Box::pin(self.render_element(child, &ctx)).await?;
             children.push(rendered_child);
         }
         let new_ctx = context! { ..ctx.clone(), ..context!{children => children} };
 
-        let rendered_element = self.render_widget(&widget, element, new_ctx)?;
+        let rendered_element = self.render_widget(&widget, element, new_ctx).await?;
 
         self.rendered_page.body.push_str(&rendered_element);
         Ok(())
     }
 
-    pub fn render_widget(
+    pub async fn render_widget(
         &mut self,
         widget: &Widget,
         element: &Element,
@@ -107,13 +107,14 @@ impl<'a> RenderedingPageData<'a> {
 #[cfg(test)]
 mod tests {
     use minijinja::Environment;
+    use tracing::info;
 
     use crate::store::factory::StoreFactory;
 
     use super::*;
 
-    #[test]
-    fn test_rendered_page() {
+    #[tokio::test]
+    async fn test_rendered_page() {
         let page = Page::new()
             .with_title("Test Page".to_string())
             .with_path("/test".to_string())
@@ -127,7 +128,11 @@ mod tests {
             )])]);
         let mut store = StoreFactory::new();
         let env = Environment::new();
-        let rendered_page = RenderedingPageData::new(&page, &store, &env);
+        let mut rendered_page = RenderedingPageData::new(&page, &store, &env);
+
+        // Test the render method
+        let ctx = minijinja::context! {};
+        rendered_page.render(&ctx).await.unwrap();
 
         info!(
             "Rendered page: {:?}",

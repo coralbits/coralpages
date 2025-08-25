@@ -22,7 +22,8 @@ struct Args {
     render_from_store: Option<String>,
 }
 
-fn main() -> Result<()> {
+#[tokio::main]
+async fn main() -> Result<()> {
     let subscriber = FmtSubscriber::builder()
         // all spans/events with a level higher than TRACE (e.g, debug, info, warn, etc.)
         // will be written to stdout.
@@ -40,14 +41,14 @@ fn main() -> Result<()> {
         // Read and render the YAML file
         info!("Rendering page file: {}", filename);
         let start = Instant::now();
-        render_page_file(&filename)?;
+        render_page_file(&filename).await?;
         let duration = start.elapsed();
         info!("Rendered page file in {:?}", duration);
     } else if let Some(pagename) = args.render_from_store {
         // Read and render the YAML file
         info!("Rendering page from store: {}", pagename);
         let start = Instant::now();
-        render_from_store(&pagename)?;
+        render_from_store(&pagename).await?;
         let duration = start.elapsed();
         info!("Rendered page file in {:?}", duration);
     } else {
@@ -59,7 +60,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn render_page_file(filename: &str) -> Result<()> {
+async fn render_page_file(filename: &str) -> Result<()> {
     // Read the YAML file
     let yaml_content = fs::read_to_string(filename)?;
 
@@ -74,7 +75,7 @@ fn render_page_file(filename: &str) -> Result<()> {
 
     // Create a RenderedPage and render it
     let ctx = context! {};
-    let rendered_page = renderer.render_page(&page, &ctx)?;
+    let rendered_page = renderer.render_page(&page, &ctx).await?;
 
     // Print the rendered body to stdout
     print!("{}", rendered_page.body);
@@ -82,7 +83,7 @@ fn render_page_file(filename: &str) -> Result<()> {
     Ok(())
 }
 
-fn render_from_store(pagename: &str) -> Result<()> {
+async fn render_from_store(pagename: &str) -> Result<()> {
     let mut renderer = PageRenderer::new();
 
     renderer
@@ -94,13 +95,14 @@ fn render_from_store(pagename: &str) -> Result<()> {
 
     let page = renderer
         .store
-        .load_page_definition(pagename)?
+        .load_page_definition(pagename)
+        .await?
         .ok_or_else(|| anyhow::anyhow!("Page '{}' not found", pagename))?;
 
-    info!("Loaded page: {:?}", page);
+    info!("Loaded page: {:?}", page.path);
 
     let ctx = context! {};
-    let rendered_page = renderer.render_page(&page, &ctx)?;
+    let rendered_page = renderer.render_page(&page, &ctx).await?;
 
     // Print the rendered body to stdout
     print!("{}", rendered_page.body);
