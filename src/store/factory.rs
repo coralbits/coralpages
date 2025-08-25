@@ -45,7 +45,7 @@ impl StoreFactory {
 #[async_trait]
 impl Store for StoreFactory {
     async fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
-        info!("Loading widget definition, path={}", path);
+        // info!("Loading widget definition, path={}", path);
         let (store, subpath) = self.split_path(path)?;
         let store = self.get_store(&store);
         if let Some(store) = store {

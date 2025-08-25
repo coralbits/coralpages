@@ -30,7 +30,7 @@ impl Api {
         })
     }
 
-    #[oai(path = "/render/:store/:path", method = "get")]
+    #[oai(path = "/render/:store/:path<.*>", method = "get")]
     async fn render(
         &self,
         Path(store): Path<String>,
