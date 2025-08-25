@@ -1,5 +1,6 @@
 pub mod page;
 pub mod renderer;
+pub mod server;
 pub mod store;
 pub mod types;
 pub mod utils;

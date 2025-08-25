@@ -1,25 +1,26 @@
 use anyhow::Result;
 use clap::Parser;
 use minijinja::context;
-use page_viewer::{
-    page::Page,
-    renderer::renderer::PageRenderer,
-    store::{file::FileStore, traits::Store},
-    utils,
-};
-use std::{fs, time::Instant};
+use page_viewer::file::FileStore;
+use page_viewer::traits::Store;
+use page_viewer::{utils, Page, PageRenderer};
+use std::fs;
+use std::time::Instant;
 use tracing::info;
 
+use page_viewer::server::start;
+
 #[derive(Parser)]
-#[command(name = "page-viewer")]
-#[command(about = "Page Viewer - Rust Edition")]
+#[command(author, version, about, long_about = None)]
 struct Args {
-    /// Render a YAML page file and output the rendered body to stdout
+    /// Render a single YAML page file
     #[arg(long, value_name = "FILENAME")]
     render_file: Option<String>,
     /// Render all pages in the given directory
     #[arg(long, value_name = "FILENAME")]
     render_from_store: Option<String>,
+    #[arg(short, long, value_name = "LISTEN", default_value = "0.0.0.0:8006")]
+    listen: Option<String>,
 }
 
 #[tokio::main]
@@ -42,6 +43,10 @@ async fn main() -> Result<()> {
         render_from_store(&pagename).await?;
         let duration = start.elapsed();
         info!("Rendered page file in {:?}", duration);
+    } else if let Some(listen) = args.listen {
+        // Start the server
+        info!("Starting server on {}", listen);
+        start_server(&listen).await?;
     } else {
         // Default behavior - show info about the tool
         println!("Page Viewer - Rust Edition");
@@ -98,5 +103,11 @@ async fn render_from_store(pagename: &str) -> Result<()> {
     // Print the rendered body to stdout
     print!("{}", rendered_page.body);
 
+    Ok(())
+}
+
+async fn start_server(listen: &str) -> Result<()> {
+    info!("Starting server on http://{}", listen);
+    start(listen).await?;
     Ok(())
 }
