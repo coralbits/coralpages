@@ -7,8 +7,9 @@ use crate::file::FileStore;
 use crate::traits::Store;
 use crate::PageRenderer;
 use poem::{
-    listener::TcpListener, middleware::Tracing, EndpointExt, Error as PoemError, Request, Route,
-    Server,
+    listener::TcpListener,
+    middleware::{NormalizePath, Tracing, TrailingSlash},
+    EndpointExt, Error as PoemError, Request, Route, Server,
 };
 use poem_openapi::{
     param::Path,
@@ -35,6 +36,18 @@ enum PageRenderResponse {
     Html(PlainText<String>),
     #[oai(status = 200, content_type = "text/css; charset=utf-8")]
     Css(PlainText<String>),
+}
+
+#[derive(Object)]
+struct PageInfoResults {
+    count: u64,
+    results: Vec<PageInfo>,
+}
+
+#[derive(Object)]
+struct PageInfo {
+    name: String,
+    path: String,
 }
 
 #[OpenApi]
@@ -99,6 +112,21 @@ impl Api {
         };
         Ok(response)
     }
+
+    #[oai(path = "/page", method = "get")]
+    async fn page(&self) -> Result<Json<PageInfoResults>, PoemError> {
+        return Ok(Json(PageInfoResults {
+            count: 0,
+            results: vec![],
+        }));
+    }
+    #[oai(path = "/page/", method = "get")]
+    async fn page2(&self) -> Result<Json<PageInfoResults>, PoemError> {
+        return Ok(Json(PageInfoResults {
+            count: 0,
+            results: vec![],
+        }));
+    }
 }
 
 pub async fn start(listen: &str) -> Result<()> {
@@ -109,7 +137,8 @@ pub async fn start(listen: &str) -> Result<()> {
     let app = Route::new()
         .nest("api/v1", api_service)
         .nest("/docs", docs)
-        .with(Tracing);
+        .with(Tracing)
+        .with(NormalizePath::new(TrailingSlash::Trim));
 
     let listener = TcpListener::bind(listen);
     Server::new(listener).run(app).await?;
