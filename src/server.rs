@@ -1,6 +1,7 @@
 use anyhow::Result;
 use minijinja::context;
 use std::sync::Arc;
+use tracing::info;
 
 use crate::file::FileStore;
 use crate::traits::Store;
@@ -29,7 +30,7 @@ impl Api {
         })
     }
 
-    #[oai(path = "/render/:store/*path", method = "get")]
+    #[oai(path = "/render/:store/:path", method = "get")]
     async fn render(
         &self,
         Path(store): Path<String>,
@@ -62,7 +63,7 @@ impl Api {
 
 pub async fn start(listen: &str) -> Result<()> {
     let api = Api::new()?;
-    let api_service = OpenApiService::new(api, "Page Viewer", "0.1.0");
+    let api_service = OpenApiService::new(api, "Page Viewer", "0.1.0").server("/api/v1");
 
     let docs = api_service.swagger_ui();
     let app = Route::new()
