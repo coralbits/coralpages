@@ -1,6 +1,6 @@
 use anyhow::Result;
 use minijinja::context;
-use std::sync::Arc;
+use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 
 use crate::file::FileStore;
@@ -11,6 +11,7 @@ use poem::{
     middleware::{NormalizePath, Tracing, TrailingSlash},
     EndpointExt, Error as PoemError, Request, Route, Server,
 };
+use poem_openapi::param::Query;
 use poem_openapi::{
     param::Path,
     payload::{Json, PlainText},
@@ -22,10 +23,32 @@ pub struct Api {
 }
 
 #[derive(Object)]
+struct PageRenderHead {
+    css: String,
+    js: String,
+    meta: Vec<PageRenderMeta>,
+}
+
+#[derive(Object)]
+struct PageRenderMeta {
+    name: String,
+    content: String,
+}
+
+#[derive(Object)]
 struct PageRenderResponseJson {
+    title: String,
     body: String,
-    css: Option<String>,
-    js: Option<String>,
+    store: String,
+    path: String,
+    head: PageRenderHead,
+    http: PageRenderHttp,
+}
+
+#[derive(Object)]
+struct PageRenderHttp {
+    headers: HashMap<String, String>,
+    response_code: u16,
 }
 
 #[derive(ApiResponse)]
@@ -65,14 +88,45 @@ impl Api {
         })
     }
 
+    #[oai(path = "/render/:store/:path1/:path2", method = "get")]
+    async fn render_with_path(
+        &self,
+        request: &Request,
+        Path(store): Path<String>,
+        Path(path1): Path<String>,
+        Path(path2): Path<String>,
+    ) -> Result<PageRenderResponse, PoemError> {
+        let realpath = format!("{}/{}", path1, path2);
+        self.render(
+            request,
+            Path(store),
+            Path(realpath),
+            Query(None),
+            Query(None),
+        )
+        .await
+    }
+
     #[oai(path = "/render/:store/:path<.*>", method = "get")]
     async fn render(
         &self,
         request: &Request,
         Path(store): Path<String>,
         Path(path): Path<String>,
+        Query(format): Query<Option<String>>,
+        Query(template): Query<Option<String>>,
     ) -> Result<PageRenderResponse, PoemError> {
-        let pagename = format!("{}/{}", store, path);
+        let realpath = if path.ends_with(".json") {
+            path.trim_end_matches(".json")
+        } else {
+            &path
+        };
+
+        // FIXME. Remove any part of the path, keep just the last part
+        let realpath = realpath.split("/").last().unwrap();
+
+        let pagename = format!("{}/{}", store, realpath);
+
         let page = self
             .renderer
             .store
@@ -106,8 +160,18 @@ impl Api {
             "text/css" => PageRenderResponse::Css(PlainText("/** not yet **/".to_string())),
             _ => PageRenderResponse::Json(Json(PageRenderResponseJson {
                 body: rendered.body,
-                css: None,
-                js: None,
+                head: PageRenderHead {
+                    css: "".to_string(),
+                    js: "".to_string(),
+                    meta: vec![],
+                },
+                http: PageRenderHttp {
+                    headers: HashMap::new(),
+                    response_code: 200,
+                },
+                path: pagename,
+                store: store,
+                title: page.title,
             })),
         };
         Ok(response)
@@ -115,13 +179,6 @@ impl Api {
 
     #[oai(path = "/page", method = "get")]
     async fn page(&self) -> Result<Json<PageInfoResults>, PoemError> {
-        return Ok(Json(PageInfoResults {
-            count: 0,
-            results: vec![],
-        }));
-    }
-    #[oai(path = "/page/", method = "get")]
-    async fn page2(&self) -> Result<Json<PageInfoResults>, PoemError> {
         return Ok(Json(PageInfoResults {
             count: 0,
             results: vec![],

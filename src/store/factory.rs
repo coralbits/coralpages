@@ -57,15 +57,21 @@ impl Store for StoreFactory {
 
     async fn load_page_definition(&self, path: &str) -> anyhow::Result<Option<Page>> {
         let (store, subpath) = self.split_path(path)?;
-        let store = self.get_store(&store);
-        if let Some(store) = store {
-            store.load_page_definition(&subpath).await
-        } else {
-            Err(anyhow::anyhow!(
-                "Store for page read not found, path={}",
-                path
-            ))
+        // store can be with a | to mark several options, that should be checked in order
+        let stores = store.split('|');
+        for store in stores {
+            let store = self.get_store(store);
+            if let Some(store) = store {
+                let page = store.load_page_definition(&subpath).await?;
+                if page.is_some() {
+                    return Ok(page);
+                }
+            }
         }
+        Err(anyhow::anyhow!(
+            "Page not found in any store, path={}",
+            path
+        ))
     }
 
     async fn save_page_definition(&self, path: &str, page: &Page) -> anyhow::Result<()> {
