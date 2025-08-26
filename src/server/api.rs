@@ -4,8 +4,8 @@ use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 
 use crate::traits::Store;
+use crate::PageRenderer;
 use crate::{file::FileStore, renderedpage::RenderedPage};
-use crate::{Page, PageRenderer};
 use poem::{
     listener::TcpListener,
     middleware::{NormalizePath, Tracing, TrailingSlash},
@@ -47,13 +47,6 @@ struct PageRenderResponseJson {
 
 impl PageRenderResponseJson {
     fn from_page_rendered(rendered: &RenderedPage) -> Self {
-        let css_variables = rendered
-            .css_variables
-            .iter()
-            .map(|(k, v)| format!("--{}: {};", k, v))
-            .collect::<Vec<String>>()
-            .join("\n");
-
         let meta = rendered
             .meta
             .iter()
@@ -66,7 +59,7 @@ impl PageRenderResponseJson {
         Self {
             body: rendered.body.clone(),
             head: PageRenderHead {
-                css: css_variables,
+                css: rendered.get_css(),
                 js: "/** TODO **/".to_string(),
                 meta: meta,
             },
@@ -201,7 +194,7 @@ impl Api {
 
         let response = match accept_type_.as_str() {
             "text/html" => PageRenderResponse::Html(PlainText(rendered.body)),
-            "text/css" => PageRenderResponse::Css(PlainText("/** not yet **/".to_string())),
+            "text/css" => PageRenderResponse::Css(PlainText(rendered.get_css())),
             _ => PageRenderResponse::Json(Json(PageRenderResponseJson::from_page_rendered(
                 &rendered,
             ))),

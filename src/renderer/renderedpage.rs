@@ -34,6 +34,22 @@ impl RenderedPage {
             errors: Vec::new(),
         }
     }
+
+    pub fn get_css(&self) -> String {
+        let css_variables = self
+            .css_variables
+            .iter()
+            .map(|(k, v)| {
+                if k.starts_with("--") {
+                    v.clone()
+                } else {
+                    format!("{} {{\n {}\n }}\n", k, v)
+                }
+            })
+            .collect::<Vec<String>>()
+            .join("\n");
+        format!("{}", css_variables)
+    }
 }
 
 pub struct RenderedingPageData<'a> {
@@ -108,7 +124,21 @@ impl<'a> RenderedingPageData<'a> {
         // Add the CSS to the rendered page
         self.rendered_page
             .css_variables
-            .insert(widget.name.clone(), widget.css.clone());
+            .insert(format!("--{}", widget.name), widget.css.clone());
+
+        // If the element has an id, add the CSS to the rendered page
+        if !element.id.is_empty() && !element.style.is_empty() {
+            let css = element
+                .style
+                .iter()
+                .map(|(k, v)| format!("{}: {};", k, v))
+                .collect::<Vec<String>>()
+                .join("\n");
+
+            self.rendered_page
+                .css_variables
+                .insert(format!("#{}", element.id), css);
+        }
 
         Ok(rendered_element)
     }
@@ -119,7 +149,7 @@ mod tests {
     use minijinja::Environment;
     use tracing::info;
 
-    use crate::{store::factory::StoreFactory, utils};
+    use crate::{store::factory::StoreFactory, utils, PageRenderer};
 
     use super::*;
 
@@ -130,8 +160,9 @@ mod tests {
         async fn load_widget_definition(&self, _path: &str) -> anyhow::Result<Option<Widget>> {
             Ok(Some(Widget {
                 name: "test".to_string(),
-                html: "Hello, {{data.text}}!".to_string(),
-                css: "".to_string(),
+                html: "<a class=\"test-link\" id=\"{{data.id}}\">Hello, {{data.text}}!</a>"
+                    .to_string(),
+                css: ".test-link { background: red; }".to_string(),
                 editor: vec![],
                 description: "Test widget".to_string(),
                 icon: "".to_string(),
@@ -149,10 +180,12 @@ mod tests {
             .with_children(vec![Element::new(
                 "test/text".to_string(),
                 serde_json::json!({ "text": "Hello, world!" }),
+                "test-link".to_string(),
             )
             .with_children(vec![Element::new(
                 "test/text".to_string(),
                 serde_json::json!({ "text": "Hello, child!" }),
+                "test-link-child".to_string(),
             )])]);
         let mut store = StoreFactory::new();
         store.add_store("test", Box::new(TestStore {}));
@@ -168,5 +201,42 @@ mod tests {
             "Rendered page: {:?}",
             rendered_page.rendered_page.body.len()
         );
+    }
+
+    #[tokio::test]
+    async fn test_rendered_page_css() {
+        utils::setup_logging();
+
+        let page = Page::new()
+            .with_title("Test Page".to_string())
+            .with_path("/test".to_string())
+            .with_children(vec![Element::new(
+                "test/text".to_string(),
+                serde_json::json!({ "text": "Hello, world!" }),
+                "test-link-id".to_string(),
+            )
+            .with_style(std::collections::HashMap::from([(
+                "background".to_string(),
+                "red".to_string(),
+            )]))]);
+
+        // Add the test store to the renderer
+        let mut renderer = PageRenderer::new();
+        renderer.store.add_store("test", Box::new(TestStore {}));
+
+        // Render
+        let rendered_page = renderer
+            .render_page(&page, &minijinja::context! {})
+            .await
+            .unwrap();
+
+        info!("Rendered page CSS: {:?}", rendered_page.get_css());
+
+        let from_element_class = ".test-link { background: red; }";
+        let from_element_id = "#test-link-id {\n background: red;\n }";
+
+        let css = rendered_page.get_css();
+        assert!(css.contains(from_element_class));
+        assert!(css.contains(from_element_id));
     }
 }

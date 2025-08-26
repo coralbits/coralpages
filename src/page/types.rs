@@ -32,7 +32,7 @@ pub struct MetaDefinition {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Element {
     #[serde(default)]
-    pub id: Option<String>,
+    pub id: String,
     #[serde(rename = "type")]
     pub widget: String,
     #[serde(default)]
@@ -44,19 +44,14 @@ pub struct Element {
 }
 
 impl Element {
-    pub fn new(widget: String, data: serde_json::Value) -> Self {
+    pub fn new(widget: String, data: serde_json::Value, id: String) -> Self {
         Self {
+            id,
             widget,
             data,
-            id: None,
             children: Vec::new(),
             style: std::collections::HashMap::new(),
         }
-    }
-
-    pub fn with_id(mut self, id: String) -> Self {
-        self.id = Some(id);
-        self
     }
 
     pub fn with_children(mut self, children: Vec<Element>) -> Self {
@@ -65,7 +60,7 @@ impl Element {
     }
 
     pub fn with_style(mut self, style: std::collections::HashMap<String, String>) -> Self {
-        self.style = style;
+        self.style.extend(style);
         self
     }
 }
@@ -194,11 +189,15 @@ mod tests {
 
     #[test]
     fn test_element_creation() {
-        let element = Element::new("div".to_string(), serde_json::json!({"text": "Hello"}));
+        let element = Element::new(
+            "div".to_string(),
+            serde_json::json!({"text": "Hello"}),
+            "test-div".to_string(),
+        );
 
         assert_eq!(element.widget, "div");
         assert_eq!(element.data["text"], "Hello");
-        assert!(element.id.is_none());
+        assert_eq!(element.id, "test-div");
         assert!(element.children.is_empty());
         assert!(element.style.is_empty());
     }
@@ -208,17 +207,24 @@ mod tests {
         let mut style = HashMap::new();
         style.insert("color".to_string(), "red".to_string());
 
-        let element = Element::new("div".to_string(), serde_json::json!({"text": "Hello"}))
-            .with_id("test-div".to_string())
-            .with_style(style);
+        let element = Element::new(
+            "div".to_string(),
+            serde_json::json!({"text": "Hello"}),
+            "test-div".to_string(),
+        )
+        .with_style(style);
 
-        assert_eq!(element.id, Some("test-div".to_string()));
+        assert_eq!(element.id, "test-div");
         assert_eq!(element.style["color"], "red");
     }
 
     #[test]
     fn test_page_with_elements() {
-        let element = Element::new("div".to_string(), serde_json::json!({"text": "Hello"}));
+        let element = Element::new(
+            "div".to_string(),
+            serde_json::json!({"text": "Hello"}),
+            "test-div".to_string(),
+        );
         let page = Page::new()
             .with_title("Test Page".to_string())
             .with_path("/test".to_string())
