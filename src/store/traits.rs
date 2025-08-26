@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     page::types::{Page, Widget},
-    store::types::PageInfo,
+    store::types::{PageInfo, PageInfoResults},
     ResultI,
 };
 use async_trait::async_trait;
@@ -25,9 +25,9 @@ pub trait Store: Send + Sync {
         &self,
         _offset: usize,
         _limit: usize,
-        _filter: &Option<HashMap<String, String>>,
-    ) -> anyhow::Result<ResultI<PageInfo>> {
-        Ok(ResultI {
+        _filter: &HashMap<String, String>,
+    ) -> anyhow::Result<PageInfoResults> {
+        Ok(PageInfoResults {
             count: 0,
             results: vec![],
         })

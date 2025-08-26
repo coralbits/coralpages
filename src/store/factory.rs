@@ -5,7 +5,10 @@ use tracing::{error, info};
 
 use crate::{
     page::types::{Page, Widget},
-    store::{traits::Store, types::PageInfo},
+    store::{
+        traits::Store,
+        types::{PageInfo, PageInfoResults},
+    },
     ResultI,
 };
 
@@ -104,16 +107,35 @@ impl Store for StoreFactory {
         &self,
         offset: usize,
         limit: usize,
-        filter: &Option<HashMap<String, String>>,
-    ) -> anyhow::Result<ResultI<PageInfo>> {
-        let mut result = ResultI {
+        filter: &HashMap<String, String>,
+    ) -> anyhow::Result<PageInfoResults> {
+        let mut result = PageInfoResults {
             count: 0,
             results: Vec::new(),
         };
-        for store in self.stores.values() {
+        let mut offset = offset;
+        let mut limit = limit;
+
+        let filter_store = filter.get("store");
+
+        for (store_name, store) in self.stores.iter() {
+            if let Some(filter_store) = filter_store {
+                if filter_store != store_name {
+                    continue;
+                }
+            }
             let store_result = store.get_page_list(offset, limit, filter).await?;
+            // Update offset and limit
+            offset = result.count.saturating_sub(offset); // limits to minimum 0
+            let ret_count = store_result.results.len();
+            limit = limit.saturating_sub(ret_count);
+            // add to results
             result.count += store_result.count;
-            result.results.extend(store_result.results);
+            let results = store_result.results.into_iter().map(|mut r| {
+                r.store = store_name.clone();
+                r
+            });
+            result.results.extend(results);
         }
         Ok(result)
     }

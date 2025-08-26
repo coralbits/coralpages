@@ -10,7 +10,10 @@ use tracing::{error, info};
 
 use crate::{
     page::types::{Page, Widget},
-    store::traits::Store,
+    store::{
+        traits::Store,
+        types::{PageInfo, PageInfoResults},
+    },
     WidgetEditor,
 };
 
@@ -165,8 +168,62 @@ impl Store for FileStore {
         &self,
         offset: usize,
         limit: usize,
-        filter: &Option<std::collections::HashMap<String, String>>,
-    ) -> anyhow::Result<crate::ResultI<super::types::PageInfo>> {
-        todo!()
+        filter: &HashMap<String, String>,
+    ) -> anyhow::Result<PageInfoResults> {
+        let path = Path::new(&self.path);
+        let mut pages: Vec<PageInfo> = Vec::new();
+        info!("Getting page list from path={}", path.display());
+        let entries = fs::read_dir(path);
+
+        let filter_type = filter.get("type");
+
+        if entries.is_err() {
+            error!("Error getting page list from path={}", path.display());
+            return Ok(PageInfoResults {
+                count: 0,
+                results: vec![],
+            });
+        }
+
+        let entries = entries.unwrap();
+
+        for entry in entries {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_file() && path.extension().unwrap_or_default() == "yaml" {
+                // page path wihtout the .yaml extension, and the self.path prefix, and prefix /
+                let path_str = path.to_str().unwrap();
+                let page_id =
+                    path_str[self.path.to_str().unwrap().len() + 1..path_str.len() - 5].to_string();
+
+                if let Some(filter_type) = filter_type {
+                    if filter_type == "template" && !path_str.starts_with("_") {
+                        continue; // skip non templates
+                    }
+                    if filter_type == "page" && path_str.starts_with("_") {
+                        continue; // skip non pages
+                    }
+                }
+
+                info!("Loading page definition from path={}", page_id);
+                let page = self.load_page_definition(&page_id).await?;
+                if let Some(page) = page {
+                    let pageinfo: PageInfo = PageInfo {
+                        id: page_id,
+                        store: "".to_string(),
+                        title: page.title.clone(),
+                        url: format!("/{}", page.path).to_string(),
+                    };
+                    pages.push(pageinfo);
+                }
+            }
+        }
+
+        let count = pages.len();
+        let pages = pages.into_iter().skip(offset).take(limit).collect();
+        Ok(PageInfoResults {
+            count,
+            results: pages,
+        })
     }
 }

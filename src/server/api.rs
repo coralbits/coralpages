@@ -3,6 +3,7 @@ use minijinja::context;
 use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 
+use crate::store::types::PageInfoResults;
 use crate::traits::Store;
 use crate::PageRenderer;
 use crate::{file::FileStore, renderedpage::RenderedPage};
@@ -88,18 +89,6 @@ enum PageRenderResponse {
     Html(PlainText<String>),
     #[oai(status = 200, content_type = "text/css; charset=utf-8")]
     Css(PlainText<String>),
-}
-
-#[derive(Object)]
-struct PageInfoResults {
-    count: u64,
-    results: Vec<PageInfo>,
-}
-
-#[derive(Object)]
-struct PageInfo {
-    name: String,
-    path: String,
 }
 
 #[OpenApi]
@@ -234,11 +223,31 @@ impl Api {
     }
 
     #[oai(path = "/page", method = "get")]
-    async fn page(&self) -> Result<Json<PageInfoResults>, PoemError> {
-        return Ok(Json(PageInfoResults {
-            count: 0,
-            results: vec![],
-        }));
+    async fn page(
+        &self,
+        Query(offset): Query<Option<usize>>,
+        Query(limit): Query<Option<usize>>,
+        Query(r#type): Query<Option<String>>,
+        Query(store): Query<Option<String>>,
+    ) -> Result<Json<PageInfoResults>, PoemError> {
+        let mut filter = HashMap::new();
+
+        if let Some(r#type) = r#type {
+            filter.insert("type".to_string(), r#type);
+        }
+        if let Some(store) = store {
+            filter.insert("store".to_string(), store);
+        }
+
+        let page_list = self
+            .renderer
+            .store
+            .get_page_list(offset.unwrap_or(0), limit.unwrap_or(10), &filter)
+            .await
+            .map_err(|e| {
+                PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+            })?;
+        return Ok(Json(page_list));
     }
 }
 
