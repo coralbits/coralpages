@@ -9,6 +9,9 @@ use minijinja::{context, Environment};
 
 #[derive(Debug)]
 pub struct RenderedPage {
+    pub path: String,
+    pub store: String,
+    pub title: String,
     pub body: String,
     pub headers: HashMap<String, String>,
     pub response_code: u16,
@@ -20,6 +23,9 @@ pub struct RenderedPage {
 impl RenderedPage {
     pub fn new() -> Self {
         Self {
+            path: String::new(),
+            store: String::new(),
+            title: String::new(),
             body: String::new(),
             headers: HashMap::new(),
             response_code: 200,
@@ -39,11 +45,15 @@ pub struct RenderedingPageData<'a> {
 
 impl<'a> RenderedingPageData<'a> {
     pub fn new(page: &'a Page, store: &'a dyn Store, env: &'a Environment) -> Self {
+        let mut rendered_page = RenderedPage::new();
+        rendered_page.path = page.path.clone();
+        rendered_page.title = page.title.clone();
+
         Self {
             page: page,
             store: store,
             env: env,
-            rendered_page: RenderedPage::new(),
+            rendered_page,
         }
     }
 

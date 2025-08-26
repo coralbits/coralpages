@@ -3,9 +3,9 @@ use minijinja::context;
 use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 
-use crate::file::FileStore;
 use crate::traits::Store;
-use crate::PageRenderer;
+use crate::{file::FileStore, renderedpage::RenderedPage};
+use crate::{Page, PageRenderer};
 use poem::{
     listener::TcpListener,
     middleware::{NormalizePath, Tracing, TrailingSlash},
@@ -43,6 +43,42 @@ struct PageRenderResponseJson {
     path: String,
     head: PageRenderHead,
     http: PageRenderHttp,
+}
+
+impl PageRenderResponseJson {
+    fn from_page_rendered(rendered: &RenderedPage) -> Self {
+        let css_variables = rendered
+            .css_variables
+            .iter()
+            .map(|(k, v)| format!("--{}: {};", k, v))
+            .collect::<Vec<String>>()
+            .join("\n");
+
+        let meta = rendered
+            .meta
+            .iter()
+            .map(|m| PageRenderMeta {
+                name: m.name.clone(),
+                content: m.content.clone(),
+            })
+            .collect();
+
+        Self {
+            body: rendered.body.clone(),
+            head: PageRenderHead {
+                css: css_variables,
+                js: "/** TODO **/".to_string(),
+                meta: meta,
+            },
+            http: PageRenderHttp {
+                headers: HashMap::new(),
+                response_code: 200,
+            },
+            path: rendered.path.clone(),
+            store: rendered.store.clone(),
+            title: rendered.title.clone(),
+        }
+    }
 }
 
 #[derive(Object)]
@@ -107,7 +143,7 @@ impl Api {
         .await
     }
 
-    #[oai(path = "/render/:store/:path<.*>", method = "get")]
+    #[oai(path = "/render/:store/:path", method = "get")]
     async fn render(
         &self,
         request: &Request,
@@ -144,37 +180,64 @@ impl Api {
 
         let ctx = context! {};
 
-        let rendered = self.renderer.render_page(&page, &ctx).await.map_err(|e| {
+        let mut rendered = self.renderer.render_page(&page, &ctx).await.map_err(|e| {
             PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
         })?;
-        let accept_type_ = if let Some(accept) = request.headers().get("Accept") {
-            accept.to_str().unwrap().split(";").next().unwrap().trim()
-        } else {
-            "application/json"
-        };
+        rendered.store = store.clone();
+        rendered.path = path.clone();
+
+        return self.response(request, format, rendered);
+    }
+
+    fn response(
+        &self,
+        request: &Request,
+        format: Option<String>,
+        rendered: RenderedPage,
+    ) -> Result<PageRenderResponse, PoemError> {
+        let accept_type_ = self.response_type(request, format);
 
         info!("Accept: {}", accept_type_);
 
-        let response = match accept_type_ {
+        let response = match accept_type_.as_str() {
             "text/html" => PageRenderResponse::Html(PlainText(rendered.body)),
             "text/css" => PageRenderResponse::Css(PlainText("/** not yet **/".to_string())),
-            _ => PageRenderResponse::Json(Json(PageRenderResponseJson {
-                body: rendered.body,
-                head: PageRenderHead {
-                    css: "".to_string(),
-                    js: "".to_string(),
-                    meta: vec![],
-                },
-                http: PageRenderHttp {
-                    headers: HashMap::new(),
-                    response_code: 200,
-                },
-                path: pagename,
-                store: store,
-                title: page.title,
-            })),
+            _ => PageRenderResponse::Json(Json(PageRenderResponseJson::from_page_rendered(
+                &rendered,
+            ))),
         };
         Ok(response)
+    }
+
+    fn response_type(&self, request: &Request, format: Option<String>) -> String {
+        // Get from format query parameter
+        if let Some(format) = format {
+            let format = match format.as_str() {
+                "application/json" => "application/json",
+                "text/json" => "application/json",
+                "text/css" => "text/css",
+                "html" => "text/html",
+                "css" => "text/css",
+                _ => "application/json",
+            };
+            return format.to_string();
+        }
+
+        // Get from Accept header
+        let ret = if let Some(accept) = request.headers().get("Accept") {
+            accept
+                .to_str()
+                .unwrap()
+                .split(";")
+                .next()
+                .unwrap()
+                .trim()
+                .to_string()
+        } else {
+            "application/json".to_string()
+        };
+
+        return ret;
     }
 
     #[oai(path = "/page", method = "get")]
