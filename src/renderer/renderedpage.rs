@@ -149,7 +149,7 @@ mod tests {
     use minijinja::Environment;
     use tracing::info;
 
-    use crate::{store::factory::StoreFactory, utils, PageRenderer};
+    use crate::{store::factory::StoreFactory, PageRenderer};
 
     use super::*;
 
@@ -172,8 +172,6 @@ mod tests {
 
     #[tokio::test]
     async fn test_rendered_page() {
-        utils::setup_logging();
-
         let page = Page::new()
             .with_title("Test Page".to_string())
             .with_path("/test".to_string())
@@ -205,8 +203,6 @@ mod tests {
 
     #[tokio::test]
     async fn test_rendered_page_css() {
-        utils::setup_logging();
-
         let page = Page::new()
             .with_title("Test Page".to_string())
             .with_path("/test".to_string())
