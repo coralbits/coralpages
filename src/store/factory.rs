@@ -1,12 +1,13 @@
-use std::collections::HashMap;
-
+use anyhow::Result;
 use async_trait::async_trait;
+use std::collections::HashMap;
 use tracing::{error, info};
 
 use crate::{
+    file::FileStore,
     page::types::{Page, ResultPageList, Widget},
     store::traits::Store,
-    WidgetResults,
+    StoreConfig, WidgetResults,
 };
 
 pub struct StoreFactory {
@@ -39,6 +40,16 @@ impl StoreFactory {
             return Err(anyhow::anyhow!("Invalid path={}", path));
         }
         Ok((parts[0].to_string(), parts[1].to_string()))
+    }
+
+    pub fn new_store(store_config: &StoreConfig) -> Result<Box<dyn Store>> {
+        match store_config.store_type.as_str() {
+            "file" => Ok(Box::new(FileStore::new(&store_config.path)?)),
+            _ => Err(anyhow::anyhow!(
+                "Unsupported store type: {}",
+                store_config.store_type
+            )),
+        }
     }
 }
 

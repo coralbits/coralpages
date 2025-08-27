@@ -2,7 +2,9 @@ use crate::{
     page::types::Page,
     renderer::renderedpage::{RenderedPage, RenderedingPageData},
     store::factory::StoreFactory,
+    StoreConfig,
 };
+use anyhow::Result;
 use minijinja::Environment;
 use pulldown_cmark::{html::push_html, Parser};
 
@@ -33,6 +35,14 @@ impl PageRenderer {
         env.add_filter("markdown", markdown_to_html);
 
         Self { store, env }
+    }
+
+    pub fn with_stores(mut self, stores: &[StoreConfig]) -> Result<Self> {
+        for store in stores {
+            self.store
+                .add_store(&store.name, StoreFactory::new_store(&store)?);
+        }
+        Ok(self)
     }
 
     #[instrument(skip(self, page, ctx), fields(page_path = page.path))]

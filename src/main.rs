@@ -1,13 +1,14 @@
 use anyhow::Result;
 use clap::Parser;
 use minijinja::context;
-use page_viewer::file::FileStore;
 use page_viewer::traits::Store;
 use page_viewer::{utils, Page, PageRenderer};
 use std::fs;
+use std::sync::LazyLock;
 use std::time::Instant;
 use tracing::info;
 
+use page_viewer::config::Config;
 use page_viewer::server::start;
 
 #[derive(Parser)]
@@ -23,9 +24,11 @@ struct Args {
     listen: Option<String>,
 }
 
+static CONFIG: LazyLock<Config> = LazyLock::new(|| Config::read("config.yaml"));
+
 #[tokio::main]
 async fn main() -> Result<()> {
-    utils::setup_logging();
+    utils::setup_logging(CONFIG.debug);
 
     let args = Args::parse();
 
@@ -47,9 +50,7 @@ async fn main() -> Result<()> {
         // Start the server
         start_server(&listen).await?;
     } else {
-        // Default behavior - show info about the tool
-        println!("Page Viewer - Rust Edition");
-        println!("Use --render <filename> to render a YAML page file");
+        start_server(&format!("{}:{}", CONFIG.server.host, CONFIG.server.port)).await?;
     }
 
     Ok(())
@@ -62,11 +63,7 @@ async fn render_page_file(filename: &str) -> Result<()> {
     // Deserialize the YAML into a Page
     let page: Page = serde_yaml::from_str(&yaml_content)?;
 
-    let mut renderer = PageRenderer::new();
-
-    renderer
-        .store
-        .add_store("builtin", Box::new(FileStore::new("builtin/widgets")?));
+    let renderer = PageRenderer::new().with_stores(&CONFIG.stores)?;
 
     // Create a RenderedPage and render it
     let ctx = context! {};
@@ -79,14 +76,7 @@ async fn render_page_file(filename: &str) -> Result<()> {
 }
 
 async fn render_from_store(pagename: &str) -> Result<()> {
-    let mut renderer = PageRenderer::new();
-
-    renderer
-        .store
-        .add_store("builtin", Box::new(FileStore::new("builtin/widgets")?));
-    renderer
-        .store
-        .add_store("pages", Box::new(FileStore::new("builtin/pages")?));
+    let renderer = PageRenderer::new().with_stores(&CONFIG.stores)?;
 
     let page = renderer
         .store
@@ -106,9 +96,10 @@ async fn render_from_store(pagename: &str) -> Result<()> {
 }
 
 async fn start_server(listen: &str) -> Result<()> {
+    let renderer = PageRenderer::new().with_stores(&CONFIG.stores)?;
+
     info!("Starting server on http://{}", listen);
     info!("OpenAPI docs: http://{}/docs", listen);
-
-    start(listen).await?;
+    start(listen, renderer).await?;
     Ok(())
 }

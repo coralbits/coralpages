@@ -7,7 +7,7 @@ use tracing::info;
 use crate::page::types::ResultPageList;
 use crate::server::PageRenderResponse;
 use crate::traits::Store;
-use crate::{file::FileStore, renderedpage::RenderedPage, renderresponse::PageRenderResponseJson};
+use crate::{renderedpage::RenderedPage, renderresponse::PageRenderResponseJson};
 use crate::{Page, PageRenderer, WidgetResults};
 use poem::{
     listener::TcpListener,
@@ -27,14 +27,7 @@ pub struct Api {
 
 #[OpenApi]
 impl Api {
-    pub fn new() -> Result<Self> {
-        let mut renderer = PageRenderer::new();
-        renderer
-            .store
-            .add_store("builtin", Box::new(FileStore::new("builtin/widgets")?));
-        renderer
-            .store
-            .add_store("pages", Box::new(FileStore::new("builtin/pages")?));
+    pub fn new(renderer: PageRenderer) -> Result<Self> {
         Ok(Self {
             renderer: Arc::new(renderer),
         })
@@ -253,8 +246,8 @@ impl Api {
     }
 }
 
-pub async fn start(listen: &str) -> Result<()> {
-    let api = Api::new()?;
+pub async fn start(listen: &str, renderer: PageRenderer) -> Result<()> {
+    let api = Api::new(renderer)?;
     let api_service = OpenApiService::new(api, "Page Viewer", "0.1.0").server("/api/v1");
 
     let cors = Cors::new()
