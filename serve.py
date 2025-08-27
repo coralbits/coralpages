@@ -153,7 +153,13 @@ def create_app(args: argparse.Namespace):
                 eldef["name"] = f"{store_item.config.name}/{widget.name}"
                 widgets_dict.append(eldef)
         return fastapi.responses.Response(
-            content=json.dumps(widgets_dict), media_type="application/json"
+            content=json.dumps(
+                {
+                    "count": len(widgets_dict),
+                    "results": widgets_dict,
+                }
+            ),
+            media_type="application/json",
         )
 
     @app.get("/api/v1/widget/{widget_name}/html")

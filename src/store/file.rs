@@ -9,36 +9,19 @@ use serde::Deserialize;
 use tracing::{error, info};
 
 use crate::{
-    page::types::{Page, Widget},
-    store::{
-        traits::Store,
-        types::{PageInfo, PageInfoResults},
-    },
-    WidgetEditor,
+    page::types::{Page, PageInfo, ResultPageList, Widget},
+    store::traits::Store,
+    WidgetResults,
 };
 
 #[derive(Debug, Deserialize)]
-struct FileWidget {
-    name: String,
-    html: String,
-    #[serde(default)]
-    css: String,
-    #[serde(default)]
-    editor: Vec<WidgetEditor>,
-    #[serde(default)]
-    description: String,
-    #[serde(default)]
-    icon: String,
-}
-
-#[derive(Debug, Deserialize)]
 struct FileStoreConfig {
-    widgets: Vec<FileWidget>,
+    widgets: Vec<Widget>,
 }
 
 pub struct FileStore {
     path: PathBuf,
-    widgets: HashMap<String, FileWidget>,
+    widgets: HashMap<String, Widget>,
 }
 
 impl FileStore {
@@ -64,7 +47,7 @@ impl FileStore {
 
         let config = self.load_config(config_path)?;
 
-        let widgets: HashMap<String, FileWidget> = config
+        let widgets: HashMap<String, Widget> = config
             .widgets
             .into_iter()
             .map(|w| (w.name.clone(), w))
@@ -169,7 +152,7 @@ impl Store for FileStore {
         offset: usize,
         limit: usize,
         filter: &HashMap<String, String>,
-    ) -> anyhow::Result<PageInfoResults> {
+    ) -> anyhow::Result<ResultPageList> {
         let path = Path::new(&self.path);
         let mut pages: Vec<PageInfo> = Vec::new();
         info!("Getting page list from path={}", path.display());
@@ -179,7 +162,7 @@ impl Store for FileStore {
 
         if entries.is_err() {
             error!("Error getting page list from path={}", path.display());
-            return Ok(PageInfoResults {
+            return Ok(ResultPageList {
                 count: 0,
                 results: vec![],
             });
@@ -221,9 +204,17 @@ impl Store for FileStore {
 
         let count = pages.len();
         let pages = pages.into_iter().skip(offset).take(limit).collect();
-        Ok(PageInfoResults {
+        Ok(ResultPageList {
             count,
             results: pages,
         })
+    }
+
+    async fn get_widget_list(&self) -> anyhow::Result<WidgetResults> {
+        let result = WidgetResults {
+            count: self.widgets.len(),
+            results: self.widgets.values().cloned().collect(),
+        };
+        Ok(result)
     }
 }

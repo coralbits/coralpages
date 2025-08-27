@@ -1,10 +1,7 @@
 use std::collections::HashMap;
 
-use crate::{
-    page::types::{Page, Widget},
-    store::types::{PageInfo, PageInfoResults},
-    ResultI,
-};
+use crate::page::types::{Page, Widget};
+use crate::page::types::{ResultPageList, WidgetResults};
 use async_trait::async_trait;
 
 #[async_trait]
@@ -26,8 +23,14 @@ pub trait Store: Send + Sync {
         _offset: usize,
         _limit: usize,
         _filter: &HashMap<String, String>,
-    ) -> anyhow::Result<PageInfoResults> {
-        Ok(PageInfoResults {
+    ) -> anyhow::Result<ResultPageList> {
+        Ok(ResultPageList {
+            count: 0,
+            results: vec![],
+        })
+    }
+    async fn get_widget_list(&self) -> anyhow::Result<WidgetResults> {
+        Ok(WidgetResults {
             count: 0,
             results: vec![],
         })

@@ -4,12 +4,9 @@ use async_trait::async_trait;
 use tracing::{error, info};
 
 use crate::{
-    page::types::{Page, Widget},
-    store::{
-        traits::Store,
-        types::{PageInfo, PageInfoResults},
-    },
-    ResultI,
+    page::types::{Page, ResultPageList, Widget},
+    store::traits::Store,
+    WidgetResults,
 };
 
 pub struct StoreFactory {
@@ -108,8 +105,8 @@ impl Store for StoreFactory {
         offset: usize,
         limit: usize,
         filter: &HashMap<String, String>,
-    ) -> anyhow::Result<PageInfoResults> {
-        let mut result = PageInfoResults {
+    ) -> anyhow::Result<ResultPageList> {
+        let mut result = ResultPageList {
             count: 0,
             results: Vec::new(),
         };
@@ -136,6 +133,24 @@ impl Store for StoreFactory {
                 r
             });
             result.results.extend(results);
+        }
+        Ok(result)
+    }
+
+    async fn get_widget_list(&self) -> anyhow::Result<WidgetResults> {
+        let mut result = WidgetResults {
+            count: 0,
+            results: Vec::new(),
+        };
+        for (store_name, store) in self.stores.iter() {
+            let mut store_result = store.get_widget_list().await?;
+            for w in store_result.results.iter_mut() {
+                w.name = format!("{}/{}", store_name, w.name);
+                w.html = "".to_string();
+                w.css = "".to_string();
+            }
+            result.count += store_result.count;
+            result.results.extend(store_result.results);
         }
         Ok(result)
     }

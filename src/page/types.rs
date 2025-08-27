@@ -1,17 +1,19 @@
-use chrono::{DateTime, Utc};
+use poem_openapi::Object;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct Widget {
     pub name: String,
     pub description: String,
     pub icon: String,
     pub html: String,
+    #[serde(default)]
     pub css: String,
+    #[serde(default)]
     pub editor: Vec<WidgetEditor>,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct WidgetEditor {
     #[serde(rename = "type")]
     pub editor_type: String,
@@ -21,15 +23,21 @@ pub struct WidgetEditor {
     pub placeholder: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
+pub struct WidgetResults {
+    pub count: usize,
+    pub results: Vec<Widget>,
+}
+
 /// A meta definition for page metadata
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct MetaDefinition {
     pub name: String,
     pub content: String,
 }
 
 /// Each widget use in a page, with content, and maybe more children
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct Element {
     #[serde(default)]
     pub id: String,
@@ -66,7 +74,7 @@ impl Element {
 }
 
 /// The page definition, with a title, and a list of blocks
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct Page {
     #[serde(default)]
     pub title: String,
@@ -78,7 +86,7 @@ pub struct Page {
     pub children: Vec<Element>,
     #[serde(default)]
     pub cache: Vec<String>,
-    pub last_modified: Option<DateTime<Utc>>,
+    pub last_modified: Option<String>,
     #[serde(default)]
     pub meta: Vec<MetaDefinition>,
     #[serde(default)]
@@ -132,7 +140,7 @@ impl Page {
 }
 
 /// A page info, with a title, and a url
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct PageInfo {
     pub id: String,
     pub title: String,
@@ -141,8 +149,8 @@ pub struct PageInfo {
 }
 
 /// A page list result, with a list of pages and a total count
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PageListResult {
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
+pub struct ResultPageList {
     pub count: usize,
     pub results: Vec<PageInfo>,
 }

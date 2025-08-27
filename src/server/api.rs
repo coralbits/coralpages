@@ -4,11 +4,11 @@ use poem::middleware::Cors;
 use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 
+use crate::page::types::{PageInfo, ResultPageList};
 use crate::server::PageRenderResponse;
-use crate::store::types::PageInfoResults;
 use crate::traits::Store;
-use crate::PageRenderer;
 use crate::{file::FileStore, renderedpage::RenderedPage, renderresponse::PageRenderResponseJson};
+use crate::{Page, PageRenderer, WidgetResults};
 use poem::{
     listener::TcpListener,
     middleware::{NormalizePath, Tracing, TrailingSlash},
@@ -163,7 +163,7 @@ impl Api {
         Query(limit): Query<Option<usize>>,
         Query(r#type): Query<Option<String>>,
         Query(store): Query<Option<String>>,
-    ) -> Result<Json<PageInfoResults>, PoemError> {
+    ) -> Result<Json<ResultPageList>, PoemError> {
         let mut filter = HashMap::new();
 
         if let Some(r#type) = r#type {
@@ -182,6 +182,59 @@ impl Api {
                 PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
             })?;
         return Ok(Json(page_list));
+    }
+
+    #[oai(path = "/page/:store/:path/", method = "get")]
+    async fn get_page_definition(
+        &self,
+        Path(store): Path<String>,
+        Path(path): Path<String>,
+    ) -> Result<Json<Page>, PoemError> {
+        let store = match self.renderer.store.get_store(&store) {
+            Some(store) => store,
+            None => {
+                return Err(PoemError::from_string(
+                    format!("Store '{}' not found", store),
+                    poem::http::StatusCode::NOT_FOUND,
+                ));
+            }
+        };
+
+        let page = store.load_page_definition(&path).await.map_err(|e| {
+            PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+        })?;
+        let page = page.ok_or_else(|| {
+            PoemError::from_string(
+                format!("Page '{}' not found", path),
+                poem::http::StatusCode::NOT_FOUND,
+            )
+        })?;
+        Ok(Json(page))
+    }
+
+    #[oai(path = "/widget/", method = "get")]
+    async fn widget(
+        &self,
+        Query(store): Query<Option<String>>,
+    ) -> Result<Json<WidgetResults>, PoemError> {
+        let results = if let Some(store) = store {
+            if let Some(store) = self.renderer.store.get_store(&store) {
+                store.get_widget_list().await
+            } else {
+                return Err(PoemError::from_string(
+                    format!("Store '{}' not found", store),
+                    poem::http::StatusCode::NOT_FOUND,
+                ));
+            }
+        } else {
+            self.renderer.store.get_widget_list().await
+        };
+
+        let results = results.map_err(|e| {
+            PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+        })?;
+
+        Ok(Json(results))
     }
 }
 
