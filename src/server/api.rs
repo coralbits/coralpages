@@ -4,10 +4,11 @@ use poem::middleware::Cors;
 use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 
+use crate::server::PageRenderResponse;
 use crate::store::types::PageInfoResults;
 use crate::traits::Store;
 use crate::PageRenderer;
-use crate::{file::FileStore, renderedpage::RenderedPage};
+use crate::{file::FileStore, renderedpage::RenderedPage, renderresponse::PageRenderResponseJson};
 use poem::{
     listener::TcpListener,
     middleware::{NormalizePath, Tracing, TrailingSlash},
@@ -17,79 +18,11 @@ use poem_openapi::param::Query;
 use poem_openapi::{
     param::Path,
     payload::{Json, PlainText},
-    ApiResponse, Object, OpenApi, OpenApiService,
+    OpenApi, OpenApiService,
 };
 
 pub struct Api {
     renderer: Arc<PageRenderer>,
-}
-
-#[derive(Object)]
-struct PageRenderHead {
-    css: String,
-    js: String,
-    meta: Vec<PageRenderMeta>,
-}
-
-#[derive(Object)]
-struct PageRenderMeta {
-    name: String,
-    content: String,
-}
-
-#[derive(Object)]
-struct PageRenderResponseJson {
-    title: String,
-    body: String,
-    store: String,
-    path: String,
-    head: PageRenderHead,
-    http: PageRenderHttp,
-}
-
-impl PageRenderResponseJson {
-    fn from_page_rendered(rendered: &RenderedPage) -> Self {
-        let meta = rendered
-            .meta
-            .iter()
-            .map(|m| PageRenderMeta {
-                name: m.name.clone(),
-                content: m.content.clone(),
-            })
-            .collect();
-
-        Self {
-            body: rendered.body.clone(),
-            head: PageRenderHead {
-                css: rendered.get_css(),
-                js: "/** TODO **/".to_string(),
-                meta: meta,
-            },
-            http: PageRenderHttp {
-                headers: HashMap::new(),
-                response_code: 200,
-            },
-            path: rendered.path.clone(),
-            store: rendered.store.clone(),
-            title: rendered.title.clone(),
-        }
-    }
-}
-
-#[derive(Object)]
-struct PageRenderHttp {
-    headers: HashMap<String, String>,
-    response_code: u16,
-}
-
-#[derive(ApiResponse)]
-enum PageRenderResponse {
-    #[oai(status = 200, content_type = "application/json; charset=utf-8")]
-    Json(Json<PageRenderResponseJson>),
-    #[oai(status = 200, content_type = "text/html; charset=utf-8")]
-    Html(PlainText<String>),
-    #[oai(status = 200, content_type = "text/css; charset=utf-8")]
-    Css(PlainText<String>),
 }
 
 #[OpenApi]
