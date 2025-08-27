@@ -33,6 +33,7 @@ impl Config {
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
         let config: Config = serde_yaml::from_reader(reader).unwrap();
+        // println!("Config loaded from path={}, config={:?}", path, config);
         config
     }
 }

@@ -6,7 +6,7 @@ use tracing::{error, info};
 use crate::{
     file::FileStore,
     page::types::{Page, ResultPageList, Widget},
-    store::traits::Store,
+    store::{db::DbStore, traits::Store},
     StoreConfig, WidgetResults,
 };
 
@@ -42,9 +42,11 @@ impl StoreFactory {
         Ok((parts[0].to_string(), parts[1].to_string()))
     }
 
-    pub fn new_store(store_config: &StoreConfig) -> Result<Box<dyn Store>> {
+    pub async fn new_store(store_config: &StoreConfig) -> Result<Box<dyn Store>> {
+        // info!("Creating store: {:?}", store_config);
         match store_config.store_type.as_str() {
             "file" => Ok(Box::new(FileStore::new(&store_config.path)?)),
+            "db" => Ok(Box::new(DbStore::new(&store_config.url).await?)),
             _ => Err(anyhow::anyhow!(
                 "Unsupported store type: {}",
                 store_config.store_type

@@ -177,7 +177,7 @@ impl Store for FileStore {
                 // page path wihtout the .yaml extension, and the self.path prefix, and prefix /
                 let path_str = path.to_str().unwrap();
                 let page_id =
-                    path_str[self.path.to_str().unwrap().len() + 1..path_str.len() - 5].to_string();
+                    path_str[self.path.to_str().unwrap().len()..path_str.len() - 5].to_string();
 
                 if let Some(filter_type) = filter_type {
                     if filter_type == "template" && !path_str.starts_with("_") {
@@ -189,7 +189,13 @@ impl Store for FileStore {
                 }
 
                 info!("Loading page definition from path={}", page_id);
-                let page = self.load_page_definition(&page_id).await?;
+                let page = match self.load_page_definition(&page_id).await {
+                    Ok(page) => page,
+                    Err(e) => {
+                        error!("Error loading page definition from path={}: {}", page_id, e);
+                        continue;
+                    }
+                };
                 if let Some(page) = page {
                     let pageinfo: PageInfo = PageInfo {
                         id: page_id,

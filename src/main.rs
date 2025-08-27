@@ -63,7 +63,7 @@ async fn render_page_file(filename: &str) -> Result<()> {
     // Deserialize the YAML into a Page
     let page: Page = serde_yaml::from_str(&yaml_content)?;
 
-    let renderer = PageRenderer::new().with_stores(&CONFIG.stores)?;
+    let renderer = PageRenderer::new().with_stores(&CONFIG.stores).await?;
 
     // Create a RenderedPage and render it
     let ctx = context! {};
@@ -76,7 +76,7 @@ async fn render_page_file(filename: &str) -> Result<()> {
 }
 
 async fn render_from_store(pagename: &str) -> Result<()> {
-    let renderer = PageRenderer::new().with_stores(&CONFIG.stores)?;
+    let renderer = PageRenderer::new().with_stores(&CONFIG.stores).await?;
 
     let page = renderer
         .store
@@ -96,7 +96,7 @@ async fn render_from_store(pagename: &str) -> Result<()> {
 }
 
 async fn start_server(listen: &str) -> Result<()> {
-    let renderer = PageRenderer::new().with_stores(&CONFIG.stores)?;
+    let renderer = PageRenderer::new().with_stores(&CONFIG.stores).await?;
 
     info!("Starting server on http://{}", listen);
     info!("OpenAPI docs: http://{}/docs", listen);
