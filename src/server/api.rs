@@ -1,5 +1,6 @@
 use anyhow::Result;
 use minijinja::context;
+use poem::middleware::Cors;
 use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 
@@ -255,12 +256,17 @@ pub async fn start(listen: &str) -> Result<()> {
     let api = Api::new()?;
     let api_service = OpenApiService::new(api, "Page Viewer", "0.1.0").server("/api/v1");
 
+    let cors = Cors::new()
+        // .allow_origin("*")
+        .allow_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+        .allow_headers(vec!["*"]);
     let docs = api_service.swagger_ui();
     let app = Route::new()
         .nest("api/v1", api_service)
         .nest("/docs", docs)
         .with(Tracing)
-        .with(NormalizePath::new(TrailingSlash::Trim));
+        .with(NormalizePath::new(TrailingSlash::Trim))
+        .with(cors);
 
     let listener = TcpListener::bind(listen);
     Server::new(listener).run(app).await?;
