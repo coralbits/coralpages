@@ -41,14 +41,19 @@ pub struct MetaDefinition {
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct Element {
     #[serde(default)]
+    #[oai(default)]
     pub id: String,
     #[serde(rename = "type")]
+    #[oai(default, rename = "type")]
     pub widget: String,
     #[serde(default)]
+    #[oai(default)]
     pub data: serde_json::Value,
     #[serde(default)]
+    #[oai(default)]
     pub children: Vec<Element>,
     #[serde(default)]
+    #[oai(default)]
     pub style: std::collections::HashMap<String, String>,
 }
 

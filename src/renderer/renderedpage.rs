@@ -117,7 +117,14 @@ impl<'a> RenderedingPageData<'a> {
     ) -> anyhow::Result<String> {
         let template = self.env.template_from_str(&widget.html)?;
 
-        let ctx = context! { ..ctx, ..context!{data => element.data.clone()} };
+        let ctx = context! { ..ctx, ..context!{
+            ..context! {
+                ..minijinja::Value::from_serialize(&element.data),
+                ..context! {
+                    id => &element.id,
+                }
+            }
+        }};
 
         let rendered_element = template.render(ctx)?;
 
