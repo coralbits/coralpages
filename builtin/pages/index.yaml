@@ -6,6 +6,7 @@ template: "pages/_default"
 
 children:
   - type: builtin/markdown
+    id: "welcome"
     data:
       title: "Welcome to Coralbits Page Editor"
       text: |
