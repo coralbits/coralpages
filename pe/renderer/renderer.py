@@ -471,7 +471,7 @@ class Renderer:
                 {css_id: f"{css_id} {{\n{css_dict_to_css_text(block.style)} \n}}"}
             )
         html = html.replace("@@class@@", block_id)
-        html = html.replace("@@id@@", block_id)
+        html = html.replace("{{data.id}}", block_id)
 
         # add the css to the page and content. The idea is to avoid repetition of the same css.
         # This is a very simple approach, but it works.

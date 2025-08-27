@@ -6,6 +6,7 @@ use crate::{
 };
 
 use minijinja::{context, Environment};
+use tracing::{debug, error};
 
 #[derive(Debug)]
 pub struct RenderedPage {
@@ -75,9 +76,14 @@ impl<'a> RenderedingPageData<'a> {
 
     pub async fn render(&mut self, ctx: &minijinja::Value) -> anyhow::Result<()> {
         for element in &self.page.children {
+            debug!("Rendering element: {:?}", element.widget);
             self.render_element(element, ctx).await?;
         }
 
+        debug!(
+            "Adding extra elements (meta, css, title...): {:?}",
+            self.rendered_page.path
+        );
         // add the meta
         self.rendered_page.meta.extend(self.page.meta.clone());
 
@@ -98,6 +104,7 @@ impl<'a> RenderedingPageData<'a> {
         // Render recursively all the children, and add to context.children as a list
         let mut children = Vec::new();
         for child in &element.children {
+            debug!("Rendering child: {:?}", child.widget);
             let rendered_child = Box::pin(self.render_element(child, &ctx)).await?;
             children.push(rendered_child);
         }
@@ -115,18 +122,38 @@ impl<'a> RenderedingPageData<'a> {
         element: &Element,
         ctx: minijinja::Value,
     ) -> anyhow::Result<String> {
+        debug!("Rendering widget: {:?}", widget.name);
+
         let template = self.env.template_from_str(&widget.html)?;
 
         let ctx = context! { ..ctx, ..context!{
             ..context! {
-                ..minijinja::Value::from_serialize(&element.data),
-                ..context! {
-                    id => &element.id,
+                data => context!{
+                    ..minijinja::Value::from_serialize(&element.data),
+                    ..context! {
+                        id => &element.id,
+                    }
                 }
             }
         }};
 
-        let rendered_element = template.render(ctx)?;
+        debug!("Context: {:?}", ctx);
+        let rendered_element = match template.render(ctx) {
+            Ok(rendered_element) => rendered_element,
+            Err(e) => {
+                error!(
+                    "Error rendering page={}, widget={}: {:?}. html={:?}",
+                    self.rendered_page.path, widget.name, e, widget.html
+                );
+                return Err(anyhow::anyhow!(
+                    "Error rendering page={}, widget={}: {:?}",
+                    self.rendered_page.path,
+                    widget.name,
+                    e
+                ));
+            }
+        };
+        debug!("Rendered element: {:?}", rendered_element);
 
         // Add the CSS to the rendered page
         self.rendered_page
@@ -156,11 +183,17 @@ mod tests {
     use minijinja::Environment;
     use tracing::info;
 
-    use crate::{store::factory::StoreFactory, PageRenderer};
+    use crate::{store::factory::StoreFactory, utils::setup_logging, PageRenderer};
+    use ctor::ctor;
 
     use super::*;
 
     struct TestStore {}
+
+    #[ctor]
+    fn setup_logging_() {
+        setup_logging();
+    }
 
     #[async_trait::async_trait]
     impl Store for TestStore {

@@ -1,19 +1,19 @@
 {% if data.caption %}
-<figure class="image-container @@class@@" id="@@id@@">
-    <img
-        class="content-image"
-        src="{{context.base_url}}{{data.src}}"
-        alt="{{data.alt or ''}}"
-    />
-    {% if data.caption %}
-    <figcaption>{{data.caption}}</figcaption>
-    {% endif %}
+<figure class="image-container @@class@@" id="{{data.id}}">
+  <img
+    class="content-image"
+    src="{{context.base_url}}{{data.src}}"
+    alt="{{data.alt or ''}}"
+  />
+  {% if data.caption %}
+  <figcaption>{{data.caption}}</figcaption>
+  {% endif %}
 </figure>
 {% else %}
 <img
-    class="content-image @@class@@"
-    id="@@id@@"
-    src="{{context.base_url}}{{data.src}}"
-    alt="{{data.alt or ''}}"
+  class="content-image @@class@@"
+  id="{{data.id}}"
+  src="{{context.base_url}}{{data.src}}"
+  alt="{{data.alt or ''}}"
 />
 {% endif %}
