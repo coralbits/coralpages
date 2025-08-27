@@ -1,6 +1,7 @@
 use anyhow::Result;
 use minijinja::context;
 use poem::middleware::Cors;
+use poem::Body;
 use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 
@@ -102,6 +103,21 @@ impl Api {
         rendered.store = store.clone();
         rendered.path = path.clone();
 
+        return self.response(request, format, rendered);
+    }
+
+    #[oai(path = "/render/", method = "post")]
+    async fn render_post(
+        &self,
+        request: &Request,
+        Json(page): Json<Page>,
+        Query(format): Query<Option<String>>,
+    ) -> Result<PageRenderResponse, PoemError> {
+        let ctx = context! {};
+
+        let rendered = self.renderer.render_page(&page, &ctx).await.map_err(|e| {
+            PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+        })?;
         return self.response(request, format, rendered);
     }
 
@@ -245,7 +261,7 @@ pub async fn start(listen: &str) -> Result<()> {
     let cors = Cors::new()
         // .allow_origin("*")
         .allow_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"])
-        .allow_headers(vec!["*"]);
+        .allow_headers(vec!["content-type"]);
     let docs = api_service.swagger_ui();
     let app = Route::new()
         .nest("api/v1", api_service)
