@@ -1,11 +1,10 @@
 use anyhow::Result;
 use minijinja::context;
 use poem::middleware::Cors;
-use poem::Body;
 use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 
-use crate::page::types::{PageInfo, ResultPageList};
+use crate::page::types::ResultPageList;
 use crate::server::PageRenderResponse;
 use crate::traits::Store;
 use crate::{file::FileStore, renderedpage::RenderedPage, renderresponse::PageRenderResponseJson};
@@ -55,7 +54,7 @@ impl Api {
             Path(store),
             Path(realpath),
             Query(None),
-            Query(None),
+            // Query(None),
         )
         .await
     }
@@ -67,7 +66,7 @@ impl Api {
         Path(store): Path<String>,
         Path(path): Path<String>,
         Query(format): Query<Option<String>>,
-        Query(template): Query<Option<String>>,
+        // Query(template): Query<Option<String>>,
     ) -> Result<PageRenderResponse, PoemError> {
         let realpath = if path.ends_with(".json") {
             path.trim_end_matches(".json")
