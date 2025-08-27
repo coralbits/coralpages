@@ -16,6 +16,7 @@ pub struct Widget {
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct WidgetEditor {
     #[serde(rename = "type")]
+    #[oai(rename = "type")]
     pub editor_type: String,
     pub label: String,
     pub name: String,
