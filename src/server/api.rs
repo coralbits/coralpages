@@ -9,7 +9,10 @@ use tracing::info;
 use crate::page::types::ResultPageList;
 use crate::server::PageRenderResponse;
 use crate::traits::Store;
-use crate::{renderedpage::RenderedPage, renderresponse::PageRenderResponseJson};
+use crate::{
+    renderedpage::RenderedPage,
+    renderresponse::{Details, PageRenderResponseJson},
+};
 use crate::{Page, PageRenderer, WidgetResults};
 use poem::{
     listener::TcpListener,
@@ -89,6 +92,8 @@ impl Api {
                 )
             })?;
 
+        let page = page.fix();
+
         let ctx = context! {};
 
         let mut rendered = self.renderer.render_page(&page, &ctx).await.map_err(|e| {
@@ -107,6 +112,8 @@ impl Api {
         Json(page): Json<Page>,
         Query(format): Query<Option<String>>,
     ) -> Result<PageRenderResponse, PoemError> {
+        let page = page.fix();
+
         let ctx = context! {};
 
         let rendered = self.renderer.render_page(&page, &ctx).await.map_err(|e| {
@@ -194,7 +201,7 @@ impl Api {
         return Ok(Json(page_list));
     }
 
-    #[oai(path = "/page/:store/:path/", method = "get")]
+    #[oai(path = "/page/:store/:path", method = "get")]
     async fn get_page_definition(
         &self,
         Path(store): Path<String>,
@@ -219,7 +226,38 @@ impl Api {
                 poem::http::StatusCode::NOT_FOUND,
             )
         })?;
+        let page = page.fix();
         Ok(Json(page))
+    }
+
+    #[oai(path = "/page/:store/:path", method = "post")]
+    async fn post_page_definition(
+        &self,
+        Path(store): Path<String>,
+        Path(path): Path<String>,
+        Json(page): Json<Page>,
+    ) -> Result<Json<Details>, PoemError> {
+        let page = page.fix();
+
+        // check it is a valid page
+        let store = match self.renderer.store.get_store(&store) {
+            Some(store) => store,
+            None => {
+                return Err(PoemError::from_string(
+                    format!("Store '{}' not found", store),
+                    poem::http::StatusCode::NOT_FOUND,
+                ));
+            }
+        };
+
+        store
+            .save_page_definition(&path, &page)
+            .await
+            .map_err(|e| {
+                PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+            })?;
+
+        Ok(Json(Details::new("Page definition saved".to_string())))
     }
 
     #[oai(path = "/widget/", method = "get")]

@@ -13,10 +13,10 @@ pub trait Store: Send + Sync {
         Ok(None)
     }
     async fn save_page_definition(&self, _path: &str, _page: &Page) -> anyhow::Result<()> {
-        Ok(())
+        Err(anyhow::anyhow!("Not implemented"))
     }
     async fn delete_page_definition(&self, _path: &str) -> anyhow::Result<bool> {
-        Ok(false)
+        Err(anyhow::anyhow!("Not implemented"))
     }
     async fn get_page_list(
         &self,

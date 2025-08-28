@@ -72,3 +72,14 @@ pub enum PageRenderResponse {
     #[oai(status = 200, content_type = "text/css; charset=utf-8")]
     Css(PlainText<String>),
 }
+
+#[derive(Object)]
+pub struct Details {
+    pub details: String,
+}
+
+impl Details {
+    pub fn new(details: String) -> Self {
+        Self { details }
+    }
+}

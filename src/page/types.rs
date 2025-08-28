@@ -77,6 +77,17 @@ impl Element {
         self.style.extend(style);
         self
     }
+
+    // Post read fix element, and recursively fix children.
+    pub fn fix(mut self) -> Self {
+        // check if the id is valid
+        if self.id.is_empty() {
+            self.id = uuid::Uuid::new_v4().to_string();
+        }
+        self.children = self.children.into_iter().map(|child| child.fix()).collect();
+
+        self
+    }
 }
 
 /// The page definition, with a title, and a list of blocks
@@ -141,6 +152,11 @@ impl Page {
 
     pub fn with_meta(mut self, meta: Vec<MetaDefinition>) -> Self {
         self.meta = meta;
+        self
+    }
+
+    pub fn fix(mut self) -> Self {
+        self.children = self.children.into_iter().map(|child| child.fix()).collect();
         self
     }
 }
