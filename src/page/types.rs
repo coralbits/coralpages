@@ -30,6 +30,18 @@ pub struct WidgetResults {
     pub results: Vec<Widget>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
+pub struct IdName {
+    pub id: String,
+    pub name: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
+pub struct StoreListResults {
+    pub count: usize,
+    pub results: Vec<IdName>,
+}
+
 /// A meta definition for page metadata
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct MetaDefinition {

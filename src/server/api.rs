@@ -13,7 +13,7 @@ use crate::{
     renderedpage::RenderedPage,
     renderresponse::{Details, PageRenderResponseJson},
 };
-use crate::{Page, PageRenderer, WidgetResults};
+use crate::{IdName, Page, PageRenderer, StoreListResults, WidgetResults};
 use poem::{
     listener::TcpListener,
     middleware::{NormalizePath, Tracing, TrailingSlash},
@@ -283,6 +283,26 @@ impl Api {
         })?;
 
         Ok(Json(results))
+    }
+
+    #[oai(path = "/store", method = "get")]
+    async fn get_store_list(&self) -> Result<Json<StoreListResults>, PoemError> {
+        let stores = self.renderer.store.get_store_list().await.map_err(|e| {
+            PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+        })?;
+
+        let results = stores
+            .iter()
+            .map(|s| IdName {
+                id: s.clone(),
+                name: s.clone(),
+            })
+            .collect();
+
+        Ok(Json(StoreListResults {
+            count: stores.len(),
+            results,
+        }))
     }
 }
 

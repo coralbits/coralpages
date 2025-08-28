@@ -53,6 +53,10 @@ impl StoreFactory {
             )),
         }
     }
+
+    pub async fn get_store_list(&self) -> Result<Vec<String>> {
+        Ok(self.stores.keys().cloned().collect())
+    }
 }
 
 #[async_trait]
