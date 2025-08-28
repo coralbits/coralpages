@@ -1,6 +1,8 @@
 use anyhow::Result;
 use minijinja::context;
 use poem::middleware::Cors;
+use poem::web::Redirect;
+use poem::{get, handler};
 use std::{collections::HashMap, sync::Arc};
 use tracing::info;
 
@@ -246,6 +248,11 @@ impl Api {
     }
 }
 
+#[handler]
+async fn root_redirect() -> Redirect {
+    return Redirect::moved_permanent("/api/v1/render    /default/index?format=html");
+}
+
 pub async fn start(listen: &str, renderer: PageRenderer) -> Result<()> {
     let api = Api::new(renderer)?;
     let api_service = OpenApiService::new(api, "Page Viewer", "0.1.0").server("/api/v1");
@@ -258,6 +265,7 @@ pub async fn start(listen: &str, renderer: PageRenderer) -> Result<()> {
     let app = Route::new()
         .nest("api/v1", api_service)
         .nest("/docs", docs)
+        .at("/", get(root_redirect))
         .with(Tracing)
         .with(NormalizePath::new(TrailingSlash::Trim))
         .with(cors);
