@@ -4,11 +4,10 @@ use minijinja::context;
 use page_viewer::traits::Store;
 use page_viewer::{utils, Page, PageRenderer};
 use std::fs;
-use std::sync::LazyLock;
 use std::time::Instant;
 use tracing::info;
 
-use page_viewer::config::Config;
+use page_viewer::config::CONFIG;
 use page_viewer::server::start;
 
 #[derive(Parser)]
@@ -23,8 +22,6 @@ struct Args {
     #[arg(short, long, value_name = "LISTEN", default_value = "0.0.0.0:8006")]
     listen: Option<String>,
 }
-
-static CONFIG: LazyLock<Config> = LazyLock::new(|| Config::read("config.yaml"));
 
 #[tokio::main]
 async fn main() -> Result<()> {

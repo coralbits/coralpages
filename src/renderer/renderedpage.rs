@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
+    config::CONFIG,
     page::types::{Element, MetaDefinition, Page, Widget},
     store::traits::Store,
 };
@@ -110,7 +111,20 @@ impl<'a> RenderedingPageData<'a> {
         }
         let new_ctx = context! { ..ctx.clone(), ..context!{children => children} };
 
-        let rendered_element = self.render_widget(&widget, element, new_ctx).await?;
+        let rendered_element = self.render_widget(&widget, element, new_ctx).await;
+
+        let rendered_element = match rendered_element {
+            Ok(rendered_element) => rendered_element,
+            Err(e) => {
+                if CONFIG.debug {
+                    let ret = format!("<pre style=\"color:red;\">{}</pre>", e.to_string());
+                    self.rendered_page.errors.push(e);
+                    ret
+                } else {
+                    return Err(e);
+                }
+            }
+        };
 
         self.rendered_page.body.push_str(&rendered_element);
         Ok(())

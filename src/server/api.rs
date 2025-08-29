@@ -4,7 +4,7 @@ use poem::middleware::Cors;
 use poem::web::Redirect;
 use poem::{get, handler};
 use std::{collections::HashMap, sync::Arc};
-use tracing::info;
+use tracing::{error, info};
 
 use crate::page::types::ResultPageList;
 use crate::server::PageRenderResponse;
@@ -118,8 +118,23 @@ impl Api {
 
         let rendered = self.renderer.render_page(&page, &ctx).await.map_err(|e| {
             PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
-        })?;
+        });
+
+        let rendered = match rendered {
+            Ok(rendered) => rendered,
+            Err(e) => {
+                error!("Error rendering page path={}: {:?}", page.path, e);
+                return self.error_response(e);
+            }
+        };
+
         return self.response(request, format, rendered);
+    }
+
+    fn error_response(&self, _error: PoemError) -> Result<PageRenderResponse, PoemError> {
+        let error_details = Details::new("Error rendering page".to_string());
+        let response = PageRenderResponse::Error(Json(error_details));
+        Ok(response)
     }
 
     fn response(
@@ -359,7 +374,7 @@ impl Api {
 
 #[handler]
 async fn root_redirect() -> Redirect {
-    return Redirect::moved_permanent("/api/v1/render    /default/index?format=html");
+    return Redirect::moved_permanent("/api/v1/render/default/index?format=html");
 }
 
 pub async fn start(listen: &str, renderer: PageRenderer) -> Result<()> {

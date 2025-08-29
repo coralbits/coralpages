@@ -1,4 +1,5 @@
 use poem_openapi::payload::{Json, PlainText};
+use serde::Serialize;
 use std::collections::HashMap;
 
 use poem_openapi::{ApiResponse, Object};
@@ -71,9 +72,11 @@ pub enum PageRenderResponse {
     Html(PlainText<String>),
     #[oai(status = 200, content_type = "text/css; charset=utf-8")]
     Css(PlainText<String>),
+    #[oai(status = 500, content_type = "application/json; charset=utf-8")]
+    Error(Json<Details>),
 }
 
-#[derive(Object)]
+#[derive(Object, Serialize, Debug)]
 pub struct Details {
     pub details: String,
 }

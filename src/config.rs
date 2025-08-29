@@ -1,3 +1,4 @@
+use std::sync::LazyLock;
 use std::{fs::File, io::BufReader};
 
 use serde::{Deserialize, Serialize};
@@ -37,3 +38,5 @@ impl Config {
         config
     }
 }
+
+pub static CONFIG: LazyLock<Config> = LazyLock::new(|| Config::read("config.yaml"));
