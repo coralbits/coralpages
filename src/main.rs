@@ -2,12 +2,12 @@ use anyhow::Result;
 use clap::Parser;
 use minijinja::context;
 use page_viewer::traits::Store;
-use page_viewer::{utils, Page, PageRenderer};
+use page_viewer::{config, utils, Page, PageRenderer};
 use std::fs;
 use std::time::Instant;
 use tracing::info;
 
-use page_viewer::config::{get_config, load_config};
+use page_viewer::config::{get_config, load_config, watch_config};
 use page_viewer::server::start;
 
 #[derive(Parser)]
@@ -34,8 +34,12 @@ async fn main() -> Result<()> {
     info!("Loading configuration from: {}", args.config);
     load_config(&args.config).await?;
 
-    let config = get_config().await;
-    utils::setup_logging(config.debug);
+    // Start watching the config file for changes
+    info!("Starting config file watcher for: {}", args.config);
+    watch_config(&args.config).await?;
+
+    let debug = config::get_debug().await;
+    utils::setup_logging(debug);
 
     if let Some(filename) = args.render_file {
         // Read and render the YAML file
@@ -55,8 +59,11 @@ async fn main() -> Result<()> {
         // Start the server
         start_server(&listen).await?;
     } else {
-        let config = get_config().await;
-        start_server(&format!("{}:{}", config.server.host, config.server.port)).await?;
+        let server = {
+            let config = get_config().await;
+            config.server.clone()
+        };
+        start_server(&format!("{}:{}", server.host, server.port)).await?;
     }
 
     Ok(())

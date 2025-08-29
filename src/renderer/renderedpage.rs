@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 
 use crate::{
+    config,
     page::types::{Element, MetaDefinition, Page, Widget},
     store::traits::Store,
 };
 
-use crate::config::get_config;
 use minijinja::{context, Environment, HtmlEscape};
 use tracing::{debug, error};
 
@@ -118,7 +118,7 @@ impl<'a> RenderedingPageData<'a> {
         let rendered_element = match rendered_element {
             Ok(rendered_element) => rendered_element,
             Err(e) => {
-                if get_config().await.debug {
+                if config::get_debug().await {
                     let ret = format!(
                         "<pre style=\"color:red;\">{}</pre>",
                         HtmlEscape(&e.to_string()).to_string()
