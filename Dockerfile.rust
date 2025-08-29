@@ -1,0 +1,15 @@
+FROM rust:1.89.0 as builder
+
+WORKDIR /app
+
+COPY . .
+
+RUN cargo install --path .
+RUN cargo build
+
+FROM debian:trixie-slim
+
+COPY --from=builder /app/target/release/page-viewer /usr/local/bin/page-viewer
+RUN chmod +x /usr/local/bin/page-viewer
+
+CMD ["/usr/local/bin/page-viewer"]
