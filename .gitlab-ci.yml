@@ -44,7 +44,7 @@ test:
 
 test-rust:
   stage: test
-  image: rust:1.83.0
+  image: rust:1.89.0
   script:
     - cargo test --locked
 

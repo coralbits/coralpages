@@ -9,7 +9,13 @@ RUN cargo build
 
 FROM debian:trixie-slim
 
-COPY --from=builder /app/target/release/page-viewer /usr/local/bin/page-viewer
-RUN chmod +x /usr/local/bin/page-viewer
+WORKDIR /app
 
-CMD ["/usr/local/bin/page-viewer"]
+COPY --from=builder /app/target/release/page-viewer /app/page-viewer
+COPY config.yaml /app/config.yaml
+COPY builtin /app/builtin
+COPY data /app/data
+
+RUN chmod +x /app/page-viewer
+
+CMD ["/app/page-viewer"]

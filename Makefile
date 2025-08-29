@@ -24,3 +24,9 @@ serve:
 
 fmt:
 	uvx ruff format .
+
+build-docker-rust:
+	docker build -t page-viewer -f Dockerfile.rust . -t page-viewer:rust
+
+run-docker-rust:
+	docker run -p 8006:8006 page-viewer:rust
