@@ -20,6 +20,7 @@ pub struct RenderedPage {
     pub meta: Vec<MetaDefinition>,
     pub css_variables: HashMap<String, String>,
     pub errors: Vec<anyhow::Error>,
+    pub elapsed: std::time::Instant,
 }
 
 impl RenderedPage {
@@ -34,6 +35,7 @@ impl RenderedPage {
             meta: Vec::new(),
             css_variables: HashMap::new(),
             errors: Vec::new(),
+            elapsed: std::time::Instant::now(),
         }
     }
 

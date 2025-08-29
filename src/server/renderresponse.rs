@@ -33,6 +33,7 @@ pub struct PageRenderResponseJson {
     path: String,
     head: PageRenderHead,
     http: PageRenderHttp,
+    elapsed: f32,
 }
 
 impl PageRenderResponseJson {
@@ -60,6 +61,7 @@ impl PageRenderResponseJson {
             path: rendered.path.clone(),
             store: rendered.store.clone(),
             title: rendered.title.clone(),
+            elapsed: rendered.elapsed.elapsed().as_micros() as f32 / 1000.0,
         }
     }
 }
