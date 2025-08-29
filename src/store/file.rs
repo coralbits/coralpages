@@ -20,13 +20,15 @@ struct FileStoreConfig {
 }
 
 pub struct FileStore {
+    name: String,
     path: PathBuf,
     widgets: HashMap<String, Widget>,
 }
 
 impl FileStore {
-    pub fn new(path: &str) -> anyhow::Result<Self> {
+    pub fn new(name: &str, path: &str) -> anyhow::Result<Self> {
         let mut ret = Self {
+            name: name.to_string(),
             path: Path::new(&path).to_path_buf(),
             widgets: HashMap::new(),
         };
@@ -105,6 +107,10 @@ impl FileStore {
 
 #[async_trait]
 impl Store for FileStore {
+    fn name(&self) -> &str {
+        &self.name
+    }
+
     async fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
         // debug!(
         //     "Loading widget definition from path={} available_count={}",

@@ -1,7 +1,7 @@
 use anyhow::Result;
 use async_trait::async_trait;
 use std::collections::HashMap;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 use crate::{
     file::FileStore,
@@ -11,27 +11,31 @@ use crate::{
 };
 
 pub struct StoreFactory {
-    stores: HashMap<String, Box<dyn Store>>,
+    // could be a hashmap, but order is important.
+    // There should not be be ever too many stores to make this slower than a hash
+    stores: Vec<Box<dyn Store>>,
 }
 
 impl StoreFactory {
     pub fn new() -> Self {
-        Self {
-            stores: HashMap::new(),
-        }
+        Self { stores: Vec::new() }
     }
 
     pub fn get_store(&self, name: &str) -> Option<&dyn Store> {
-        let store = self.stores.get(name).map(|s| s.as_ref());
+        let store = self
+            .stores
+            .iter()
+            .find(|s| s.name() == name)
+            .map(|s| s.as_ref());
         if store.is_none() {
             error!("Store not found name={}", name);
         }
         store
     }
 
-    pub fn add_store(&mut self, name: &str, store: Box<dyn Store>) {
-        self.stores.insert(name.to_string(), store);
-        info!("Added store: {}", name);
+    pub fn add_store(&mut self, store: Box<dyn Store>) {
+        info!("Added store: {}", store.name());
+        self.stores.push(store);
     }
 
     fn split_path(&self, path: &str) -> Result<(String, String), anyhow::Error> {
@@ -45,8 +49,13 @@ impl StoreFactory {
     pub async fn new_store(store_config: &StoreConfig) -> Result<Box<dyn Store>> {
         // info!("Creating store: {:?}", store_config);
         match store_config.store_type.as_str() {
-            "file" => Ok(Box::new(FileStore::new(&store_config.path)?)),
-            "db" => Ok(Box::new(DbStore::new(&store_config.url).await?)),
+            "file" => Ok(Box::new(FileStore::new(
+                store_config.name.as_str(),
+                &store_config.path,
+            )?)),
+            "db" => Ok(Box::new(
+                DbStore::new(store_config.name.as_str(), &store_config.url).await?,
+            )),
             _ => Err(anyhow::anyhow!(
                 "Unsupported store type: {}",
                 store_config.store_type
@@ -55,12 +64,16 @@ impl StoreFactory {
     }
 
     pub async fn get_store_list(&self) -> Result<Vec<String>> {
-        Ok(self.stores.keys().cloned().collect())
+        Ok(self.stores.iter().map(|s| s.name().to_string()).collect())
     }
 }
 
 #[async_trait]
 impl Store for StoreFactory {
+    fn name(&self) -> &str {
+        "factory"
+    }
+
     async fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
         // info!("Loading widget definition, path={}", path);
         let (store, subpath) = self.split_path(path)?;
@@ -132,7 +145,8 @@ impl Store for StoreFactory {
 
         let filter_store = filter.get("store");
 
-        for (store_name, store) in self.stores.iter() {
+        for store in self.stores.iter() {
+            let store_name = store.name();
             if let Some(filter_store) = filter_store {
                 if filter_store != store_name {
                     continue;
@@ -146,9 +160,15 @@ impl Store for StoreFactory {
             // add to results
             result.count += store_result.count;
             let results = store_result.results.into_iter().map(|mut r| {
-                r.store = store_name.clone();
+                r.store = store_name.to_string();
                 r
             });
+            debug!(
+                "reading pages from store_name={}, count={}, results_size={}",
+                store_name,
+                store_result.count,
+                results.len()
+            );
             result.results.extend(results);
         }
         Ok(result)
@@ -159,7 +179,8 @@ impl Store for StoreFactory {
             count: 0,
             results: Vec::new(),
         };
-        for (store_name, store) in self.stores.iter() {
+        for store in self.stores.iter() {
+            let store_name = store.name();
             let mut store_result = store.get_widget_list().await?;
             for w in store_result.results.iter_mut() {
                 w.name = format!("{}/{}", store_name, w.name);

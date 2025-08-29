@@ -192,11 +192,15 @@ mod tests {
 
     #[ctor]
     fn setup_logging_() {
-        setup_logging();
+        setup_logging(true);
     }
 
     #[async_trait::async_trait]
     impl Store for TestStore {
+        fn name(&self) -> &str {
+            "test"
+        }
+
         async fn load_widget_definition(&self, _path: &str) -> anyhow::Result<Option<Widget>> {
             Ok(Some(Widget {
                 name: "test".to_string(),
@@ -226,7 +230,7 @@ mod tests {
                 "test-link-child".to_string(),
             )])]);
         let mut store = StoreFactory::new();
-        store.add_store("test", Box::new(TestStore {}));
+        store.add_store(Box::new(TestStore {}));
 
         let env = Environment::new();
         let mut rendered_page = RenderedingPageData::new(&page, &store, &env);
@@ -258,7 +262,7 @@ mod tests {
 
         // Add the test store to the renderer
         let mut renderer = PageRenderer::new();
-        renderer.store.add_store("test", Box::new(TestStore {}));
+        renderer.store.add_store(Box::new(TestStore {}));
 
         // Render
         let rendered_page = renderer

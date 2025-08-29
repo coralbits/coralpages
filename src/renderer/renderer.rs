@@ -39,8 +39,7 @@ impl PageRenderer {
 
     pub async fn with_stores(mut self, stores: &[StoreConfig]) -> Result<Self> {
         for store in stores {
-            self.store
-                .add_store(&store.name, StoreFactory::new_store(&store).await?);
+            self.store.add_store(StoreFactory::new_store(&store).await?);
         }
         Ok(self)
     }

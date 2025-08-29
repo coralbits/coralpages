@@ -6,6 +6,7 @@ use async_trait::async_trait;
 
 #[async_trait]
 pub trait Store: Send + Sync {
+    fn name(&self) -> &str;
     async fn load_widget_definition(&self, _path: &str) -> anyhow::Result<Option<Widget>> {
         Ok(None)
     }
