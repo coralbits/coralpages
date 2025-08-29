@@ -3,6 +3,8 @@ use minijinja::context;
 use poem::middleware::Cors;
 use poem::web::Redirect;
 use poem::{get, handler};
+use poem_openapi::Object;
+use serde::Serialize;
 use std::{collections::HashMap, sync::Arc};
 use tracing::{error, info};
 
@@ -306,6 +308,36 @@ impl Api {
         let page = page.fix();
 
         // check it is a valid page
+        let store = match self.renderer.store.get_store(&store) {
+            Some(store) => store,
+            None => {
+                return Err(PoemError::from_string(
+                    format!("Store '{}' not found", store),
+                    poem::http::StatusCode::NOT_FOUND,
+                ));
+            }
+        };
+
+        store
+            .save_page_definition(&path, &page)
+            .await
+            .map_err(|e| {
+                PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+            })?;
+
+        Ok(Json(Details::new("Page definition saved".to_string())))
+    }
+
+    #[oai(path = "/page/:store/:path", method = "put")]
+    async fn put_page_definition(
+        &self,
+        Path(store): Path<String>,
+        Path(path): Path<String>,
+    ) -> Result<Json<Details>, PoemError> {
+        let page = Page::new().with_title(path.clone());
+
+        let page = page.fix();
+
         let store = match self.renderer.store.get_store(&store) {
             Some(store) => store,
             None => {
