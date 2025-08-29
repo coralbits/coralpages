@@ -1,5 +1,6 @@
-use std::sync::{Arc, RwLock};
+use std::sync::Arc;
 use std::{fs::File, io::BufReader};
+use tokio::sync::{RwLock, RwLockReadGuard};
 
 use serde::{Deserialize, Serialize};
 
@@ -62,22 +63,16 @@ impl ConfigManager {
         }
     }
 
-    pub fn load_config(&self, path: &str) -> anyhow::Result<()> {
+    pub async fn load_config(&self, path: &str) -> anyhow::Result<()> {
         let config = Config::read(path)?;
-        let mut write_lock = self
-            .config
-            .write()
-            .map_err(|e| anyhow::anyhow!("Failed to acquire write lock: {}", e))?;
+        let mut write_lock = self.config.write().await;
         *write_lock = config;
         Ok(())
     }
 
-    pub fn get_config(&self) -> anyhow::Result<Config> {
-        let read_lock = self
-            .config
-            .read()
-            .map_err(|e| anyhow::anyhow!("Failed to acquire read lock: {}", e))?;
-        Ok(read_lock.clone())
+    pub async fn get_config(&self) -> RwLockReadGuard<'_, Config> {
+        let read_lock = self.config.read().await;
+        read_lock
     }
 }
 
@@ -92,12 +87,12 @@ pub static CONFIG_MANAGER: once_cell::sync::Lazy<ConfigManager> =
     once_cell::sync::Lazy::new(ConfigManager::new);
 
 // Convenience functions for backward compatibility
-pub fn get_config() -> anyhow::Result<Config> {
-    CONFIG_MANAGER.get_config()
+pub async fn get_config() -> RwLockReadGuard<'static, Config> {
+    CONFIG_MANAGER.get_config().await
 }
 
-pub fn load_config(path: &str) -> anyhow::Result<()> {
-    CONFIG_MANAGER.load_config(path)
+pub async fn load_config(path: &str) -> anyhow::Result<()> {
+    CONFIG_MANAGER.load_config(path).await
 }
 
 #[cfg(test)]
@@ -113,21 +108,21 @@ mod tests {
         assert_eq!(config.stores.len(), 0);
     }
 
-    #[test]
-    fn test_config_manager_new() {
+    #[tokio::test]
+    async fn test_config_manager_new() {
         let manager = ConfigManager::new();
-        let config = manager.get_config().unwrap();
+        let config = manager.get_config().await;
         assert_eq!(config.debug, false);
         assert_eq!(config.server.port, 8006);
         assert_eq!(config.server.host, "0.0.0.0");
         assert_eq!(config.stores.len(), 0);
     }
 
-    #[test]
-    fn test_config_from_file() {
+    #[tokio::test]
+    async fn test_config_from_file() {
         let manager = ConfigManager::new();
-        manager.load_config("config.yaml").unwrap();
-        let config = manager.get_config().unwrap();
+        manager.load_config("config.yaml").await.unwrap();
+        let config = manager.get_config().await;
         assert_eq!(config.debug, true);
         assert_eq!(config.server.port, 8006);
         assert_eq!(config.server.host, "0.0.0.0");

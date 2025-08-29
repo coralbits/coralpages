@@ -32,9 +32,9 @@ async fn main() -> Result<()> {
 
     // Load configuration
     info!("Loading configuration from: {}", args.config);
-    load_config(&args.config)?;
+    load_config(&args.config).await?;
 
-    let config = get_config()?;
+    let config = get_config().await;
     utils::setup_logging(config.debug);
 
     if let Some(filename) = args.render_file {
@@ -55,7 +55,7 @@ async fn main() -> Result<()> {
         // Start the server
         start_server(&listen).await?;
     } else {
-        let config = get_config()?;
+        let config = get_config().await;
         start_server(&format!("{}:{}", config.server.host, config.server.port)).await?;
     }
 
@@ -69,7 +69,7 @@ async fn render_page_file(filename: &str) -> Result<()> {
     // Deserialize the YAML into a Page
     let page: Page = serde_yaml::from_str(&yaml_content)?;
 
-    let config = get_config()?;
+    let config = get_config().await;
     let renderer = PageRenderer::new().with_stores(&config.stores).await?;
 
     // Create a RenderedPage and render it
@@ -83,7 +83,7 @@ async fn render_page_file(filename: &str) -> Result<()> {
 }
 
 async fn render_from_store(pagename: &str) -> Result<()> {
-    let config = get_config()?;
+    let config = get_config().await;
     let renderer = PageRenderer::new().with_stores(&config.stores).await?;
 
     let page = renderer
@@ -104,8 +104,10 @@ async fn render_from_store(pagename: &str) -> Result<()> {
 }
 
 async fn start_server(listen: &str) -> Result<()> {
-    let config = get_config()?;
-    let renderer = PageRenderer::new().with_stores(&config.stores).await?;
+    let renderer = {
+        let config = get_config().await;
+        PageRenderer::new().with_stores(&config.stores).await?
+    };
 
     info!("Starting server on http://{}", listen);
     info!("OpenAPI docs: http://{}/docs", listen);

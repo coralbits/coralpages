@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::{
     page::types::{Element, MetaDefinition, Page, Widget},
     store::traits::Store,
- };
+};
 
 use crate::config::get_config;
 use minijinja::{context, Environment, HtmlEscape};
@@ -118,18 +118,15 @@ impl<'a> RenderedingPageData<'a> {
         let rendered_element = match rendered_element {
             Ok(rendered_element) => rendered_element,
             Err(e) => {
-                if let Ok(config) = get_config() {
-                    if config.debug {
-                        let ret = format!(
-                            "<pre style=\"color:red;\">{}</pre>",
-                            HtmlEscape(&e.to_string()).to_string()
-                        );
-                        self.rendered_page.errors.push(e);
-                        ret
-                    } else {
-                        return Err(e);
-                    }
+                if get_config().await.debug {
+                    let ret = format!(
+                        "<pre style=\"color:red;\">{}</pre>",
+                        HtmlEscape(&e.to_string()).to_string()
+                    );
+                    self.rendered_page.errors.push(e);
+                    ret
                 } else {
+                    // on no debug, just return an error when rendering a failed widget
                     return Err(e);
                 }
             }
