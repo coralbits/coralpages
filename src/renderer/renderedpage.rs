@@ -1,12 +1,12 @@
 use std::collections::HashMap;
 
 use crate::{
-    config::CONFIG,
     page::types::{Element, MetaDefinition, Page, Widget},
     store::traits::Store,
+    CONFIG,
 };
 
-use minijinja::{context, Environment};
+use minijinja::{context, Environment, HtmlEscape};
 use tracing::{debug, error};
 
 #[derive(Debug)]
@@ -117,7 +117,10 @@ impl<'a> RenderedingPageData<'a> {
             Ok(rendered_element) => rendered_element,
             Err(e) => {
                 if CONFIG.debug {
-                    let ret = format!("<pre style=\"color:red;\">{}</pre>", e.to_string());
+                    let ret = format!(
+                        "<pre style=\"color:red;\">{}</pre>",
+                        HtmlEscape(&e.to_string()).to_string()
+                    );
                     self.rendered_page.errors.push(e);
                     ret
                 } else {
@@ -140,16 +143,15 @@ impl<'a> RenderedingPageData<'a> {
 
         let template = self.env.template_from_str(&widget.html)?;
 
-        let ctx = context! { ..ctx, ..context!{
-            ..context! {
-                data => context!{
-                    ..minijinja::Value::from_serialize(&element.data),
-                    ..context! {
-                        id => &element.id,
-                    }
+        let ctx = context! {
+            data => context!{
+                ..minijinja::Value::from_serialize(&element.data),
+                ..context! {
+                    id => &element.id,
                 }
-            }
-        }};
+            },
+            context => ctx
+        };
 
         debug!("Context: {:?}", ctx);
         let rendered_element = match template.render(ctx) {

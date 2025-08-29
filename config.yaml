@@ -13,7 +13,7 @@ server:
 
   render: true
 
-debug: false
+debug: true
 
 # tags from stores are inherited into their elements, for exmaple
 # jinja2 at store, makes all the elements jinja2 rendered.
