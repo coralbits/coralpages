@@ -201,6 +201,30 @@ impl Api {
         return Ok(Json(page_list));
     }
 
+    // I dont know how to make poem openapi (mayeb some bug?) accept a path as last param.. so I do it manually
+    #[oai(path = "/page/:store/:path1/:path2/:path3", method = "get")]
+    async fn get_page_definition_with_path_3(
+        &self,
+        Path(store): Path<String>,
+        Path(path1): Path<String>,
+        Path(path2): Path<String>,
+        Path(path3): Path<String>,
+    ) -> Result<Json<Page>, PoemError> {
+        let realpath = format!("{}/{}/{}", path1, path2, path3);
+        self.get_page_definition(Path(store), Path(realpath)).await
+    }
+
+    #[oai(path = "/page/:store/:path1/:path2", method = "get")]
+    async fn get_page_definition_with_path(
+        &self,
+        Path(store): Path<String>,
+        Path(path1): Path<String>,
+        Path(path2): Path<String>,
+    ) -> Result<Json<Page>, PoemError> {
+        let realpath = format!("{}/{}", path1, path2);
+        self.get_page_definition(Path(store), Path(realpath)).await
+    }
+
     #[oai(path = "/page/:store/:path", method = "get")]
     async fn get_page_definition(
         &self,
@@ -228,6 +252,33 @@ impl Api {
         })?;
         let page = page.fix();
         Ok(Json(page))
+    }
+
+    #[oai(path = "/page/:store/:path1/:path2/:path3", method = "post")]
+    async fn post_page_definition_with_path_3(
+        &self,
+        Path(store): Path<String>,
+        Path(path1): Path<String>,
+        Path(path2): Path<String>,
+        Path(path3): Path<String>,
+        Json(page): Json<Page>,
+    ) -> Result<Json<Details>, PoemError> {
+        let realpath = format!("{}/{}/{}", path1, path2, path3);
+        self.post_page_definition(Path(store), Path(realpath), Json(page))
+            .await
+    }
+
+    #[oai(path = "/page/:store/:path1/:path2", method = "post")]
+    async fn post_page_definition_with_path(
+        &self,
+        Path(store): Path<String>,
+        Path(path1): Path<String>,
+        Path(path2): Path<String>,
+        Json(page): Json<Page>,
+    ) -> Result<Json<Details>, PoemError> {
+        let realpath = format!("{}/{}", path1, path2);
+        self.post_page_definition(Path(store), Path(realpath), Json(page))
+            .await
     }
 
     #[oai(path = "/page/:store/:path", method = "post")]

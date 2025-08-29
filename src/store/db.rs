@@ -63,6 +63,16 @@ impl Store for DbStore {
         }
     }
 
+    async fn save_page_definition(&self, path: &str, page: &Page) -> anyhow::Result<()> {
+        let data = serde_json::to_string(page)?;
+        sqlx::query(r#"INSERT OR REPLACE INTO pages (path, data) VALUES (?, ?)"#)
+            .bind(path)
+            .bind(data)
+            .execute(&self.db)
+            .await?;
+        Ok(())
+    }
+
     async fn get_page_list(
         &self,
         _offset: usize,
