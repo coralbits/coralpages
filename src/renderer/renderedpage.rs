@@ -3,9 +3,9 @@ use std::collections::HashMap;
 use crate::{
     page::types::{Element, MetaDefinition, Page, Widget},
     store::traits::Store,
-    CONFIG,
-};
+ };
 
+use crate::config::get_config;
 use minijinja::{context, Environment, HtmlEscape};
 use tracing::{debug, error};
 
@@ -118,13 +118,17 @@ impl<'a> RenderedingPageData<'a> {
         let rendered_element = match rendered_element {
             Ok(rendered_element) => rendered_element,
             Err(e) => {
-                if CONFIG.debug {
-                    let ret = format!(
-                        "<pre style=\"color:red;\">{}</pre>",
-                        HtmlEscape(&e.to_string()).to_string()
-                    );
-                    self.rendered_page.errors.push(e);
-                    ret
+                if let Ok(config) = get_config() {
+                    if config.debug {
+                        let ret = format!(
+                            "<pre style=\"color:red;\">{}</pre>",
+                            HtmlEscape(&e.to_string()).to_string()
+                        );
+                        self.rendered_page.errors.push(e);
+                        ret
+                    } else {
+                        return Err(e);
+                    }
                 } else {
                     return Err(e);
                 }

@@ -1323,6 +1323,7 @@ dependencies = [
  "clap",
  "ctor",
  "minijinja",
+ "once_cell",
  "poem",
  "poem-openapi",
  "pulldown-cmark",

@@ -7,12 +7,15 @@ use std::fs;
 use std::time::Instant;
 use tracing::info;
 
-use page_viewer::config::CONFIG;
+use page_viewer::config::{get_config, load_config};
 use page_viewer::server::start;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
 struct Args {
+    /// Configuration file path
+    #[arg(long, value_name = "CONFIG_FILE", default_value = "config.yaml")]
+    config: String,
     /// Render a single YAML page file
     #[arg(long, value_name = "FILENAME")]
     render_file: Option<String>,
@@ -25,9 +28,14 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    utils::setup_logging(CONFIG.debug);
-
     let args = Args::parse();
+
+    // Load configuration
+    info!("Loading configuration from: {}", args.config);
+    load_config(&args.config)?;
+
+    let config = get_config()?;
+    utils::setup_logging(config.debug);
 
     if let Some(filename) = args.render_file {
         // Read and render the YAML file
@@ -47,7 +55,8 @@ async fn main() -> Result<()> {
         // Start the server
         start_server(&listen).await?;
     } else {
-        start_server(&format!("{}:{}", CONFIG.server.host, CONFIG.server.port)).await?;
+        let config = get_config()?;
+        start_server(&format!("{}:{}", config.server.host, config.server.port)).await?;
     }
 
     Ok(())
@@ -60,7 +69,8 @@ async fn render_page_file(filename: &str) -> Result<()> {
     // Deserialize the YAML into a Page
     let page: Page = serde_yaml::from_str(&yaml_content)?;
 
-    let renderer = PageRenderer::new().with_stores(&CONFIG.stores).await?;
+    let config = get_config()?;
+    let renderer = PageRenderer::new().with_stores(&config.stores).await?;
 
     // Create a RenderedPage and render it
     let ctx = context! {};
@@ -73,7 +83,8 @@ async fn render_page_file(filename: &str) -> Result<()> {
 }
 
 async fn render_from_store(pagename: &str) -> Result<()> {
-    let renderer = PageRenderer::new().with_stores(&CONFIG.stores).await?;
+    let config = get_config()?;
+    let renderer = PageRenderer::new().with_stores(&config.stores).await?;
 
     let page = renderer
         .store
@@ -93,7 +104,8 @@ async fn render_from_store(pagename: &str) -> Result<()> {
 }
 
 async fn start_server(listen: &str) -> Result<()> {
-    let renderer = PageRenderer::new().with_stores(&CONFIG.stores).await?;
+    let config = get_config()?;
+    let renderer = PageRenderer::new().with_stores(&config.stores).await?;
 
     info!("Starting server on http://{}", listen);
     info!("OpenAPI docs: http://{}/docs", listen);
