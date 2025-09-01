@@ -3,8 +3,6 @@ use minijinja::context;
 use poem::middleware::Cors;
 use poem::web::Redirect;
 use poem::{get, handler};
-use poem_openapi::Object;
-use serde::Serialize;
 use std::{collections::HashMap, sync::Arc};
 use tracing::{error, info};
 

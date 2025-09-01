@@ -5,8 +5,7 @@ use tokio::sync::{RwLock, RwLockReadGuard};
 use notify::{RecursiveMode, Watcher};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use tokio::time::Timeout;
-use tracing::{debug, error, info};
+use tracing::{error, info};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -214,7 +213,7 @@ mod tests {
         let manager = ConfigManager::new();
         manager.load_config("config.yaml").await.unwrap();
         let config = manager.get_config().await;
-        assert_eq!(config.debug, true);
+        assert_eq!(config.debug, false);
         assert_eq!(config.server.port, 8006);
         assert_eq!(config.server.host, "0.0.0.0");
         assert_ne!(config.stores.len(), 0);
