@@ -1,35 +1,48 @@
-# Coralbits Page Editor - Documentation
-# Main documentation index page
-
-title: "Coralbits Page Editor Documentation"
-template: "pages/_default"
-
+title: Coralbits Page Editor Documentation
+path: ''
+url: null
+template: pages/_default
 children:
-  - type: builtin/markdown
-    id: "welcome"
-    data:
-      title: "Welcome to Coralbits Page Editor"
-      text: |
-        The Coralbits Page Editor is a powerful, API-first page editor and renderer designed for modern web development.
-        It provides a flexible, component-based approach to creating dynamic web pages with an embedded Single Page Application (SPA) interface.
+- id: welcome
+  type: builtin/markdown
+  data:
+    text: |+
+      The Coralbits Page Viewer and Page Editor is a powerful, API-first page editor and renderer designed for modern web development.
 
-        ## Key Features
+      The page viewer provides a lightning fast microservice that is laser focused on dynamic page rendering. From a basic full static content, to dynamic content obtaining data from external REST endpoints to full embeding externally generated HTML and CSS.
 
-        - **Component-Based Architecture**: Built-in and extensible components
-        - **API-First Design**: RESTful API for page generation and editing
-        - **Embedded SPA Editor**: Rich editing experience within your applications
-        - **Flexible Rendering**: Generate HTML from built-in elements or external microservices
-        - **Caching Support**: Intelligent caching for optimal performance
-        - **Extensible**: Easy integration with external components via REST APIs
+      The page editor provides a flexible editor that allows non technical users to edit and manipulate the pages to be rendered by the the viewer. It also allows to use simple templating options and advanced elements like a grid container allows to design a simple element and reuse it many times, getting the data from external endpoints.
 
-        ## Philosophy
 
-        The Coralbits Page Editor follows a **microservices-first** approach, where each component is treated as an independent service.
-        This design philosophy enables:
+      ## Key Features
 
-        - **Scalability**: Components can be scaled independently
-        - **Maintainability**: Clear separation of concerns
-        - **Flexibility**: Easy to add, remove, or modify components
-        - **Reusability**: Components can be shared across different projects
+      - **Component-Based Architecture**: Built-in and extensible components
+      - **API-First Design**: RESTful API for page generation and editing
+      - **Embedded SPA Editor**: Rich editing experience within your applications
+      - **Flexible Rendering**: Generate HTML from built-in elements or external microservices
+      - **Extensible**: Easy integration with external components via REST APIs
 
-        Whether you're building a simple landing page or a complex web application, the Coralbits Page Editor provides the tools and flexibility you need.
+    title: Welcome to Coralbits Page Editor
+  children: []
+  style: {}
+- id: cfc48f9d-3c40-45f8-aab1-1c25855fd1a1
+  type: builtin/markdown
+  data:
+    text: |-
+      ## Philosophy
+
+      The Coralbits Page Editor follows a **microservices-first** approach, where each component is treated as an independent service.
+      This design philosophy enables:
+
+      - **Scalability**: Components can be scaled independently
+      - **Maintainability**: Clear separation of concerns
+      - **Flexibility**: Easy to add, remove, or modify components
+      - **Reusability**: Components can be shared across different projects
+
+      Whether you're building a simple landing page or a complex web application, the Coralbits Page Editor provides the tools and flexibility you need.
+  children: []
+  style: {}
+cache: []
+last_modified: null
+meta: []
+css_variables: {}

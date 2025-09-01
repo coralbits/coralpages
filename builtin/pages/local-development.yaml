@@ -1,291 +1,76 @@
-# Local Development Guide
-
-title: "Local Development"
-template: "pages/_default"
-
+title: Local Development
+path: ''
+url: null
+template: pages/_default
 children:
-  - type: builtin/markdown
-    data:
-      title: "Development Environment Setup"
-      text: |
-        ## Prerequisites
+- id: 84fc9272-43e2-4f8c-aa9b-323c7cc5ad6e
+  type: builtin/markdown
+  data:
+    text: "## Prerequisites\n\n- Rust 1.49\n\n## Installation\n\n```bash\n# Clone the repository\ngit clone https://github.com/coralbits/pv\ncd pv\n\n# Install dependencies using cargo \ncargo install\n```\n\n## Running the Development Server\n\n### Manual Server Start\n```bash\n# Start the development server\ncargo run\n```\n\n### Using the Run Script\n```bash\n# Run the server\n./run.sh\n```\n\nThe run script allows easy edit of parameters, like listening port or use another config.yaml file.\n\n\nThe server will start on `http://localhost:8006` by default.\n\nCheck the `config.yaml` file for many more options.\n"
+    title: Development Environment Setup
+  children: []
+  style: {}
+- id: feac43e0-2612-4f16-a844-de9d18456204
+  type: builtin/markdown
+  data:
+    text: |
+      ## Creating Pages
 
-        - Python 3.8 or higher
-        - uv (recommended) or pip
-        - Git
+      Pages are defined in JSON format. There are several stoers that can be used to store pages, from file based YAML files to database backed.
 
-        ## Installation
+      Teh easiest way to start to create pages is useing the [page editor](https://github.com/coralbits/pe).
 
-        ```bash
-        # Clone the repository
-        git clone <repository-url>
-        cd page_editor
+      To create manual pages, create a new page by adding a YAML file to your pages directory:
 
-        # Install dependencies using uv (recommended)
-        uv sync
+      ```yaml
+      # my-page.yaml
+      title: Example page
+      children:
+        - type: builtin/header
+          data:
+            text: "My New Page"
+          style:
+            background: blue
+            color: white
+            text-align: center
+            padding: 20px
 
-        # Or using pip
-        pip install -r requirements.txt
-        ```
+        - type: builtin/text
+          data:
+            text: "Welcome to my new page!"
+          style:
+            padding: 20px
+            font-size: 18px
+      ```
 
-        ## Running the Development Server
+      ## Page Rendering
 
-        ### Using the Development Script
-        ```bash
-        # Start the development server
-        python serve.py
-        ```
+      ### Render a Single Page
+      ```bash
+      page-viewer --render-file <filename.yaml>
+      ```
+    title: Working with Pages
+  children: []
+  style: {}
+- id: 6a50e5ef-0353-4bdb-9b4d-1531e41b04c3
+  type: builtin/markdown
+  data:
+    text: |+
+      ## Running Tests
 
-        ### Using the Run Script
-        ```bash
-        # Make the script executable
-        chmod +x run.sh
+      ```bash
+      # Run all tests
+      cargo test
+      ```
 
-        # Run the server
-        ./run.sh
-        ```
+      ## Writing tests
 
-        ### Manual Server Start
-        ```bash
-        # Start the server manually
-        python -m pe.server
-        ```
+      Any new functionality should receive a new test, to ensure it keeps working in the future.
 
-        The server will start on `http://localhost:8000` by default.
-  - type: builtin/markdown
-    data:
-      title: "Working with Pages"
-      text: |
-        ## Creating Pages
-
-        Pages are defined in YAML format. Create a new page by adding a YAML file to your pages directory:
-
-        ```yaml
-        # my-page.yaml
-        data:
-          - type: builtin/header
-            data:
-              text: "My New Page"
-            style:
-              background: blue
-              color: white
-              text-align: center
-              padding: 20px
-
-          - type: builtin/text
-            data:
-              text: "Welcome to my new page!"
-            style:
-              padding: 20px
-              font-size: 18px
-        ```
-
-        ## Page Rendering
-
-        ### Render a Single Page
-        ```bash
-        # Render a page to HTML
-        python render.py my-page.yaml
-        ```
-
-        ### Render with Custom Output
-        ```bash
-        # Render to a specific output file
-        python render.py my-page.yaml -o output.html
-        ```
-
-        ## Development Workflow
-
-        1. **Create/Edit YAML files** in your pages directory
-        2. **Test rendering** with `python render.py page.yaml`
-        3. **View in browser** by opening the generated HTML
-        4. **Iterate and refine** your page design
-        5. **Use the editor** for visual editing (if available)
-  - type: builtin/markdown
-    data:
-      title: "Directory Structure"
-      text: |
-        ## Project Layout
-
-        ```
-        page_editor/
-        ├── pe/                    # Core application code
-        │   ├── __init__.py
-        │   ├── main.py           # Main application entry point
-        │   ├── server.py         # HTTP server implementation
-        │   ├── renderer.py       # Page rendering logic
-        │   ├── config.py         # Configuration management
-        │   ├── types.py          # Type definitions
-        │   └── ...
-        ├── templates/            # Component templates
-        │   ├── header/
-        │   ├── text/
-        │   ├── image/
-        │   └── ...
-        ├── docs/                 # Documentation pages
-        │   ├── index.yaml
-        │   ├── getting-started.yaml
-        │   └── ...
-        ├── config.yaml           # Component configuration
-        ├── serve.py              # Development server script
-        ├── render.py             # Page rendering script
-        └── requirements.txt      # Python dependencies
-        ```
-
-        ## Key Directories
-
-        - **`pe/`**: Core application logic and API
-        - **`templates/`**: HTML templates for each component
-        - **`docs/`**: Documentation pages in YAML format
-        - **`config.yaml`**: Component definitions and configuration
-  - type: builtin/markdown
-    data:
-      title: "Development Tools"
-      text: |
-        ## Available Scripts
-
-        ### Development Server
-        ```bash
-        python serve.py
-        ```
-        Starts the development server with hot reloading.
-
-        ### Page Renderer
-        ```bash
-        python render.py <page.yaml>
-        ```
-        Renders a YAML page to HTML.
-
-        ### Make Commands
-        ```bash
-        # Build the project
-        make build
-
-        # Run tests
-        make test
-
-        # Clean build artifacts
-        make clean
-        ```
-
-        ## Debugging
-
-        ### Enable Debug Mode
-        ```bash
-        # Set debug environment variable
-        export DEBUG=1
-        python serve.py
-        ```
-
-        ### Logging
-        The application uses Python's logging module. Set the log level:
-        ```bash
-        export LOG_LEVEL=DEBUG
-        python serve.py
-        ```
-
-        ### Common Issues
-
-        **Port already in use:**
-        ```bash
-        # Kill process using port 8000
-        lsof -ti:8000 | xargs kill -9
-        ```
-
-        **Permission denied:**
-        ```bash
-        # Make scripts executable
-        chmod +x run.sh
-        chmod +x render.py
-        ```
-  - type: builtin/markdown
-    data:
-      title: "Testing"
-      text: |
-        ## Running Tests
-
-        ```bash
-        # Run all tests
-        python -m pytest pe/tests/
-
-        # Run specific test file
-        python -m pytest pe/tests/test_renderer.py
-
-        # Run with verbose output
-        python -m pytest -v pe/tests/
-        ```
-
-        ## Test Structure
-
-        Tests are located in `pe/tests/` and follow standard pytest conventions:
-
-        - `test_*.py`: Test files
-        - `test_*()`: Test functions
-        - `Test*`: Test classes
-
-        ## Writing Tests
-
-        ```python
-        # Example test
-        def test_renderer_basic():
-            from pe.renderer import render_page
-            from pe.types import PageData
-
-            page_data = PageData(
-                data=[
-                    {
-                        "type": "text",
-                        "data": {"text": "Hello World"},
-                        "style": {"color": "blue"}
-                    }
-                ]
-            )
-
-            result = render_page(page_data)
-            assert "Hello World" in result
-            assert "color: blue" in result
-        ```
-  - type: builtin/markdown
-    data:
-      title: "Configuration"
-      text: |
-        ## Environment Variables
-
-        ```bash
-        # Server configuration
-        export PORT=8000                    # Server port (default: 8000)
-        export HOST=0.0.0.0                 # Server host (default: 127.0.0.1)
-        export DEBUG=1                      # Enable debug mode
-        export LOG_LEVEL=INFO               # Logging level
-
-        # Development settings
-        export RELOAD=1                     # Enable auto-reload
-        export TEMPLATE_CACHE=0             # Disable template caching
-        ```
-
-        ## Configuration File
-
-        The `config.yaml` file defines available components:
-
-        ```yaml
-        elements:
-          - name: text
-            viewer: builtin/text/view.html
-            css: builtin/text/style.css
-            editor:
-              - id: text
-                type: rich-text
-          # ... more components
-        ```
-
-        ## Custom Components
-
-        To add custom components, edit `config.yaml`:
-
-        ```yaml
-        elements:
-          - name: custom-component
-            viewer: http://localhost:8080/api/custom-viewer
-            css: http://localhost:8080/api/custom-css
-            editor: http://localhost:8080/api/custom-editor
-        ```
+    title: Testing
+  children: []
+  style: {}
+cache: []
+last_modified: null
+meta: []
+css_variables: {}
