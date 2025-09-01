@@ -25,24 +25,7 @@ build:
   tags:
     - docker
 
-# Test stage - runs tests in the Docker container
 test:
-  stage: test
-  image: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHA
-  before_script:
-    - echo "Running tests in Docker container"
-  script:
-    - uv run -m unittest
-  dependencies:
-    - build
-  only:
-    - main
-    - develop
-    - merge_requests
-  tags:
-    - docker
-
-test-rust:
   stage: test
   image: rust:1.89.0
   script:

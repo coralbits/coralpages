@@ -1,19 +1,21 @@
-FROM ghcr.io/astral-sh/uv:bookworm-slim
+FROM rust:1.89.0 as builder
 
 WORKDIR /app
 
-
-# Copy dependency files
 COPY . .
 
-# Remove venv if it exists
-RUN rm -rf .venv
+RUN cargo install --path .
+RUN cargo build
 
-# Install Python dependencies
-RUN uv sync
+FROM debian:trixie-slim
 
-# Expose the port the app runs on
-EXPOSE 8006
+WORKDIR /app
 
-# Command to run the application
-CMD ["./run.sh"]
+COPY --from=builder /app/target/release/page-viewer /app/page-viewer
+COPY config.yaml /app/config.yaml
+COPY builtin /app/builtin
+COPY data /app/data
+
+RUN chmod +x /app/page-viewer
+
+CMD ["/app/page-viewer"]
