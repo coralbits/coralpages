@@ -95,6 +95,10 @@ impl Element {
         // check if the id is valid
         if self.id.is_empty() {
             self.id = uuid::Uuid::new_v4().to_string();
+            // id can not start with a number
+            if self.id.chars().next().unwrap().is_digit(10) {
+                self.id = "id_".to_string() + &self.id;
+            }
         }
         self.children = self.children.into_iter().map(|child| child.fix()).collect();
 
