@@ -122,7 +122,8 @@ impl<'a> RenderedingPageData<'a> {
         };
 
         // TODO is forcing create a clone always, when in most cases is not needed. But have lifetime problems if not.
-        let ctx = if widget.name == "static_context" {
+        // Also not best way to get the widget type
+        let ctx = if widget.name == "static_context" || widget.name == "url_context" {
             debug!("Getting static context for element: {:?}", element.widget);
             let ctx = match CodeStore::get_nested_widget_context(element, &ctx).await {
                 Ok(ctx) => ctx,
@@ -186,7 +187,7 @@ impl<'a> RenderedingPageData<'a> {
 
         let template = self.env.template_from_str(&widget.html)?;
 
-        let ctx = if widget.name == "static_context" {
+        let ctx = if widget.name == "static_context" || widget.name == "url_context" {
             debug!("Getting static context for element: {:?}", element.widget);
             CodeStore::get_nested_widget_context(element, &ctx).await?
         } else {

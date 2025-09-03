@@ -19,7 +19,7 @@ pdf:
   # System wide may not be good enough, as snaps have their own paths
   temp_dir: $HOME/tmp/pdf/
 
-debug: false
+debug: true
 
 # tags from stores are inherited into their elements, for exmaple
 # jinja2 at store, makes all the elements jinja2 rendered.
