@@ -54,6 +54,12 @@ impl RenderedPage {
             .join("\n");
         format!("{}", css_variables)
     }
+
+    pub fn render_full_html_page(&self) -> String {
+        let css = self.get_css();
+        let html = format!("<!DOCTYPE html>\n<html>\n<head>\n<style>\n{}\n</style>\n</head>\n<body>\n{}\n</body>\n</html>", css, self.body);
+        html
+    }
 }
 
 pub struct RenderedingPageData<'a> {

@@ -66,10 +66,11 @@ impl Api {
         Query(format): Query<Option<String>>,
         // Query(template): Query<Option<String>>,
     ) -> Result<PageRenderResponse, PoemError> {
-        let realpath = if path.ends_with(".json") {
-            path.trim_end_matches(".json")
+        let extension = path.split(".").last();
+        let realpath = if let Some(ext) = extension {
+            &path[..path.len() - (ext.len() + 1)]
         } else {
-            &path
+            path.as_str()
         };
 
         // FIXME. Remove any part of the path, keep just the last part
@@ -102,7 +103,8 @@ impl Api {
         rendered.store = page.store.clone();
         rendered.path = page.path.clone();
 
-        return self.response(request, format, rendered);
+        let accept_type = self.accept_type(request, format, extension);
+        return self.response(rendered, accept_type);
     }
 
     #[oai(path = "/render/", method = "post")]
@@ -128,7 +130,51 @@ impl Api {
             }
         };
 
-        return self.response(request, format, rendered);
+        let accept_type = self.accept_type(request, format, None);
+        return self.response(rendered, accept_type);
+    }
+
+    fn accept_type(
+        &self,
+        request: &Request,
+        format: Option<String>,
+        extension: Option<&str>,
+    ) -> String {
+        let accept_type = request.headers().get("Accept");
+
+        if let Some(extension) = extension {
+            match extension {
+                "json" => return "application/json".to_string(),
+                "html" => return "text/html".to_string(),
+                "css" => return "text/css".to_string(),
+                _ => return "application/json".to_string(),
+            }
+        }
+
+        if let Some(format) = format {
+            match format.as_str() {
+                "application/json" => return "application/json".to_string(),
+                "text/json" => return "application/json".to_string(),
+                "text/css" => return "text/css".to_string(),
+                "html" => return "text/html".to_string(),
+                "css" => return "text/css".to_string(),
+                _ => return "application/json".to_string(),
+            }
+        }
+
+        if let Some(accept) = accept_type {
+            let accept_type = accept
+                .to_str()
+                .unwrap()
+                .split(";")
+                .next()
+                .unwrap()
+                .trim()
+                .to_string();
+            return accept_type;
+        }
+
+        return "application/json".to_string();
     }
 
     fn error_response(&self, _error: PoemError) -> Result<PageRenderResponse, PoemError> {
@@ -139,16 +185,11 @@ impl Api {
 
     fn response(
         &self,
-        request: &Request,
-        format: Option<String>,
         rendered: RenderedPage,
+        accept_type: String,
     ) -> Result<PageRenderResponse, PoemError> {
-        let accept_type_ = self.response_type(request, format);
-
-        info!("Accept: {}", accept_type_);
-
-        let response = match accept_type_.as_str() {
-            "text/html" => PageRenderResponse::Html(PlainText(rendered.body)),
+        let response = match accept_type.as_str() {
+            "text/html" => PageRenderResponse::Html(PlainText(rendered.render_full_html_page())),
             "text/css" => PageRenderResponse::Css(PlainText(rendered.get_css())),
             _ => PageRenderResponse::Json(Json(PageRenderResponseJson::from_page_rendered(
                 &rendered,
