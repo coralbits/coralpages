@@ -49,6 +49,11 @@ stores:
     tags:
       - widgets
       - jinja2
+
+  # this is pure code, to allow extra specialized widgets
+  - name: code
+    type: code
+
   # allow HTTP based stores
   # - name: http
   #   type: http

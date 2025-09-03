@@ -6,7 +6,7 @@ use tracing::{debug, error, info};
 use crate::{
     file::FileStore,
     page::types::{Page, ResultPageList, Widget},
-    store::{db::DbStore, traits::Store},
+    store::{code::CodeStore, db::DbStore, traits::Store},
     StoreConfig, WidgetResults,
 };
 
@@ -56,6 +56,7 @@ impl StoreFactory {
             "db" => Ok(Box::new(
                 DbStore::new(store_config.name.as_str(), &store_config.url).await?,
             )),
+            "code" => Ok(Box::new(CodeStore::new(store_config.name.as_str()))),
             _ => Err(anyhow::anyhow!(
                 "Unsupported store type: {}",
                 store_config.store_type

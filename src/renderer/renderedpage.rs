@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
+    code::CodeStore,
     config,
     page::types::{Element, MetaDefinition, Page, Widget},
     store::traits::Store,
@@ -113,6 +114,30 @@ impl<'a> RenderedingPageData<'a> {
             None => return Err(anyhow::anyhow!("Widget not found: {}", element.widget)),
         };
 
+        // TODO is forcing create a clone always, when in most cases is not needed. But have lifetime problems if not.
+        let ctx = if widget.name == "static_context" {
+            debug!("Getting static context for element: {:?}", element.widget);
+            let ctx = match CodeStore::get_nested_widget_context(element, &ctx).await {
+                Ok(ctx) => ctx,
+                Err(e) => {
+                    error!(
+                        "Error getting static context for element: {:?}: {}",
+                        element.widget, e
+                    );
+                    if config::get_debug().await {
+                        return Ok(format!(
+                            "<pre style=\"color:red;\">{}</pre>",
+                            HtmlEscape(&e.to_string()).to_string()
+                        ));
+                    }
+                    return Err(e);
+                }
+            };
+            ctx
+        } else {
+            ctx.clone()
+        };
+
         // Render recursively all the children, and add to context.children as a list
         let mut children = Vec::new();
         for child in &element.children {
@@ -120,9 +145,9 @@ impl<'a> RenderedingPageData<'a> {
             let rendered_child = Box::pin(self.render_element(child, &ctx)).await?;
             children.push(rendered_child);
         }
-        let new_ctx = context! { ..ctx.clone(), ..context!{children => children} };
+        let render_ctx = context! { ..ctx, ..context!{children => children} };
 
-        let rendered_element = self.render_widget(&widget, element, new_ctx).await;
+        let rendered_element = self.render_widget(&widget, element, render_ctx).await;
 
         let rendered_text = match rendered_element {
             Ok(rendered_element) => rendered_element,
@@ -154,7 +179,14 @@ impl<'a> RenderedingPageData<'a> {
 
         let template = self.env.template_from_str(&widget.html)?;
 
-        let ctx = context! {
+        let ctx = if widget.name == "static_context" {
+            debug!("Getting static context for element: {:?}", element.widget);
+            CodeStore::get_nested_widget_context(element, &ctx).await?
+        } else {
+            ctx
+        };
+
+        let non_templated_context = context! {
             data => context!{
                 ..minijinja::Value::from_serialize(&element.data),
                 ..context! {
@@ -164,8 +196,20 @@ impl<'a> RenderedingPageData<'a> {
             context => ctx
         };
 
-        debug!("Context: {:?}", ctx);
-        let rendered_element = match template.render(ctx) {
+        // this should be some if, not every element should have this
+        let templated_context = Self::render_data_context(&element.data, non_templated_context)?;
+        let render_ctx = context! {
+            data => context!{
+                ..minijinja::Value::from_serialize(templated_context),
+                ..context! {
+                    id => &element.id,
+                }
+            },
+            context => ctx
+        };
+
+        debug!("Render context: {:?}", render_ctx);
+        let rendered_element = match template.render(render_ctx) {
             Ok(rendered_element) => rendered_element,
             Err(e) => {
                 error!(
@@ -202,6 +246,33 @@ impl<'a> RenderedingPageData<'a> {
         }
 
         Ok(rendered_element)
+    }
+
+    fn render_data_context(
+        data: &HashMap<String, String>,
+        ctx: minijinja::Value,
+    ) -> anyhow::Result<HashMap<String, String>> {
+        let mut result = HashMap::new();
+
+        for (k, v) in data {
+            let rendered_v = Self::render_data_context_str(v, ctx.clone())?;
+            result.insert(k.clone(), rendered_v);
+        }
+
+        Ok(result)
+    }
+
+    fn render_data_context_str(data: &String, ctx: minijinja::Value) -> anyhow::Result<String> {
+        debug!("Rendering data context: {:?}", ctx);
+        if data.contains("{{") || data.contains("{%") {
+            let env = minijinja::Environment::new();
+            let template = env.template_from_str(data)?;
+            let rendered_data = template.render(ctx)?;
+            debug!("Rendered data: {:?} -> {:?}", data, rendered_data);
+            Ok(rendered_data)
+        } else {
+            Ok(data.clone())
+        }
     }
 }
 
@@ -254,12 +325,18 @@ mod tests {
             .with_path("/test".to_string())
             .with_children(vec![Element::new(
                 "test/text".to_string(),
-                serde_json::json!({ "text": "Hello, world!" }),
+                std::collections::HashMap::from([(
+                    "text".to_string(),
+                    "Hello, world!".to_string(),
+                )]),
                 "test-link".to_string(),
             )
             .with_children(vec![Element::new(
                 "test/text".to_string(),
-                serde_json::json!({ "text": "Hello, child!" }),
+                std::collections::HashMap::from([(
+                    "text".to_string(),
+                    "Hello, child!".to_string(),
+                )]),
                 "test-link-child".to_string(),
             )])]);
         let mut store = StoreFactory::new();
@@ -285,7 +362,10 @@ mod tests {
             .with_path("/test".to_string())
             .with_children(vec![Element::new(
                 "test/text".to_string(),
-                serde_json::json!({ "text": "Hello, world!" }),
+                std::collections::HashMap::from([(
+                    "text".to_string(),
+                    "Hello, world!".to_string(),
+                )]),
                 "test-link-id".to_string(),
             )
             .with_style(std::collections::HashMap::from([(
@@ -320,18 +400,21 @@ mod tests {
             .with_path("/test".to_string())
             .with_children(vec![Element::new(
                 "test/columns".to_string(),
-                serde_json::json!({ "wrap": true, "gap": 12 }),
+                std::collections::HashMap::from([
+                    ("wrap".to_string(), "true".to_string()),
+                    ("gap".to_string(), "12".to_string()),
+                ]),
                 "test-columns".to_string(),
             )
             .with_children(vec![
                 Element::new(
                     "test/text".to_string(),
-                    serde_json::json!({ "text": "Column 1" }),
+                    std::collections::HashMap::from([("text".to_string(), "Column 1".to_string())]),
                     "test-link-1".to_string(),
                 ),
                 Element::new(
                     "test/text".to_string(),
-                    serde_json::json!({ "text": "Column 2" }),
+                    std::collections::HashMap::from([("text".to_string(), "Column 2".to_string())]),
                     "test-link-2".to_string(),
                 ),
             ])]);

@@ -27,11 +27,44 @@ pub struct WidgetEditor {
     #[oai(rename = "type")]
     pub editor_type: String,
     pub label: String,
+    #[serde(default)]
     pub name: String,
     #[serde(default)]
     pub placeholder: String,
     #[serde(default)]
     pub options: Vec<WidgetEditorOption>,
+}
+
+impl WidgetEditor {
+    pub fn new() -> Self {
+        WidgetEditor {
+            editor_type: "".to_string(),
+            label: "".to_string(),
+            name: "".to_string(),
+            placeholder: "".to_string(),
+            options: Vec::new(),
+        }
+    }
+
+    pub fn with_editor_type(mut self, editor_type: String) -> Self {
+        self.editor_type = editor_type;
+        self
+    }
+
+    pub fn with_label(mut self, label: String) -> Self {
+        self.label = label;
+        self
+    }
+
+    pub fn with_name(mut self, name: String) -> Self {
+        self.name = name;
+        self
+    }
+
+    pub fn with_placeholder(mut self, placeholder: String) -> Self {
+        self.placeholder = placeholder;
+        self
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]
@@ -70,7 +103,7 @@ pub struct Element {
     pub widget: String,
     #[serde(default)]
     #[oai(default)]
-    pub data: serde_json::Value,
+    pub data: std::collections::HashMap<String, String>,
     #[serde(default)]
     #[oai(default)]
     pub children: Vec<Element>,
@@ -80,7 +113,11 @@ pub struct Element {
 }
 
 impl Element {
-    pub fn new(widget: String, data: serde_json::Value, id: String) -> Self {
+    pub fn new(
+        widget: String,
+        data: std::collections::HashMap<String, String>,
+        id: String,
+    ) -> Self {
         Self {
             id,
             widget,
@@ -250,7 +287,7 @@ mod tests {
     fn test_element_creation() {
         let element = Element::new(
             "div".to_string(),
-            serde_json::json!({"text": "Hello"}),
+            std::collections::HashMap::from([("text".to_string(), "Hello".to_string())]),
             "test-div".to_string(),
         );
 
@@ -268,7 +305,7 @@ mod tests {
 
         let element = Element::new(
             "div".to_string(),
-            serde_json::json!({"text": "Hello"}),
+            std::collections::HashMap::from([("text".to_string(), "Hello".to_string())]),
             "test-div".to_string(),
         )
         .with_style(style);
@@ -281,7 +318,7 @@ mod tests {
     fn test_page_with_elements() {
         let element = Element::new(
             "div".to_string(),
-            serde_json::json!({"text": "Hello"}),
+            std::collections::HashMap::from([("text".to_string(), "Hello".to_string())]),
             "test-div".to_string(),
         );
         let page = Page::new()
