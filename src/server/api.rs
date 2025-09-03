@@ -4,7 +4,7 @@ use poem::middleware::Cors;
 use poem::web::Redirect;
 use poem::{get, handler};
 use std::{collections::HashMap, sync::Arc};
-use tracing::{error, info};
+use tracing::error;
 
 use crate::page::types::ResultPageList;
 use crate::server::PageRenderResponse;
@@ -196,37 +196,6 @@ impl Api {
             ))),
         };
         Ok(response)
-    }
-
-    fn response_type(&self, request: &Request, format: Option<String>) -> String {
-        // Get from format query parameter
-        if let Some(format) = format {
-            let format = match format.as_str() {
-                "application/json" => "application/json",
-                "text/json" => "application/json",
-                "text/css" => "text/css",
-                "html" => "text/html",
-                "css" => "text/css",
-                _ => "application/json",
-            };
-            return format.to_string();
-        }
-
-        // Get from Accept header
-        let ret = if let Some(accept) = request.headers().get("Accept") {
-            accept
-                .to_str()
-                .unwrap()
-                .split(";")
-                .next()
-                .unwrap()
-                .trim()
-                .to_string()
-        } else {
-            "application/json".to_string()
-        };
-
-        return ret;
     }
 
     #[oai(path = "/page", method = "get")]
