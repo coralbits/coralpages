@@ -14,6 +14,14 @@ pub struct Widget {
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]
+pub struct WidgetEditorOption {
+    pub label: String,
+    pub value: String,
+    #[serde(default)]
+    pub icon: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct WidgetEditor {
     #[serde(rename = "type")]
     #[oai(rename = "type")]
@@ -22,6 +30,8 @@ pub struct WidgetEditor {
     pub name: String,
     #[serde(default)]
     pub placeholder: String,
+    #[serde(default)]
+    pub options: Vec<WidgetEditorOption>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]

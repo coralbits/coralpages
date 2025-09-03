@@ -78,9 +78,10 @@ impl<'a> RenderedingPageData<'a> {
     }
 
     pub async fn render(&mut self, ctx: &minijinja::Value) -> anyhow::Result<()> {
+        let mut rendered_body = String::new();
         for element in &self.page.children {
             debug!("Rendering element: {:?}", element.widget);
-            self.render_element(element, ctx).await?;
+            rendered_body.push_str(&self.render_element(element, ctx).await?);
         }
 
         debug!(
@@ -90,6 +91,8 @@ impl<'a> RenderedingPageData<'a> {
         // add the meta
         self.rendered_page.meta.extend(self.page.meta.clone());
 
+        self.rendered_page.body = rendered_body;
+
         Ok(())
     }
 
@@ -97,7 +100,7 @@ impl<'a> RenderedingPageData<'a> {
         &mut self,
         element: &Element,
         ctx: &minijinja::Value,
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<String> {
         let widget = self.store.load_widget_definition(&element.widget).await?;
         let widget = match widget {
             Some(widget) => widget,
@@ -115,7 +118,7 @@ impl<'a> RenderedingPageData<'a> {
 
         let rendered_element = self.render_widget(&widget, element, new_ctx).await;
 
-        let rendered_element = match rendered_element {
+        let rendered_text = match rendered_element {
             Ok(rendered_element) => rendered_element,
             Err(e) => {
                 if config::get_debug().await {
@@ -132,8 +135,7 @@ impl<'a> RenderedingPageData<'a> {
             }
         };
 
-        self.rendered_page.body.push_str(&rendered_element);
-        Ok(())
+        Ok(rendered_text)
     }
 
     pub async fn render_widget(
@@ -220,11 +222,17 @@ mod tests {
             "test"
         }
 
-        async fn load_widget_definition(&self, _path: &str) -> anyhow::Result<Option<Widget>> {
+        async fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
+            debug!("Loading widget definition from path: {}", path);
+            let html = match path {
+                "text" => "<a class=\"test-link\" id=\"{{data.id}}\">Hello, {{data.text}}!</a>",
+                "columns" => "<div class=\"columns column-{{data.id}}\" id=\"{{data.id}}\">{{context.children|join('')}}</div>",
+                _ => return Ok(None),
+            };
+
             Ok(Some(Widget {
-                name: "test".to_string(),
-                html: "<a class=\"test-link\" id=\"{{data.id}}\">Hello, {{data.text}}!</a>"
-                    .to_string(),
+                name: path.to_string(),
+                html: html.to_string(),
                 css: ".test-link { background: red; }".to_string(),
                 editor: vec![],
                 description: "Test widget".to_string(),
@@ -297,5 +305,40 @@ mod tests {
         let css = rendered_page.get_css();
         assert!(css.contains(from_element_class));
         assert!(css.contains(from_element_id));
+    }
+
+    #[tokio::test]
+    async fn test_rendered_page_columns() {
+        let page = Page::new()
+            .with_title("Test Page".to_string())
+            .with_path("/test".to_string())
+            .with_children(vec![Element::new(
+                "test/columns".to_string(),
+                serde_json::json!({ "wrap": true, "gap": 12 }),
+                "test-columns".to_string(),
+            )
+            .with_children(vec![
+                Element::new(
+                    "test/text".to_string(),
+                    serde_json::json!({ "text": "Column 1" }),
+                    "test-link-1".to_string(),
+                ),
+                Element::new(
+                    "test/text".to_string(),
+                    serde_json::json!({ "text": "Column 2" }),
+                    "test-link-2".to_string(),
+                ),
+            ])]);
+
+        let mut renderer = PageRenderer::new();
+        renderer.store.add_store(Box::new(TestStore {}));
+
+        let rendered_page = renderer
+            .render_page(&page, &minijinja::context! {})
+            .await
+            .unwrap();
+
+        info!("Rendered page: {:?}", rendered_page.body);
+        assert_eq!(rendered_page.body, "<div class=\"columns column-test-columns\" id=\"test-columns\"><a class=\"test-link\" id=\"test-link-1\">Hello, Column 1!</a><a class=\"test-link\" id=\"test-link-2\">Hello, Column 2!</a></div>");
     }
 }
