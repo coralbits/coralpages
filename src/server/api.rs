@@ -3,6 +3,7 @@ use minijinja::context;
 use poem::middleware::Cors;
 use poem::web::Redirect;
 use poem::{get, handler};
+use poem_openapi::payload::Binary;
 use std::{collections::HashMap, sync::Arc};
 use tracing::error;
 
@@ -11,6 +12,7 @@ use crate::server::PageRenderResponse;
 use crate::traits::Store;
 use crate::{
     renderedpage::RenderedPage,
+    renderer::pdf::render_pdf,
     renderresponse::{Details, PageRenderResponseJson},
 };
 use crate::{IdName, Page, PageRenderer, StoreListResults, WidgetResults};
@@ -104,7 +106,7 @@ impl Api {
         rendered.path = page.path.clone();
 
         let accept_type = self.accept_type(request, format, extension);
-        return self.response(rendered, accept_type);
+        return self.response(rendered, accept_type).await;
     }
 
     #[oai(path = "/render/", method = "post")]
@@ -131,7 +133,7 @@ impl Api {
         };
 
         let accept_type = self.accept_type(request, format, None);
-        return self.response(rendered, accept_type);
+        return self.response(rendered, accept_type).await;
     }
 
     fn accept_type(
@@ -147,6 +149,7 @@ impl Api {
                 "json" => return "application/json".to_string(),
                 "html" => return "text/html".to_string(),
                 "css" => return "text/css".to_string(),
+                "pdf" => return "application/pdf".to_string(),
                 _ => return "application/json".to_string(),
             }
         }
@@ -156,8 +159,10 @@ impl Api {
                 "application/json" => return "application/json".to_string(),
                 "text/json" => return "application/json".to_string(),
                 "text/css" => return "text/css".to_string(),
+                "application/pdf" => return "application/pdf".to_string(),
                 "html" => return "text/html".to_string(),
                 "css" => return "text/css".to_string(),
+                "pdf" => return "application/pdf".to_string(),
                 _ => return "application/json".to_string(),
             }
         }
@@ -183,7 +188,7 @@ impl Api {
         Ok(response)
     }
 
-    fn response(
+    async fn response(
         &self,
         rendered: RenderedPage,
         accept_type: String,
@@ -191,6 +196,15 @@ impl Api {
         let response = match accept_type.as_str() {
             "text/html" => PageRenderResponse::Html(PlainText(rendered.render_full_html_page())),
             "text/css" => PageRenderResponse::Css(PlainText(rendered.get_css())),
+            "application/pdf" => {
+                PageRenderResponse::Pdf(Binary(render_pdf(&rendered).await.map_err(|e| {
+                    error!("Error rendering PDF: {:?}", e);
+                    PoemError::from_string(
+                        e.to_string(),
+                        poem::http::StatusCode::INTERNAL_SERVER_ERROR,
+                    )
+                })?))
+            }
             _ => PageRenderResponse::Json(Json(PageRenderResponseJson::from_page_rendered(
                 &rendered,
             ))),

@@ -12,6 +12,13 @@ pub struct Config {
     pub debug: bool,
     pub server: ServerConfig,
     pub stores: Vec<StoreConfig>,
+    pub pdf: Option<PdfConfig>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct PdfConfig {
+    pub chromium_path: String,
+    pub temp_dir: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -40,12 +47,24 @@ impl Config {
         let reader = BufReader::new(file);
         let config: Config = serde_yaml::from_reader(reader)
             .map_err(|e| anyhow::anyhow!("Failed to parse config file {}: {}", path, e))?;
+        let config = config.postprocess();
         Ok(config)
+    }
+    fn postprocess(mut self) -> Self {
+        if let Some(pdf) = self.pdf.as_mut() {
+            if pdf.temp_dir.starts_with("$HOME") {
+                pdf.temp_dir = pdf
+                    .temp_dir
+                    .replace("$HOME", &std::env::var("HOME").unwrap());
+            }
+        }
+        self
     }
 
     pub fn empty() -> Self {
         Self {
             debug: false,
+            pdf: None,
             server: ServerConfig {
                 port: 8006,
                 host: "0.0.0.0".to_string(),

@@ -1,4 +1,4 @@
-use poem_openapi::payload::{Json, PlainText};
+use poem_openapi::payload::{Binary, Json, PlainText};
 use serde::Serialize;
 use std::collections::HashMap;
 
@@ -74,6 +74,8 @@ pub enum PageRenderResponse {
     Html(PlainText<String>),
     #[oai(status = 200, content_type = "text/css; charset=utf-8")]
     Css(PlainText<String>),
+    #[oai(status = 200, content_type = "application/pdf")]
+    Pdf(Binary<Vec<u8>>),
     #[oai(status = 500, content_type = "application/json; charset=utf-8")]
     Error(Json<Details>),
 }

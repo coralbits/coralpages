@@ -1,3 +1,4 @@
+pub mod pdf;
 pub mod renderedpage;
 pub mod renderer;
 
