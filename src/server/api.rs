@@ -99,8 +99,8 @@ impl Api {
         let mut rendered = self.renderer.render_page(&page, &ctx).await.map_err(|e| {
             PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
         })?;
-        rendered.store = store.clone();
-        rendered.path = path.clone();
+        rendered.store = page.store.clone();
+        rendered.path = page.path.clone();
 
         return self.response(request, format, rendered);
     }

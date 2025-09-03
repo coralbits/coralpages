@@ -113,6 +113,8 @@ pub struct Page {
     pub title: String,
     #[serde(default)]
     pub path: String,
+    #[serde(default)]
+    pub store: String,
     pub url: Option<String>,
     pub template: Option<String>,
     #[serde(default)]
@@ -131,6 +133,7 @@ impl Page {
         Self {
             title: "".to_string(),
             path: "".to_string(),
+            store: "".to_string(),
             url: None,
             template: None,
             children: Vec::new(),

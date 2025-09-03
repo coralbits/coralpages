@@ -93,8 +93,10 @@ impl Store for StoreFactory {
             let store = self.get_store(store);
             if let Some(store) = store {
                 let page = store.load_page_definition(&subpath).await?;
-                if page.is_some() {
-                    return Ok(page);
+                if let Some(mut page) = page {
+                    page.store = store.name().to_string();
+                    page.path = subpath.to_string();
+                    return Ok(Some(page));
                 }
             }
         }
