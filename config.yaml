@@ -43,6 +43,12 @@ stores:
     tags:
       - widgets
       - jinja2
+  - name: graphs
+    type: file
+    path: ./builtin/graphs/
+    tags:
+      - widgets
+      - jinja2
   # allow HTTP based stores
   # - name: http
   #   type: http
