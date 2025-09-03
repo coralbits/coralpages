@@ -81,7 +81,7 @@ async fn render_page_file(filename: &str) -> Result<()> {
 
     // Create a RenderedPage and render it
     let ctx = context! {};
-    let rendered_page = renderer.render_page(&page, &ctx).await?;
+    let rendered_page = renderer.render_page(&page, &ctx, false).await?;
 
     // Print the rendered body to stdout
     print!("{}", rendered_page.body);
@@ -102,7 +102,7 @@ async fn render_from_store(pagename: &str) -> Result<()> {
     info!("Loaded page: {:?}", page.path);
 
     let ctx = context! {};
-    let rendered_page = renderer.render_page(&page, &ctx).await?;
+    let rendered_page = renderer.render_page(&page, &ctx, false).await?;
 
     // Print the rendered body to stdout
     print!("{}", rendered_page.body);

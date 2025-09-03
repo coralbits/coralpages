@@ -68,6 +68,7 @@ pub struct RenderedingPageData<'a> {
     store: &'a dyn Store,
     env: &'a Environment<'a>,
     pub rendered_page: RenderedPage,
+    debug: bool,
 }
 
 impl<'a> RenderedingPageData<'a> {
@@ -81,7 +82,13 @@ impl<'a> RenderedingPageData<'a> {
             store: store,
             env: env,
             rendered_page,
+            debug: false,
         }
+    }
+
+    pub fn with_debug(mut self, debug: bool) -> Self {
+        self.debug = debug;
+        self
     }
 
     pub async fn render(&mut self, ctx: &minijinja::Value) -> anyhow::Result<()> {
@@ -124,7 +131,7 @@ impl<'a> RenderedingPageData<'a> {
                         "Error getting static context for element: {:?}: {}",
                         element.widget, e
                     );
-                    if config::get_debug().await {
+                    if self.debug {
                         return Ok(format!(
                             "<pre style=\"color:red;\">{}</pre>",
                             HtmlEscape(&e.to_string()).to_string()
@@ -152,7 +159,7 @@ impl<'a> RenderedingPageData<'a> {
         let rendered_text = match rendered_element {
             Ok(rendered_element) => rendered_element,
             Err(e) => {
-                if config::get_debug().await {
+                if self.debug {
                     let ret = format!(
                         "<pre style=\"color:red;\">{}</pre>",
                         HtmlEscape(&e.to_string()).to_string()
@@ -379,7 +386,7 @@ mod tests {
 
         // Render
         let rendered_page = renderer
-            .render_page(&page, &minijinja::context! {})
+            .render_page(&page, &minijinja::context! {}, false)
             .await
             .unwrap();
 
@@ -423,7 +430,7 @@ mod tests {
         renderer.store.add_store(Box::new(TestStore {}));
 
         let rendered_page = renderer
-            .render_page(&page, &minijinja::context! {})
+            .render_page(&page, &minijinja::context! {}, false)
             .await
             .unwrap();
 

@@ -54,7 +54,7 @@ impl Api {
             Path(store),
             Path(realpath),
             Query(None),
-            // Query(None),
+            Query(None),
         )
         .await
     }
@@ -66,6 +66,7 @@ impl Api {
         Path(store): Path<String>,
         Path(path): Path<String>,
         Query(format): Query<Option<String>>,
+        Query(debug): Query<Option<bool>>,
         // Query(template): Query<Option<String>>,
     ) -> Result<PageRenderResponse, PoemError> {
         let extension = path.split(".").last();
@@ -99,9 +100,13 @@ impl Api {
 
         let ctx = context! {};
 
-        let mut rendered = self.renderer.render_page(&page, &ctx).await.map_err(|e| {
-            PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
-        })?;
+        let mut rendered = self
+            .renderer
+            .render_page(&page, &ctx, debug.unwrap_or(false))
+            .await
+            .map_err(|e| {
+                PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+            })?;
         rendered.store = page.store.clone();
         rendered.path = page.path.clone();
 
@@ -115,14 +120,20 @@ impl Api {
         request: &Request,
         Json(page): Json<Page>,
         Query(format): Query<Option<String>>,
+        Query(debug): Query<Option<bool>>,
     ) -> Result<PageRenderResponse, PoemError> {
         let page = page.fix();
 
         let ctx = context! {};
 
-        let rendered = self.renderer.render_page(&page, &ctx).await.map_err(|e| {
-            PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
-        });
+        let debug = debug.unwrap_or(false);
+        let rendered = self
+            .renderer
+            .render_page(&page, &ctx, debug)
+            .await
+            .map_err(|e| {
+                PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+            });
 
         let rendered = match rendered {
             Ok(rendered) => rendered,
