@@ -130,6 +130,7 @@ impl Store for CodeStore {
             name: "static_context".to_string(),
             description: "Static context".to_string(),
             html: "{% for child in context.children %}{{child}}{% endfor %}".to_string(),
+            icon: "networkWired".to_string(),
             css: "".to_string(),
             editor: vec![
                 WidgetEditor::new()
@@ -150,7 +151,6 @@ impl Store for CodeStore {
                 .with_placeholder("Enter static JSON code".to_string()) 
                 ,
             ],
-            icon: "static_context".to_string(),
         }))
     }
     "url_context" => {
@@ -158,6 +158,7 @@ impl Store for CodeStore {
             name: "url_context".to_string(),
             description: "URL context".to_string(),
             html: "{% for child in context.children %}{{child}}{% endfor %}".to_string(),
+            icon: "gem".to_string(),
             css: "".to_string(),
             editor: vec![
                 WidgetEditor::new()
@@ -173,7 +174,6 @@ impl Store for CodeStore {
                 .with_placeholder("Enter URL".to_string())
                 ,
             ],
-            icon: "url_context".to_string(),
         }))
     },
     _ => {

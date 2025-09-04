@@ -1,14 +1,4 @@
 widgets:
-  - name: text
-    description: A text widget
-    icon: text
-    html: text/view.html
-    css: text/style.css
-    editor:
-      - type: textarea
-        label: Text
-        name: text
-        placeholder: Enter text
   - name: image
     description: An image widget
     icon: image
@@ -52,45 +42,21 @@ widgets:
     html: header/view.html
     css: header/style.css
     editor:
+      - type: select
+        label: Size
+        name: size
+        options:
+          - label: Large
+            value: large
+          - label: Medium
+            value: medium
+          - label: Small
+            value: small
+        default: medium
       - type: text
         label: Text
         name: text
         placeholder: Enter text
-  - name: section
-    description: A section widget
-    icon: section
-    html: section/view.html
-    css: section/style.css
-    editor:
-      - type: textarea
-        label: Text
-        name: text
-        placeholder: Enter text
-  - name: tag-cloud
-    description: A tag cloud widget
-    icon: tag
-    html: tag-cloud/view.html
-    css: tag-cloud/style.css
-    editor:
-      - type: text
-        label: Title
-        name: tags
-        placeholder: Enter tags
-  - name: paragraph
-    description: A paragraph widget
-    icon: paragraph
-    html: text/view.html
-    css: text/style.css
-    editor:
-      - type: textarea
-        label: Text
-        name: text
-        placeholder: Enter text
-  - name: menu
-    description: A menu widget
-    icon: menu
-    html: menu/view.html
-    css: menu/style.css
   - name: markdown
     description: A markdown widget
     icon: markdown
@@ -102,46 +68,19 @@ widgets:
         name: text
         placeholder: Enter markdown text
         required: true
-  - name: children
-    description: A children widget
-    icon: children
-    html: children/view.html
-    css: children/style.css
-  - name: button
-    description: A button widget
-    icon: button
-    html: button/view.html
-    css: button/style.css
-    editor:
-      - type: text
-        label: Text
-        name: text
-        placeholder: Enter text
-      - type: select
-        label: Type
-        name: type
-        options:
-          - label: Nothing
-            value:
-          - label: Submit
-            value: submit
-          - label: Onclick
-            value: onclick
-        default: onclick
-      - type: textarea
-        label: Onclick
-        name: onclick
-        placeholder: Enter onclick javascript
-  - name: div
-    description: A div widget
-    icon: div
-    html: div/view.html
-    css: div/style.css.j2
+  - name: section
+    description: Section
+    icon: borderNone
+    html: section/view.html
+    css: section/style.css
     editor:
       - type: select-buttons
         label: Direction
         name: direction
         options:
+          - label: Responsive
+            value: responsive
+            icon: columns
           - label: Column
             value: column
             icon: down
@@ -181,23 +120,26 @@ widgets:
         label: Wrap
         name: wrap
         default: false
-      - type: number
+      - type: select
         label: Gap
         name: gap
+        options:
+          - label: 0
+            value: 0
+          - label: 4
+            value: 4
+          - label: 8
+            value: 8
+          - label: 12
+            value: 12
+          - label: 16
+            value: 16
+          - label: 20
+            value: 20
         default: 0
-
-  - name: html
-    description: A HTML widget
-    icon: html
-    html: html/view.html
-    editor:
-      - type: html
-        label: HTML
-        name: html
-
   - name: form
     description: A Form
-    icon: form
+    icon: columns
     html: form/form.html
     css: form/style.css
     editor:
@@ -230,7 +172,7 @@ widgets:
 
   - name: form_input
     description: A Form Input
-    icon: form_input
+    icon: squareCheck
     html: form/input.html
     editor:
       - type: text
@@ -262,45 +204,3 @@ widgets:
         name: default_value
         label: Default Value
         description: Default value of the input
-  - name: columns
-    description: Columns layout
-    icon: columns
-    html: columns/view.html
-    css: columns/style.css
-    editor:
-      - type: boolean
-        label: Wrap
-        name: wrap
-        default: false
-      - type: number
-        label: Gap
-        name: gap
-        default: 12
-      - type: select
-        label: Align Items
-        name: align_items
-        options:
-          - label: Top
-            value: start
-          - label: Bottom
-            value: end
-          - label: Center
-            value: center
-          - label: Stretch
-            value: stretch
-        default: start
-      - type: select
-        label: Justify Content
-        name: justify_content
-        options:
-          - label: Start
-            value: start
-          - label: End
-            value: end
-          - label: Center
-            value: center
-          - label: Space Between
-            value: space-between
-          - label: Space Around
-            value: space-around
-        default: start

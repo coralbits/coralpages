@@ -1,7 +1,7 @@
 widgets:
   - name: pie
     description: A pie chart widget
-    icon: pie
+    icon: chartPie
     html: pie/view.html
     css: pie/style.css
     editor:

@@ -1,7 +1,26 @@
-<section class="content-section @@class@@" id="{{data.id}}">
-  {% if data.title %}
-  <h2>{{data.title}}</h2>
-  {% endif %} {% if data.text %}
-  <p>{{data.text}}</p>
-  {% endif %} {{children}}
-</section>
+<div
+  class="
+  {%- if data.direction == 'row' %} 
+    flex flex-row 
+  {%- elif data.direction == 'column' %} 
+    flex flex-col 
+  {%- elif data.direction == 'responsive' %}
+    flex flex-responsive
+  {%- endif %}
+  {%- if data.gap %}
+    gap-{{data.gap}}
+  {%- endif %}
+  {%- if data.alignment_horizontal %}
+    align-horizontal-{{data.alignment_horizontal}}
+  {%- endif %}
+  {%- if data.alignment_vertical %}
+    align-vertical-{{data.alignment_vertical}}
+  {%- endif %}
+  {%- if data.wrap %}
+    flex-wrap
+  {%- endif %}
+  "
+  id="{{data.id}}"
+>
+  {% for child in context.children %} {{child}} {% endfor %}
+</div>

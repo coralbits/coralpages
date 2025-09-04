@@ -1,0 +1,41 @@
+widgets:
+  - name: menu
+    description: A menu widget
+    icon: menu
+    html: menu/view.html
+    css: menu/style.css
+  - name: button
+    description: A button widget
+    icon: button
+    html: button/view.html
+    css: button/style.css
+    editor:
+      - type: text
+        label: Text
+        name: text
+        placeholder: Enter text
+      - type: select
+        label: Type
+        name: type
+        options:
+          - label: Nothing
+            value:
+          - label: Submit
+            value: submit
+          - label: Onclick
+            value: onclick
+        default: onclick
+      - type: textarea
+        label: Onclick
+        name: onclick
+        placeholder: Enter onclick javascript
+  - name: tag-cloud
+    description: A tag cloud widget
+    icon: tag
+    html: tag-cloud/view.html
+    css: tag-cloud/style.css
+    editor:
+      - type: text
+        label: Title
+        name: tags
+        placeholder: Enter tags

@@ -1,3 +1,7 @@
-<h1 class="page-header @@class@@" id="{{data.id}}">
-  {{data.text}}{{children}}
-</h1>
+{% if data.size == 'large' %}
+<h1 class="page-header" id="{{data.id}}">{{data.text}}{{context.children}}</h1>
+{% elif data.size == 'medium' %}
+<h2 class="page-header" id="{{data.id}}">{{data.text}}{{context.children}}</h2>
+{% elif data.size == 'small' %}
+<h3 class="page-header" id="{{data.id}}">{{data.text}}{{context.children}}</h3>
+{% endif %}
