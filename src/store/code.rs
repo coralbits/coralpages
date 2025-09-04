@@ -1,18 +1,15 @@
-use std::{collections::HashMap, sync::LazyLock};
+use std::collections::HashMap;
 
+use crate::cache::cache;
 use async_trait::async_trait;
 use minijinja::{context, Value};
-use tokio::sync::RwLock;
-use tracing::{debug, info};
+use tracing::debug;
 
 use crate::{traits::Store, Element, Widget, WidgetEditor, WidgetResults};
 
 pub struct CodeStore {
     name: String,
 }
-
-static CODE_STORE_CACHE: LazyLock<RwLock<HashMap<String, Value>>> =
-    LazyLock::new(|| RwLock::new(HashMap::new()));
 
 impl CodeStore {
     pub fn new(name: &str) -> Self {
@@ -72,8 +69,9 @@ impl CodeStore {
             .ok_or_else(|| anyhow::anyhow!("Key not found"))?;
 
         // first all read
-        let value = if let Some(value) = CODE_STORE_CACHE.read().await.get(url) {
-            debug!("Cache hit for URL: {}, value={:?}", url, value);
+        let value = if let Some(value_str) = cache::cache().get(url).await {
+            let value: Value = serde_json::from_str(&value_str)?;
+            debug!("Cache hit for URL: {}, value length={:?}", url, value.len());
             Some(value.clone())
         } else {
             debug!("Cache miss for URL: {}", url);
@@ -93,22 +91,21 @@ impl CodeStore {
                     .send()
                     .await?;
                 let body = url_contents.bytes().await?;
-                debug!("Body: {:?}", body);
+                cache::cache()
+                    .set(url, &String::from_utf8(body.to_vec())?)
+                    .await;
+                debug!("Body length: {:?}", body.len());
                 let body: Value = serde_json::from_slice(&body)?;
-                CODE_STORE_CACHE
-                    .write()
-                    .await
-                    .insert(url.to_string(), body.clone());
                 body
             }
         };
 
-        debug!(
-            "URL context: URL={url} body={body} key={key}",
-            url = url,
-            body = value,
-            key = key
-        );
+        // debug!(
+        //     "URL context: URL={url} body={body} key={key}",
+        //     url = url,
+        //     body = value,
+        //     key = key
+        // );
         let mut hashmap: HashMap<String, Value> = HashMap::new();
         hashmap.insert(key.to_string(), value);
 

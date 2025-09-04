@@ -13,6 +13,13 @@ pub struct Config {
     pub server: ServerConfig,
     pub stores: Vec<StoreConfig>,
     pub pdf: Option<PdfConfig>,
+    pub cache: Option<CacheConfig>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct CacheConfig {
+    pub backend: String,
+    pub url: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -65,6 +72,7 @@ impl Config {
         Self {
             debug: false,
             pdf: None,
+            cache: None,
             server: ServerConfig {
                 port: 8006,
                 host: "0.0.0.0".to_string(),

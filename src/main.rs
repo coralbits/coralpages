@@ -2,7 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use minijinja::context;
 use page_viewer::traits::Store;
-use page_viewer::{config, utils, Page, PageRenderer};
+use page_viewer::{cache, config, utils, Page, PageRenderer};
 use std::fs;
 use std::time::Instant;
 use tracing::info;
@@ -22,8 +22,10 @@ struct Args {
     /// Render all pages in the given directory
     #[arg(long, value_name = "FILENAME")]
     render_from_store: Option<String>,
-    #[arg(short, long, value_name = "LISTEN", default_value = "0.0.0.0:8006")]
+    #[arg(long, value_name = "LISTEN", default_value = "0.0.0.0:8006")]
     listen: Option<String>,
+    #[arg(long, default_value = "false")]
+    verbose: bool,
 }
 
 #[tokio::main]
@@ -38,8 +40,18 @@ async fn main() -> Result<()> {
     info!("Starting config file watcher for: {}", args.config);
     watch_config(&args.config).await?;
 
-    let debug = config::get_debug().await;
+    let debug = if args.verbose {
+        true
+    } else {
+        config::get_debug().await
+    };
     utils::setup_logging(debug);
+
+    {
+        if let Some(cache) = get_config().await.cache.as_ref() {
+            cache::set_cache(&cache.backend, &cache.url).await?;
+        }
+    }
 
     if let Some(filename) = args.render_file {
         // Read and render the YAML file

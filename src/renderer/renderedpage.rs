@@ -216,7 +216,7 @@ impl<'a> RenderedingPageData<'a> {
             context => ctx
         };
 
-        debug!("Render context: {:?}", render_ctx);
+        // debug!("Render context: {:?}", render_ctx);
         let rendered_element = match template.render(render_ctx) {
             Ok(rendered_element) => rendered_element,
             Err(e) => {
@@ -271,7 +271,7 @@ impl<'a> RenderedingPageData<'a> {
     }
 
     fn render_data_context_str(data: &String, ctx: minijinja::Value) -> anyhow::Result<String> {
-        debug!("Rendering data context: {:?}", ctx);
+        // debug!("Rendering data context: {:?}", ctx);
         if data.contains("{{") || data.contains("{%") {
             let env = minijinja::Environment::new();
             let template = env.template_from_str(data)?;
