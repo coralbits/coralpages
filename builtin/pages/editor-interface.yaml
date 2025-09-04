@@ -5,6 +5,7 @@ template: "pages/_default"
 
 children:
   - type: builtin/markdown
+    id: "visual-page-editor"
     data:
       title: "Visual Page Editor"
       text: |
@@ -32,6 +33,7 @@ children:
         - **Preview Pane**: Live preview of the page
         - **Component Library**: Available components sidebar
   - type: builtin/markdown
+    id: "getting-started-with-the-editor"
     data:
       title: "Getting Started with the Editor"
       text: |
@@ -71,6 +73,7 @@ children:
         5. **Preview**: See changes in real-time
         6. **Save**: Save your changes to the page
   - type: builtin/markdown
+    id: "component-editors"
     data:
       title: "Component Editors"
       text: |
@@ -182,6 +185,7 @@ children:
         - **Media Queries**: Conditional styling for different screens
         - **Touch-Friendly**: Optimize for touch interfaces
   - type: builtin/markdown
+    id: "layout-management"
     data:
       title: "Layout Management"
       text: |
@@ -223,6 +227,7 @@ children:
         - **Distribute**: Evenly space multiple components
         - **Group/Ungroup**: Group related components
   - type: builtin/markdown
+    id: "preview-and-testing"
     data:
       title: "Preview and Testing"
       text: |
@@ -262,6 +267,7 @@ children:
         - **JSON Export**: Export page data
         - **PDF Export**: Generate PDF version
   - type: builtin/markdown
+    id: "advanced-features"
     data:
       title: "Advanced Features"
       text: |

@@ -4,3 +4,7 @@ __pycache__
 data/
 !.gitlab-ci.yml
 !.github
+
+# Added by cargo
+
+/target

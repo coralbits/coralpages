@@ -1,0 +1,61 @@
+use crate::{
+    page::types::Page,
+    renderer::renderedpage::{RenderedPage, RenderedingPageData},
+    store::factory::StoreFactory,
+    StoreConfig,
+};
+use anyhow::Result;
+use minijinja::Environment;
+use pulldown_cmark::{html::push_html, Parser};
+
+use tracing::instrument;
+
+pub struct PageRenderer {
+    pub store: StoreFactory,
+    pub env: Environment<'static>,
+}
+
+impl std::fmt::Debug for PageRenderer {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "PageRenderer")
+    }
+}
+
+fn markdown_to_html(markdown: &str) -> String {
+    let mut html = String::new();
+    let parser = Parser::new(markdown);
+    push_html(&mut html, parser);
+    html
+}
+
+impl PageRenderer {
+    pub fn new() -> Self {
+        let store = StoreFactory::new();
+        let mut env = Environment::new();
+        env.add_filter("markdown", markdown_to_html);
+
+        Self { store, env }
+    }
+
+    pub async fn with_stores(mut self, stores: &[StoreConfig]) -> Result<Self> {
+        for store in stores {
+            self.store.add_store(StoreFactory::new_store(&store).await?);
+        }
+        Ok(self)
+    }
+
+    #[instrument(skip(self, page, ctx, debug), fields(page_path = page.path))]
+    pub async fn render_page(
+        &self,
+        page: &Page,
+        ctx: &minijinja::Value,
+        debug: bool,
+    ) -> anyhow::Result<RenderedPage> {
+        let mut rendering_page =
+            RenderedingPageData::new(&page, &self.store, &self.env).with_debug(debug);
+
+        rendering_page.render(ctx).await?;
+        let rendered_page = rendering_page.rendered_page;
+        Ok(rendered_page)
+    }
+}

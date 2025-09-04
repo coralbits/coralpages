@@ -2,131 +2,81 @@
 
 ## Overview
 
-This is an API first page renderer. There is no editor, nor editing API yet.
+This is an API first page renderer. There is no editor. For that check out the
+[page editor](https://github.com/coralbits/pe).
 
-It has several endpoints that allow to assemble pages.
+The main idea is to be used as a microservice focused only in ease the edition (via the editor),
+and very fast specialized rendering of the HTML content.
 
-- /api/v1/view/{page_name}
+Currently I'm reimplementing the whole system in rust for performance reasons. The initial
+prototype in Python proved very useful, in rust its extremely usefull as the speed increase is
+incredible (10x in my tests, normally sub ms for a full page render).
 
-It has a nested approach to page creation. Basic mode is just using
-builtin blocks, passing some data, and rendering the result. The
-blocks can be nested themselves. The page is rendered as a single HTML
-page, with the blocks rendered as if they were in the page.
+## Features
 
-On a more advanced level, the blocks can be requested to be rendered by
-remote endpoints, and the result will be rendered as if it were a builtin
-block.
+- [ ] Flexible store configuration support. Can have sveral stores, each with a diferent backend.
+- [ ] Easy to add new widgets to create a custom page personality.
+- [ ] Easy to add new stores to create a custom page backend.
+- [ ] HTTP backend, so it can add data to the context, or directly render elements.
 
-This is structured in stores, which can return HTML with jinja templating,
-or raw HTML. Each store has different configuration, and can be mixed.
+## TODO
 
-Stores have several functions:
+- [ ] Permissions per store. So some JWT tags can be used to allow view or edit.
+- [ ] Draft support & History. Now only last edited page is stored in the stores.
+- [ ] Improve HTTP support for the rust implemetnation.
 
-- Pages
-- Blocks
-- Templates
+## License
 
-## Builtin Widget Templates
+Page Viewer is licensed under the AGPLv3 license.
 
-- Section
-- Block
-- Image
-- Button
-- Rich Text
-- Markdown
-- Video
-- Header
-- Tag Cloud
-- Menu
-- Paragraph
+This basically means that any of your users, even on netowrk enviroments, have the
+right to get the source code of the software and any modification.
 
-## External Blocks Templates
+If for any reason this is not acceptable to you or your company, it's possible to
+purchase a commercial license from Coralbits, with a fixed closed price of 100€ per
+release. This basically means that you can use the software with the only limitation
+is that relicensing, redistribution nor resale are allowed.
 
-To add external blocks edit the config.yaml and add the endpoints for the external blocks. It
-must have these format:
-
-```yaml
-stores:
-  - name: myremote
-    type: http
-    base_url: http://localhost:8080/api/v1/element/
-    tags:
-      - pages
-      - blocks
-      - templates
-```
-
-## Config structure and data flow
-
-In the config there are several stores configured, each store is a loader that can get data in a way, from filesystem, database, or HTTP.
-
-When viewing a page all stores in order are queried for the given page, first to answer is used.
-
-The page has blocks, for the block we follow the same idea, but first we
-check into the config one, and then maybe on the store.
-
-Each store has its own configuration and may not have blocks pages or
-whatever. We use tags to filter out when not needed.
-
-Once we have the definitions, we proceed to render each block, in
-parallel, and finally assemble the final page.
-
-The page may have a template, which do the same process, only for
-template stores, and sets the children.
-
-The sequence diagram is the following:
-
-```mermaid
-sequenceDiagram
-  User ->>+ Renderer: Request page
-  Renderer <<->>+ Loader: Load page
-  Loader <<->>- Store: Load page from store
-  Renderer <<->>+ Loader: Load block
-  Loader <<->>- Store: Load block from store
-  Renderer <<->>+ Loader: Load block
-  Loader <<->>- Store: Load block from store
-  Renderer <<->>+ Loader: Load template
-  Loader <<->>- Store: Load template from store
-  Renderer ->>- User: Render response
-```
-
-The renderer may need to change the response in some ways, for example
-jinja templating, or nothing.
-
-The loader can actually use the block data to render it itself and do not
-require any more templating.
+If you need a commercial license, please contact us at info@coralbits.com.
 
 ## Terminology
 
-### Store
+- Store: A repository for widgets, pages and other resources.
+- Widget: A blueprint of an element. They contains some HTML, CSS, and may add a context.
+- Element: A definition of an element of a page, using a BlockTemplate, giving some specific properties.
+- RenderedElement: The rendered result of an element.
+- Page: A definition of a specific page. It contains many Elements that will use Widgets
+  to render themselves.
+- RenderedPage: The rendered result of a page template.
 
-Its a repository for widgets, pages and other resources.
+## Basic endpoints
 
-### Widget
+- `POST /api/v1/render/` -- Render a page. Send the page json, and receives a json of the html
+  parts. Can ask for a given format or part like only the html, CSS or JS, of all the parts in
+  JSON. My preferred way is the JSON format with the parts, so some very simple templating in the frontend can place the parts where needed.
+- `GET/PUT/POST /api/v1/page/:store/:path` -- Get/create/modify a page. If it doesn't exist, it will
+  be created with the default page template.
+- `GET /api/v1/render/:store/:path` -- Get a rendered page from the page store.
+- `GET /docs` -- Full OpenAPI documentation of the API.
 
-Its the blueprint of an element. They contains some HTML, CSS, and may add a context.
+There are other paths that are necesary for the page editor, like list of available widgets or
+stores.
 
-### Element
+## Page structure
 
-Its a definition of an element of a page, using a BlockTemplate, giving some specific properties.
-For example a title will set the exact title, and maybe some CSS properties.
+There are several example pages at `builtin/pages`. These are the default pages which contains
+more detailed documentation.
 
-### RenderedElement
+But a very basic page would be, in JSON:
 
-Its the rendered result of an element.
-
-### Page
-
-Its the definition of a specific page. It contains many Elements that will use Widgets
-to render themselves.
-
-They can be recursive via templates, so a page decides the important blocks at that level,
-and the template wraps it all inside a template. For example you can create
-a blog page using the blog template, and a product page using the product template.
-
-Templates can use templates themselves, and finally are just rendered to an html using
-a template. this allows even to create a full html based template where you put your blocks.
-
-### RenderedPage
-
-Its the rendered result of a page template.
+```json
+{
+  "title": "Example page",
+  "children": [
+    {
+      "type": "builtin/markdown",
+      "content": "This is an example page."
+    }
+  ]
+}
+```

@@ -13,7 +13,17 @@ server:
 
   render: true
 
-debug: true
+# can be empty to disallow generating PDFs
+pdf:
+  chromium_path: /usr/bin/chromium-browser
+  # System wide may not be good enough, as snaps have their own paths
+  temp_dir: $HOME/tmp/pdf/
+
+cache:
+  backend: redis
+  url: redis://localhost:6379/0
+
+debug: false
 
 # tags from stores are inherited into their elements, for exmaple
 # jinja2 at store, makes all the elements jinja2 rendered.
@@ -37,8 +47,20 @@ stores:
     tags:
       - widgets
       - jinja2
+  - name: graphs
+    type: file
+    path: ./builtin/graphs/
+    tags:
+      - widgets
+      - jinja2
+
+  # this is pure code, to allow extra specialized widgets
+  - name: code
+    type: code
+
   # allow HTTP based stores
-  - name: http
-    type: http
-    base_urls: # only allow HTTP request that start like any of these. Leave empty for all.
-      - http://localhost:8000/api/v1/element/
+  # - name: http
+  #   type: http
+  #   base_urls: # only allow HTTP request that start like any of these. Leave empty for all.
+  #     - http://localhost:8000/api/v1/element/
+# test comment

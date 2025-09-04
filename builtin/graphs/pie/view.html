@@ -1,0 +1,35 @@
+<div id="{{data.id}}" class="graph-container">{{data.data}}</div>
+<script
+  defer
+  src="https://cdn.jsdelivr.net/npm/echarts@6.0.0/dist/echarts.min.js"
+  integrity="sha256-uqjf5+HZM2uY6Jhrp+IOoV582+oe9CpZ1ZR4Yy+kWh0="
+  crossorigin="anonymous"
+></script>
+<script defer>
+  document.addEventListener("DOMContentLoaded", function () {
+      const chart = echarts.init(document.querySelector("#{{data.id}}"));
+      const options = {
+        title: {
+          text: "{{data.title}}",
+          left: "center",
+        },
+        xAxis: {
+          type: "{{data.xAxisType}}",
+          {% if data.xAxisType == "category" %}
+          data: "{{data.categories}}".split(","),
+          {% endif %}
+        },
+        yAxis: {
+          type: "{{data.yAxisType}}",
+          {% if data.yAxisType == "category" %}
+          data: "{{data.categories}}".split(","),
+          {% endif %}
+        },
+        series: [{ type: "{{data.type}}", data: {{data.data}} }],
+        animation: false,
+      };
+      chart.setOption(options);
+      console.log("Chart initialized");
+      console.log({chart});
+  });
+</script>

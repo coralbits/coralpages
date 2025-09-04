@@ -1,4 +1,4 @@
-<button class="button @@class@@" id="@@id@@" type="{{data.type}}">
+<button class="button @@class@@" id="{{data.id}}" type="{{data.type}}">
   {{data.text}}{{ children }}
 </button>
 {% if "toggle_show" in data.onclick %}
@@ -6,15 +6,19 @@
   document.addEventListener("DOMContentLoaded", function () {
     console.log("DOMContentLoaded");
 
-    const element = document.getElementById("@@id@@");
+    const element = document.getElementById("{{data.id}}");
     element.addEventListener("click", function () {
-      {{data.onclick}}
+      {
+        {
+          data.onclick;
+        }
+      }
     });
 
     function toggle_show(id, display) {
       const element = document.querySelector(id);
       element.style.display =
-        (element.style.display === "none" || element.style.display === "")
+        element.style.display === "none" || element.style.display === ""
           ? display
           : "none";
     }

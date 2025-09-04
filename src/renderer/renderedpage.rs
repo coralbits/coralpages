@@ -1,0 +1,441 @@
+use std::collections::HashMap;
+
+use crate::{
+    code::CodeStore,
+    config,
+    page::types::{Element, MetaDefinition, Page, Widget},
+    store::traits::Store,
+};
+
+use minijinja::{context, Environment, HtmlEscape};
+use tracing::{debug, error};
+
+#[derive(Debug)]
+pub struct RenderedPage {
+    pub path: String,
+    pub store: String,
+    pub title: String,
+    pub body: String,
+    pub headers: HashMap<String, String>,
+    pub response_code: u16,
+    pub meta: Vec<MetaDefinition>,
+    pub css_variables: HashMap<String, String>,
+    pub errors: Vec<anyhow::Error>,
+    pub elapsed: std::time::Instant,
+}
+
+impl RenderedPage {
+    pub fn new() -> Self {
+        Self {
+            path: String::new(),
+            store: String::new(),
+            title: String::new(),
+            body: String::new(),
+            headers: HashMap::new(),
+            response_code: 200,
+            meta: Vec::new(),
+            css_variables: HashMap::new(),
+            errors: Vec::new(),
+            elapsed: std::time::Instant::now(),
+        }
+    }
+
+    pub fn get_css(&self) -> String {
+        let css_variables = self
+            .css_variables
+            .iter()
+            .map(|(k, v)| {
+                if k.starts_with("--") {
+                    v.clone()
+                } else {
+                    format!("{} {{\n {}\n }}\n", k, v)
+                }
+            })
+            .collect::<Vec<String>>()
+            .join("\n");
+        format!("{}", css_variables)
+    }
+
+    pub fn render_full_html_page(&self) -> String {
+        let css = self.get_css();
+        let html = format!("<!DOCTYPE html>\n<html>\n<head>\n<style>\n{}\n</style>\n</head>\n<body>\n{}\n</body>\n</html>", css, self.body);
+        html
+    }
+}
+
+pub struct RenderedingPageData<'a> {
+    page: &'a Page,
+    store: &'a dyn Store,
+    env: &'a Environment<'a>,
+    pub rendered_page: RenderedPage,
+    debug: bool,
+}
+
+impl<'a> RenderedingPageData<'a> {
+    pub fn new(page: &'a Page, store: &'a dyn Store, env: &'a Environment) -> Self {
+        let mut rendered_page = RenderedPage::new();
+        rendered_page.path = page.path.clone();
+        rendered_page.title = page.title.clone();
+
+        Self {
+            page: page,
+            store: store,
+            env: env,
+            rendered_page,
+            debug: false,
+        }
+    }
+
+    pub fn with_debug(mut self, debug: bool) -> Self {
+        self.debug = debug;
+        self
+    }
+
+    pub async fn render(&mut self, ctx: &minijinja::Value) -> anyhow::Result<()> {
+        let mut rendered_body = String::new();
+        for element in &self.page.children {
+            debug!("Rendering element: {:?}", element.widget);
+            rendered_body.push_str(&self.render_element(element, ctx).await?);
+        }
+
+        debug!(
+            "Adding extra elements (meta, css, title...): {:?}",
+            self.rendered_page.path
+        );
+        // add the meta
+        self.rendered_page.meta.extend(self.page.meta.clone());
+
+        self.rendered_page.body = rendered_body;
+
+        Ok(())
+    }
+
+    pub async fn render_element(
+        &mut self,
+        element: &Element,
+        ctx: &minijinja::Value,
+    ) -> anyhow::Result<String> {
+        let widget = self.store.load_widget_definition(&element.widget).await?;
+        let widget = match widget {
+            Some(widget) => widget,
+            None => return Err(anyhow::anyhow!("Widget not found: {}", element.widget)),
+        };
+
+        // TODO is forcing create a clone always, when in most cases is not needed. But have lifetime problems if not.
+        // Also not best way to get the widget type
+        let ctx = if widget.name == "static_context" || widget.name == "url_context" {
+            debug!("Getting static context for element: {:?}", element.widget);
+            let ctx = match CodeStore::get_nested_widget_context(element, &ctx).await {
+                Ok(ctx) => ctx,
+                Err(e) => {
+                    error!(
+                        "Error getting static context for element: {:?}: {}",
+                        element.widget, e
+                    );
+                    if self.debug {
+                        return Ok(format!(
+                            "<pre style=\"color:red;\">{}</pre>",
+                            HtmlEscape(&e.to_string()).to_string()
+                        ));
+                    }
+                    return Err(e);
+                }
+            };
+            ctx
+        } else {
+            ctx.clone()
+        };
+
+        // Render recursively all the children, and add to context.children as a list
+        let mut children = Vec::new();
+        for child in &element.children {
+            debug!("Rendering child: {:?}", child.widget);
+            let rendered_child = Box::pin(self.render_element(child, &ctx)).await?;
+            children.push(rendered_child);
+        }
+        let render_ctx = context! { ..ctx, ..context!{children => children} };
+
+        let rendered_element = self.render_widget(&widget, element, render_ctx).await;
+
+        let rendered_text = match rendered_element {
+            Ok(rendered_element) => rendered_element,
+            Err(e) => {
+                if self.debug {
+                    let ret = format!(
+                        "<pre style=\"color:red;\">{}</pre>",
+                        HtmlEscape(&e.to_string()).to_string()
+                    );
+                    self.rendered_page.errors.push(e);
+                    ret
+                } else {
+                    // on no debug, just return an error when rendering a failed widget
+                    return Err(e);
+                }
+            }
+        };
+
+        Ok(rendered_text)
+    }
+
+    pub async fn render_widget(
+        &mut self,
+        widget: &Widget,
+        element: &Element,
+        ctx: minijinja::Value,
+    ) -> anyhow::Result<String> {
+        debug!("Rendering widget: {:?}", widget.name);
+
+        let template = self.env.template_from_str(&widget.html)?;
+
+        let ctx = if widget.name == "static_context" || widget.name == "url_context" {
+            debug!("Getting static context for element: {:?}", element.widget);
+            CodeStore::get_nested_widget_context(element, &ctx).await?
+        } else {
+            ctx
+        };
+
+        let non_templated_context = context! {
+            data => context!{
+                ..minijinja::Value::from_serialize(&element.data),
+                ..context! {
+                    id => &element.id,
+                }
+            },
+            context => ctx
+        };
+
+        // this should be some if, not every element should have this
+        let templated_context = Self::render_data_context(&element.data, non_templated_context)?;
+        let render_ctx = context! {
+            data => context!{
+                ..minijinja::Value::from_serialize(templated_context),
+                ..context! {
+                    id => &element.id,
+                }
+            },
+            context => ctx
+        };
+
+        // debug!("Render context: {:?}", render_ctx);
+        let rendered_element = match template.render(render_ctx) {
+            Ok(rendered_element) => rendered_element,
+            Err(e) => {
+                error!(
+                    "Error rendering page={}, widget={}: {:?}. html={:?}",
+                    self.rendered_page.path, widget.name, e, widget.html
+                );
+                return Err(anyhow::anyhow!(
+                    "Error rendering page={}, widget={}: {:?}",
+                    self.rendered_page.path,
+                    widget.name,
+                    e
+                ));
+            }
+        };
+        debug!("Rendered element: {:?}", rendered_element);
+
+        // Add the CSS to the rendered page
+        self.rendered_page
+            .css_variables
+            .insert(format!("--{}", widget.name), widget.css.clone());
+
+        // If the element has an id, add the CSS to the rendered page
+        if !element.id.is_empty() && !element.style.is_empty() {
+            let css = element
+                .style
+                .iter()
+                .map(|(k, v)| format!("{}: {};", k, v))
+                .collect::<Vec<String>>()
+                .join("\n");
+
+            self.rendered_page
+                .css_variables
+                .insert(format!("#{}", element.id), css);
+        }
+
+        Ok(rendered_element)
+    }
+
+    fn render_data_context(
+        data: &HashMap<String, String>,
+        ctx: minijinja::Value,
+    ) -> anyhow::Result<HashMap<String, String>> {
+        let mut result = HashMap::new();
+
+        for (k, v) in data {
+            let rendered_v = Self::render_data_context_str(v, ctx.clone())?;
+            result.insert(k.clone(), rendered_v);
+        }
+
+        Ok(result)
+    }
+
+    fn render_data_context_str(data: &String, ctx: minijinja::Value) -> anyhow::Result<String> {
+        // debug!("Rendering data context: {:?}", ctx);
+        if data.contains("{{") || data.contains("{%") {
+            let env = minijinja::Environment::new();
+            let template = env.template_from_str(data)?;
+            let rendered_data = template.render(ctx)?;
+            debug!("Rendered data: {:?} -> {:?}", data, rendered_data);
+            Ok(rendered_data)
+        } else {
+            Ok(data.clone())
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use minijinja::Environment;
+    use tracing::info;
+
+    use crate::{store::factory::StoreFactory, utils::setup_logging, PageRenderer};
+    use ctor::ctor;
+
+    use super::*;
+
+    struct TestStore {}
+
+    #[ctor]
+    fn setup_logging_() {
+        setup_logging(true);
+    }
+
+    #[async_trait::async_trait]
+    impl Store for TestStore {
+        fn name(&self) -> &str {
+            "test"
+        }
+
+        async fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
+            debug!("Loading widget definition from path: {}", path);
+            let html = match path {
+                "text" => "<a class=\"test-link\" id=\"{{data.id}}\">Hello, {{data.text}}!</a>",
+                "columns" => "<div class=\"columns column-{{data.id}}\" id=\"{{data.id}}\">{{context.children|join('')}}</div>",
+                _ => return Ok(None),
+            };
+
+            Ok(Some(Widget {
+                name: path.to_string(),
+                html: html.to_string(),
+                css: ".test-link { background: red; }".to_string(),
+                editor: vec![],
+                description: "Test widget".to_string(),
+                icon: "".to_string(),
+            }))
+        }
+    }
+
+    #[tokio::test]
+    async fn test_rendered_page() {
+        let page = Page::new()
+            .with_title("Test Page".to_string())
+            .with_path("/test".to_string())
+            .with_children(vec![Element::new(
+                "test/text".to_string(),
+                std::collections::HashMap::from([(
+                    "text".to_string(),
+                    "Hello, world!".to_string(),
+                )]),
+                "test-link".to_string(),
+            )
+            .with_children(vec![Element::new(
+                "test/text".to_string(),
+                std::collections::HashMap::from([(
+                    "text".to_string(),
+                    "Hello, child!".to_string(),
+                )]),
+                "test-link-child".to_string(),
+            )])]);
+        let mut store = StoreFactory::new();
+        store.add_store(Box::new(TestStore {}));
+
+        let env = Environment::new();
+        let mut rendered_page = RenderedingPageData::new(&page, &store, &env);
+
+        // Test the render method
+        let ctx = minijinja::context! {};
+        rendered_page.render(&ctx).await.unwrap();
+
+        info!(
+            "Rendered page: {:?}",
+            rendered_page.rendered_page.body.len()
+        );
+    }
+
+    #[tokio::test]
+    async fn test_rendered_page_css() {
+        let page = Page::new()
+            .with_title("Test Page".to_string())
+            .with_path("/test".to_string())
+            .with_children(vec![Element::new(
+                "test/text".to_string(),
+                std::collections::HashMap::from([(
+                    "text".to_string(),
+                    "Hello, world!".to_string(),
+                )]),
+                "test-link-id".to_string(),
+            )
+            .with_style(std::collections::HashMap::from([(
+                "background".to_string(),
+                "red".to_string(),
+            )]))]);
+
+        // Add the test store to the renderer
+        let mut renderer = PageRenderer::new();
+        renderer.store.add_store(Box::new(TestStore {}));
+
+        // Render
+        let rendered_page = renderer
+            .render_page(&page, &minijinja::context! {}, false)
+            .await
+            .unwrap();
+
+        info!("Rendered page CSS: {:?}", rendered_page.get_css());
+
+        let from_element_class = ".test-link { background: red; }";
+        let from_element_id = "#test-link-id {\n background: red;\n }";
+
+        let css = rendered_page.get_css();
+        assert!(css.contains(from_element_class));
+        assert!(css.contains(from_element_id));
+    }
+
+    #[tokio::test]
+    async fn test_rendered_page_columns() {
+        let page = Page::new()
+            .with_title("Test Page".to_string())
+            .with_path("/test".to_string())
+            .with_children(vec![Element::new(
+                "test/columns".to_string(),
+                std::collections::HashMap::from([
+                    ("wrap".to_string(), "true".to_string()),
+                    ("gap".to_string(), "12".to_string()),
+                ]),
+                "test-columns".to_string(),
+            )
+            .with_children(vec![
+                Element::new(
+                    "test/text".to_string(),
+                    std::collections::HashMap::from([("text".to_string(), "Column 1".to_string())]),
+                    "test-link-1".to_string(),
+                ),
+                Element::new(
+                    "test/text".to_string(),
+                    std::collections::HashMap::from([("text".to_string(), "Column 2".to_string())]),
+                    "test-link-2".to_string(),
+                ),
+            ])]);
+
+        let mut renderer = PageRenderer::new();
+        renderer.store.add_store(Box::new(TestStore {}));
+
+        let rendered_page = renderer
+            .render_page(&page, &minijinja::context! {}, false)
+            .await
+            .unwrap();
+
+        info!("Rendered page: {:?}", rendered_page.body);
+        assert_eq!(rendered_page.body, "<div class=\"columns column-test-columns\" id=\"test-columns\"><a class=\"test-link\" id=\"test-link-1\">Hello, Column 1!</a><a class=\"test-link\" id=\"test-link-2\">Hello, Column 2!</a></div>");
+    }
+}

@@ -1,0 +1,45 @@
+widgets:
+  - name: pie
+    description: A pie chart widget
+    icon: pie
+    html: pie/view.html
+    css: pie/style.css
+    editor:
+      - type: select
+        label: Type
+        name: type
+        options:
+          - label: Pie
+            value: pie
+          - label: Bar
+            value: bar
+          - label: Line
+            value: line
+      - type: select
+        label: xAxis Type
+        name: xAxisType
+        options:
+          - label: Category
+            value: category
+          - label: Value
+            value: value
+      - type: select
+        label: yAxis Type
+        name: yAxisType
+        options:
+          - label: Category
+            value: category
+          - label: Value
+            value: value
+      - type: text
+        label: Categories
+        name: categories
+        placeholder: Enter categories, separated by commas
+      - type: text
+        label: Title
+        name: title
+        placeholder: Enter title
+      - type: textarea
+        label: Data
+        name: data
+        placeholder: Enter data in JSON format

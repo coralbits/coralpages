@@ -16,9 +16,13 @@ widgets:
     css: image/style.css
     editor:
       - type: image
-        label: Image
+        label: Image from Assets
         name: src
         placeholder: Image URL
+      - type: text
+        label: Direct Image URL
+        name: url
+        placeholder: HTTP image URL
       - type: text
         label: Alt
         name: alt
@@ -27,6 +31,21 @@ widgets:
         label: Caption
         name: caption
         placeholder: Enter caption
+      - type: select
+        label: Fit
+        name: fit
+        options:
+          - label: Cover
+            value: cover
+          - label: Contain
+            value: contain
+          - label: None
+            value: none
+          - label: Fill
+            value: fill
+          - label: Scale Down
+            value: scale-down
+        default: cover
   - name: header
     description: A header widget
     icon: header
@@ -179,6 +198,7 @@ widgets:
     editor:
       - type: html
         label: HTML
+        name: html
 
   - name: form
     description: A Form
@@ -188,6 +208,7 @@ widgets:
     editor:
       - type: text
         label: URL
+        name: url
         description: URL to POST data to
       - type: select
         label: Method
@@ -246,3 +267,45 @@ widgets:
         name: default_value
         label: Default Value
         description: Default value of the input
+  - name: columns
+    description: Columns layout
+    icon: columns
+    html: columns/view.html
+    css: columns/style.css
+    editor:
+      - type: boolean
+        label: Wrap
+        name: wrap
+        default: false
+      - type: number
+        label: Gap
+        name: gap
+        default: 12
+      - type: select
+        label: Align Items
+        name: align_items
+        options:
+          - label: Top
+            value: start
+          - label: Bottom
+            value: end
+          - label: Center
+            value: center
+          - label: Stretch
+            value: stretch
+        default: start
+      - type: select
+        label: Justify Content
+        name: justify_content
+        options:
+          - label: Start
+            value: start
+          - label: End
+            value: end
+          - label: Center
+            value: center
+          - label: Space Between
+            value: space-between
+          - label: Space Around
+            value: space-around
+        default: start

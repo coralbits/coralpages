@@ -1,19 +1,27 @@
+{% if data.url %}
+{% set url = data.url %}
+{% elif context.base_url %}
+{% set url = context.base_url + data.src %}
+{% else %}
+{% set url = data.src %}
+{% endif %}
+
 {% if data.caption %}
-<figure class="image-container @@class@@" id="@@id@@">
-    <img
-        class="content-image"
-        src="{{context.base_url}}{{data.src}}"
-        alt="{{data.alt or ''}}"
-    />
-    {% if data.caption %}
-    <figcaption>{{data.caption}}</figcaption>
-    {% endif %}
-</figure>
+<div class="image-container" id="{{data.id}}">
+  <img
+    class="content-image fit-{{data.fit}}"
+    src="{{url}}"
+    alt="{{data.alt or ''}}"
+  />
+  {% if data.caption %}
+  <div class="image-caption">{{data.caption}}</div>
+  {% endif %}
+</div>
 {% else %}
 <img
-    class="content-image @@class@@"
-    id="@@id@@"
-    src="{{context.base_url}}{{data.src}}"
-    alt="{{data.alt or ''}}"
+  class="content-image fit-{{data.fit}}"
+  id="{{data.id}}"
+  src="{{url}}"
+  alt="{{data.alt or ''}}"
 />
 {% endif %}

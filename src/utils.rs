@@ -1,0 +1,17 @@
+use tracing::Level;
+use tracing_subscriber::FmtSubscriber;
+
+pub fn setup_logging(debug: bool) {
+    let log_level = if debug { Level::DEBUG } else { Level::INFO };
+
+    let subscriber = FmtSubscriber::builder()
+        // all spans/events with a level higher than TRACE (e.g, debug, info, warn, etc.)
+        // will be written to stdout.
+        .with_max_level(log_level)
+        // trace to stderr
+        .with_writer(std::io::stderr)
+        // completes the builder.
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("setting default subscriber failed");
+}
