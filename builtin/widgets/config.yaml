@@ -16,9 +16,13 @@ widgets:
     css: image/style.css
     editor:
       - type: image
-        label: Image
+        label: Image from Assets
         name: src
         placeholder: Image URL
+      - type: text
+        label: Direct Image URL
+        name: url
+        placeholder: HTTP image URL
       - type: text
         label: Alt
         name: alt
@@ -27,6 +31,21 @@ widgets:
         label: Caption
         name: caption
         placeholder: Enter caption
+      - type: select
+        label: Fit
+        name: fit
+        options:
+          - label: Cover
+            value: cover
+          - label: Contain
+            value: contain
+          - label: None
+            value: none
+          - label: Fill
+            value: fill
+          - label: Scale Down
+            value: scale-down
+        default: cover
   - name: header
     description: A header widget
     icon: header

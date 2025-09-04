@@ -3,7 +3,5 @@
   id="{{data.id}}"
   style="gap: {{data.gap}}px; {% if data.wrap %}flex-wrap: wrap;{% endif %} align-items: {{data.align_items}}; justify-content: {{data.justify_content}};"
 >
-  {% for child in context.children %}
-  <div>{{child}}</div>
-  {% endfor %}
+  {% for child in context.children %} {{child}} {% endfor %}
 </div>

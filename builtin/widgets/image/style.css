@@ -4,17 +4,46 @@
   align-items: center;
   justify-content: start;
   overflow: hidden;
+  position: relative;
 }
 
-img {
+.image-container .image-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.content-image {
   max-width: 100%;
   max-height: 100%;
 }
-figure {
+.content-image .image-caption {
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: start;
+}
+
+.content-image.fit-cover {
+  object-fit: cover;
+}
+
+.content-image.fit-contain {
+  object-fit: contain;
+}
+
+.content-image.fit-none {
+  object-fit: none;
+}
+
+.content-image.fit-fill {
+  object-fit: fill;
+}
+
+.content-image.fit-scale-down {
+  object-fit: scale-down;
 }
