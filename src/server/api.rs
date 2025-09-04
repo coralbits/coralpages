@@ -5,7 +5,7 @@ use poem::web::Redirect;
 use poem::{get, handler};
 use poem_openapi::payload::Binary;
 use std::{collections::HashMap, sync::Arc};
-use tracing::error;
+use tracing::{error, info};
 
 use crate::page::types::ResultPageList;
 use crate::server::PageRenderResponse;
@@ -69,7 +69,10 @@ impl Api {
         Query(debug): Query<Option<bool>>,
         // Query(template): Query<Option<String>>,
     ) -> Result<PageRenderResponse, PoemError> {
-        let extension = path.split(".").last();
+        let mut extension = path.split(".").last();
+        if extension == Some(&path) {
+            extension = None;
+        }
         let realpath = if let Some(ext) = extension {
             &path[..path.len() - (ext.len() + 1)]
         } else {

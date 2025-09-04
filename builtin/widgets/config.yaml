@@ -97,11 +97,6 @@ widgets:
     html: markdown/view.html
     css: markdown/style.css
     editor:
-      - type: text
-        label: Title
-        name: title
-        placeholder: Enter title
-        required: true
       - type: textarea
         label: Markdown
         name: text
