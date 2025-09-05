@@ -1,9 +1,7 @@
 .flex {
   display: flex;
 }
-.flex > * {
-  flex: 1;
-}
+
 .flex-responsive {
   flex-direction: row;
   container-type: inline-size;
