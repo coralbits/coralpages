@@ -5,12 +5,20 @@
   flex: 1;
 }
 .flex-responsive {
-  flex-direction: column;
+  flex-direction: row;
+  container-type: inline-size;
 }
 
 @media (min-width: 768px) {
+  @container (max-width: 768px) {
+    .flex-responsive {
+      flex-direction: column;
+    }
+  }
+}
+@media (max-width: 768px) {
   .flex-responsive {
-    flex-direction: row;
+    flex-direction: column;
   }
 }
 
