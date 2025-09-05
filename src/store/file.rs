@@ -131,7 +131,17 @@ impl Store for FileStore {
     async fn load_page_definition(&self, path: &str) -> anyhow::Result<Option<Page>> {
         let path = Path::new(&self.path).join(format!("{}.yaml", path));
         // info!("Loading page definition from {}", path.display());
-        let file = File::open(path)?;
+        let file = match File::open(&path) {
+            Ok(file) => file,
+            Err(e) => {
+                error!(
+                    "Error loading page definition from path={}: {}",
+                    path.display(),
+                    e
+                );
+                return Ok(None);
+            }
+        };
         let page: Page = serde_yaml::from_reader(file)?;
         Ok(Some(page))
     }
@@ -194,7 +204,7 @@ impl Store for FileStore {
                     }
                 }
 
-                info!("Loading page definition from path={}", page_id);
+                // info!("Loading page definition from path={}", page_id);
                 let page = match self.load_page_definition(&page_id).await {
                     Ok(page) => page,
                     Err(e) => {

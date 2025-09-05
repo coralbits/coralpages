@@ -82,6 +82,7 @@ impl Api {
         };
 
         let pagename = format!("{}/{}", store, realpath);
+        info!("Loading page definition from path={}", pagename);
 
         let page = self
             .renderer
