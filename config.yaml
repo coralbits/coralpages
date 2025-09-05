@@ -53,6 +53,11 @@ stores:
     tags:
       - widgets
       - jinja2
+  - name: classes
+    type: file
+    path: ./builtin/classes/
+    tags:
+      - css_classes
 
   # this is pure code, to allow extra specialized widgets
   - name: code

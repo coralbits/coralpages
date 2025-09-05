@@ -1,39 +1,43 @@
 css_classes:
-  - name: columns
-    description: Columns classes
-    classes:
-      - name: mobile-rows
-        description: Columns on desktop, rows on mobile
-        css: |
-          .mobile-rows {
-            flex-direction: column;
-          }
-          @media (max-width: 768px) {
-            .mobile-rows {
-              flex-direction: row;
-            }
-          }
-      - name: flex-1
-        description: All columns same width
-        css: |
-          .flex-1 {
-            flex: 1;
-          }
-      - name: flex-0
-        description: Columns take as little as possible
-        css: |
-          .flex-0 {
-            flex: 0;
-          }
-      - name: flex-wrap
-        description: Columns wrap
-        css: |
-          .flex-wrap {
-            flex-wrap: wrap;
-          }
-      - name: flex-nowrap
-        description: Columns do not wrap
-        css: |
-          .flex-nowrap {
-            flex-wrap: nowrap;
-          }
+  - name: mobile-rows
+    description: Columns on desktop, rows on mobile
+    css: |
+      .mobile-rows {
+        flex-direction: column;
+      }
+      @media (max-width: 768px) {
+        .mobile-rows {
+          flex-direction: row;
+        }
+      }
+  - name: flex-1
+    description: All columns same width
+    css: |
+      .flex-1 {
+        flex: 1;
+      }
+  - name: flex-0
+    description: Columns take as little as possible
+    css: |
+      .flex-0 {
+        flex: 0;
+      }
+  - name: flex-wrap
+    description: Columns wrap
+    css: |
+      .flex-wrap {
+        flex-wrap: wrap;
+      }
+  - name: flex-nowrap
+    description: Columns do not wrap
+    css: |
+      .flex-nowrap {
+        flex-wrap: nowrap;
+      }
+  - name: center-content-800px
+    description: Center content 800px wide
+    css: |
+      .center-content-800px {
+        max-width: 800px;
+        margin: 0 auto;
+      }

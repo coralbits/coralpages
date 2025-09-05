@@ -1,3 +1,0 @@
-# when empty, means read yaml files
-css_classes:
-  - "*.yaml"

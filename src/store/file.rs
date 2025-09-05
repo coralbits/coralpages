@@ -6,16 +6,22 @@ use std::{
 
 use async_trait::async_trait;
 use serde::Deserialize;
-use tracing::{error, info};
+use tracing::{error, info, warn};
 
 use crate::{
     page::types::{Page, PageInfo, ResultPageList, Widget},
     store::traits::Store,
-    WidgetResults,
+    CssClass, CssClassResult, CssClassResults, StoreConfig, WidgetResults,
 };
 
 #[derive(Debug, Deserialize)]
+struct CssClasses {
+    css_classes: Vec<CssClass>,
+}
+
+#[derive(Debug, Deserialize)]
 struct FileStoreConfig {
+    #[serde(default)]
     widgets: Vec<Widget>,
 }
 
@@ -23,19 +29,81 @@ pub struct FileStore {
     name: String,
     path: PathBuf,
     widgets: HashMap<String, Widget>,
+    css_classes: HashMap<String, CssClass>,
+    has_widgets: bool,
+    has_css_classes: bool,
+    has_pages: bool,
 }
 
 impl FileStore {
-    pub fn new(name: &str, path: &str) -> anyhow::Result<Self> {
+    pub fn new(config: &StoreConfig) -> anyhow::Result<Self> {
         let mut ret = Self {
-            name: name.to_string(),
-            path: Path::new(&path).to_path_buf(),
+            name: config.name.clone(),
+            path: Path::new(&config.path).to_path_buf(),
             widgets: HashMap::new(),
+            css_classes: HashMap::new(),
+            has_widgets: config.tags.contains(&"widgets".to_string()),
+            has_css_classes: config.tags.contains(&"css_classes".to_string()),
+            has_pages: config.tags.contains(&"pages".to_string()),
         };
 
-        ret.load_widgets(&ret.path.join("config.yaml"))?;
+        if ret.has_widgets {
+            ret.load_widgets(&ret.path.join("config.yaml"))?;
+        }
+
+        if ret.has_css_classes {
+            ret.load_css_classes_config(&ret.path.clone())?;
+        }
 
         Ok(ret)
+    }
+
+    fn load_css_classes_config(&mut self, config_path: &Path) -> anyhow::Result<()> {
+        if !self.has_css_classes {
+            return Ok(());
+        }
+        self.load_css_classes_path(&config_path)?;
+        Ok(())
+    }
+
+    fn load_css_classes_path(&mut self, path: &Path) -> anyhow::Result<()> {
+        // read all *.yaml files at cconfig_path, as CssClass
+        let mut css_classes: HashMap<String, CssClass> = HashMap::new();
+        for entry in fs::read_dir(path)? {
+            let entry = entry?;
+            let path = entry.path();
+            if path.is_file() && path.extension().unwrap_or_default() == "yaml" {
+                let css_class = match self.load_css_class_config(&path) {
+                    Ok(css_class) => css_class,
+                    Err(e) => {
+                        error!(
+                            "Error loading CSS class from path={}: {}",
+                            path.display(),
+                            e
+                        );
+                        continue;
+                    }
+                };
+                for css_class in css_class.css_classes {
+                    css_classes.insert(css_class.name.clone(), css_class);
+                }
+            }
+        }
+        info!(
+            "Loading CSS classes from path={} count={}",
+            path.display(),
+            css_classes.len()
+        );
+
+        self.css_classes.extend(css_classes);
+
+        Ok(())
+    }
+
+    fn load_css_class_config(&mut self, path: &Path) -> anyhow::Result<CssClasses> {
+        let file = File::open(path)?;
+        let css_class: CssClasses = serde_yaml::from_reader(file)?;
+        Ok(css_class)
     }
 
     fn load_widgets(&mut self, config_path: &Path) -> anyhow::Result<()> {
@@ -47,7 +115,7 @@ impl FileStore {
             return Ok(());
         }
 
-        let config = self.load_config(config_path)?;
+        let config = self.load_widget_config(config_path)?;
 
         let widgets: HashMap<String, Widget> = config
             .widgets
@@ -61,7 +129,7 @@ impl FileStore {
         Ok(())
     }
 
-    fn load_config(&mut self, path: &Path) -> anyhow::Result<FileStoreConfig> {
+    fn load_widget_config(&mut self, path: &Path) -> anyhow::Result<FileStoreConfig> {
         let file = File::open(path)?;
         let mut config: FileStoreConfig = serde_yaml::from_reader(file)?;
 
@@ -112,6 +180,9 @@ impl Store for FileStore {
     }
 
     async fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
+        if !self.has_widgets {
+            return Ok(None);
+        }
         // debug!(
         //     "Loading widget definition from path={} available_count={}",
         //     path,
@@ -129,6 +200,9 @@ impl Store for FileStore {
     }
 
     async fn load_page_definition(&self, path: &str) -> anyhow::Result<Option<Page>> {
+        if !self.has_pages {
+            return Ok(None);
+        }
         let path = Path::new(&self.path).join(format!("{}.yaml", path));
         // info!("Loading page definition from {}", path.display());
         let file = match File::open(&path) {
@@ -147,6 +221,9 @@ impl Store for FileStore {
     }
 
     async fn save_page_definition(&self, path: &str, page: &Page) -> anyhow::Result<()> {
+        if !self.has_pages {
+            return Ok(());
+        }
         let path = Path::new(&self.path).join(format!("{}.yaml", path));
         let file = File::create(path)?;
         serde_yaml::to_writer(file, page)?;
@@ -154,6 +231,9 @@ impl Store for FileStore {
     }
 
     async fn delete_page_definition(&self, path: &str) -> anyhow::Result<bool> {
+        if !self.has_pages {
+            return Ok(false);
+        }
         let path = Path::new(&self.path).join(format!("{}.yaml", path));
         if path.exists() {
             std::fs::remove_file(path)?;
@@ -169,6 +249,13 @@ impl Store for FileStore {
         limit: usize,
         filter: &HashMap<String, String>,
     ) -> anyhow::Result<ResultPageList> {
+        if !self.has_pages {
+            return Ok(ResultPageList {
+                count: 0,
+                results: vec![],
+            });
+        }
+
         let path = Path::new(&self.path);
         let mut pages: Vec<PageInfo> = Vec::new();
         info!("Getting page list from path={}", path.display());
@@ -233,10 +320,48 @@ impl Store for FileStore {
     }
 
     async fn get_widget_list(&self) -> anyhow::Result<WidgetResults> {
+        if !self.has_widgets {
+            return Ok(WidgetResults {
+                count: 0,
+                results: vec![],
+            });
+        }
+
         let result = WidgetResults {
             count: self.widgets.len(),
             results: self.widgets.values().cloned().collect(),
         };
         Ok(result)
+    }
+
+    async fn load_css_classes(&self) -> anyhow::Result<CssClassResults> {
+        if !self.has_css_classes {
+            return Ok(CssClassResults {
+                count: 0,
+                results: vec![],
+            });
+        }
+
+        let ret = CssClassResults {
+            count: self.css_classes.len(),
+            results: self
+                .css_classes
+                .values()
+                .map(|c| CssClassResult {
+                    name: format!("{}/{}", self.name, c.name.clone()),
+                    description: c.description.clone(),
+                })
+                .collect(),
+        };
+
+        Ok(ret)
+    }
+
+    async fn load_css_class_definition(&self, name: &str) -> anyhow::Result<Option<CssClass>> {
+        if !self.has_css_classes {
+            return Ok(None);
+        }
+        let css_class = self.css_classes.get(name).map(|c| c.clone());
+        Ok(css_class)
     }
 }

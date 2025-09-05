@@ -16,7 +16,9 @@ use crate::{
     renderer::pdf::render_pdf,
     renderresponse::{Details, PageRenderResponseJson},
 };
-use crate::{IdName, Page, PageRenderer, StoreListResults, WidgetResults};
+use crate::{
+    CssClass, CssClassResults, IdName, Page, PageRenderer, StoreListResults, WidgetResults,
+};
 use poem::{
     listener::TcpListener,
     middleware::{NormalizePath, Tracing, TrailingSlash},
@@ -450,6 +452,54 @@ impl Api {
             results,
         }))
     }
+
+    #[oai(path = "/classes/", method = "get")]
+    async fn classes(
+        &self,
+        Query(store): Query<Option<String>>,
+    ) -> Result<Json<CssClassResults>, PoemError> {
+        let results = if let Some(store) = store {
+            if let Some(store) = self.renderer.store.get_store(&store) {
+                store.load_css_classes().await
+            } else {
+                return Err(PoemError::from_string(
+                    format!("Store '{}' not found", store),
+                    poem::http::StatusCode::NOT_FOUND,
+                ));
+            }
+        } else {
+            self.renderer.store.load_css_classes().await
+        };
+        let results = results.map_err(|e| {
+            PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+        })?;
+
+        Ok(Json(results))
+    }
+
+    #[oai(path = "/classes/:store/:name", method = "get")]
+    async fn get_css_class_definition(
+        &self,
+        Path(store): Path<String>,
+        Path(name): Path<String>,
+    ) -> Result<Json<CssClass>, PoemError> {
+        let full_name = format!("{}/{}", store, name);
+        let results = self
+            .renderer
+            .store
+            .load_css_class_definition(&full_name)
+            .await
+            .map_err(|e| {
+                PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+            })?;
+        let results = results.ok_or_else(|| {
+            PoemError::from_string(
+                format!("CSS class '{}' not found", full_name),
+                poem::http::StatusCode::NOT_FOUND,
+            )
+        })?;
+        Ok(Json(results))
+    }
 }
 
 #[handler]
@@ -463,9 +513,9 @@ pub async fn start(listen: &str, renderer: PageRenderer) -> Result<()> {
 }
 
 pub async fn start_with_shutdown(
-    listen: &str, 
-    renderer: PageRenderer, 
-    mut shutdown_rx: broadcast::Receiver<()>
+    listen: &str,
+    renderer: PageRenderer,
+    mut shutdown_rx: broadcast::Receiver<()>,
 ) -> Result<()> {
     let api = Api::new(renderer)?;
     let api_service = OpenApiService::new(api, "Page Viewer", "0.1.0").server("/api/v1");
@@ -485,7 +535,7 @@ pub async fn start_with_shutdown(
 
     let listener = TcpListener::bind(listen);
     let server = Server::new(listener);
-    
+
     // Run the server until shutdown signal is received
     tokio::select! {
         result = server.run(app) => {

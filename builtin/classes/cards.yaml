@@ -1,0 +1,20 @@
+css_classes:
+  - name: simple_card
+    description: A simple card widget
+    css: |
+      .simple_card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+      }
+  - name: rainbow_card
+    description: A rainbow card widget
+    css: |
+      .rainbow_card {
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        padding: 10px;
+        background: linear-gradient(45deg, red, orange, yellow, green, blue, indigo, violet);
+        border-radius: 10px;
+        box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.5);
+      }

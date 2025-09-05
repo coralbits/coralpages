@@ -7,7 +7,7 @@ use crate::{
     file::FileStore,
     page::types::{Page, ResultPageList, Widget},
     store::{code::CodeStore, db::DbStore, traits::Store},
-    StoreConfig, WidgetResults,
+    CssClass, CssClassResults, StoreConfig, WidgetResults,
 };
 
 pub struct StoreFactory {
@@ -49,10 +49,7 @@ impl StoreFactory {
     pub async fn new_store(store_config: &StoreConfig) -> Result<Box<dyn Store>> {
         // info!("Creating store: {:?}", store_config);
         match store_config.store_type.as_str() {
-            "file" => Ok(Box::new(FileStore::new(
-                store_config.name.as_str(),
-                &store_config.path,
-            )?)),
+            "file" => Ok(Box::new(FileStore::new(store_config)?)),
             "db" => Ok(Box::new(
                 DbStore::new(store_config.name.as_str(), &store_config.url).await?,
             )),
@@ -194,5 +191,31 @@ impl Store for StoreFactory {
             result.results.extend(store_result.results);
         }
         Ok(result)
+    }
+
+    async fn load_css_classes(&self) -> anyhow::Result<CssClassResults> {
+        let mut result = CssClassResults {
+            count: 0,
+            results: Vec::new(),
+        };
+        for store in self.stores.iter() {
+            let store_result = store.load_css_classes().await?;
+            result.count += store_result.count;
+            result.results.extend(store_result.results);
+        }
+        Ok(result)
+    }
+
+    async fn load_css_class_definition(&self, name: &str) -> anyhow::Result<Option<CssClass>> {
+        let (store, subpath) = self.split_path(name)?;
+        let store = self.get_store(&store);
+        if let Some(store) = store {
+            store.load_css_class_definition(&subpath).await
+        } else {
+            Err(anyhow::anyhow!(
+                "Store for CSS class definition not found, name={}",
+                name
+            ))
+        }
     }
 }

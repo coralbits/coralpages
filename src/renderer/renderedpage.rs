@@ -41,7 +41,7 @@ impl RenderedPage {
     }
 
     pub fn get_css(&self) -> String {
-        let css_variables = self
+        let mut css_variables = self
             .css_variables
             .iter()
             .map(|(k, v)| {
@@ -51,8 +51,10 @@ impl RenderedPage {
                     format!("{} {{\n {}\n }}\n", k, v)
                 }
             })
-            .collect::<Vec<String>>()
-            .join("\n");
+            .collect::<Vec<String>>();
+        css_variables.sort_by(|a, b| a.cmp(b));
+        let css_variables = css_variables.join("\n");
+
         format!("{}", css_variables)
     }
 
@@ -207,6 +209,31 @@ impl<'a> RenderedingPageData<'a> {
             CodeStore::get_nested_widget_context(element, &ctx).await?
         } else {
             ctx
+        };
+
+        let ctx = if element.classes.is_empty() {
+            ctx
+        } else {
+            let mut classes = vec![];
+
+            for class in &element.classes {
+                if let Some(classdef) = self.store.load_css_class_definition(class).await? {
+                    self.rendered_page
+                        .css_variables
+                        .insert(format!("--{}", class), classdef.css.clone());
+                    classes.push(classdef.name.clone());
+                } else {
+                    error!("CSS class not found: {}", class);
+                    return Err(anyhow::anyhow!("CSS class not found: {}", class));
+                };
+            }
+
+            context! {
+                ..ctx,
+                ..context! {
+                    classes,
+                }
+            }
         };
 
         let non_templated_context = context! {

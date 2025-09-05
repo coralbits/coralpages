@@ -19,6 +19,7 @@
   {%- if data.wrap %}
     flex-wrap
   {%- endif %}
+  {{context.classes|join(' ')}}
   "
   id="{{data.id}}"
 >

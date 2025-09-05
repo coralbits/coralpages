@@ -110,6 +110,9 @@ pub struct Element {
     #[serde(default)]
     #[oai(default)]
     pub style: std::collections::HashMap<String, String>,
+    #[serde(default)]
+    #[oai(default)]
+    pub classes: Vec<String>,
 }
 
 impl Element {
@@ -124,6 +127,7 @@ impl Element {
             data,
             children: Vec::new(),
             style: std::collections::HashMap::new(),
+            classes: Vec::new(),
         }
     }
 
@@ -134,6 +138,11 @@ impl Element {
 
     pub fn with_style(mut self, style: std::collections::HashMap<String, String>) -> Self {
         self.style.extend(style);
+        self
+    }
+
+    pub fn with_classes(mut self, classes: Vec<String>) -> Self {
+        self.classes = classes;
         self
     }
 
@@ -241,6 +250,25 @@ pub struct PageInfo {
 pub struct ResultPageList {
     pub count: usize,
     pub results: Vec<PageInfo>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
+pub struct CssClass {
+    pub name: String,
+    pub description: String,
+    pub css: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
+pub struct CssClassResult {
+    pub name: String,
+    pub description: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
+pub struct CssClassResults {
+    pub count: usize,
+    pub results: Vec<CssClassResult>,
 }
 
 #[cfg(test)]

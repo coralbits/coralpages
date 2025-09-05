@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
-use crate::page::types::{Page, Widget};
+use crate::page::types::{CssClass, Page, Widget};
 use crate::page::types::{ResultPageList, WidgetResults};
+use crate::CssClassResults;
 use async_trait::async_trait;
 
 #[async_trait]
@@ -19,6 +20,16 @@ pub trait Store: Send + Sync {
     async fn delete_page_definition(&self, _path: &str) -> anyhow::Result<bool> {
         Err(anyhow::anyhow!("Not implemented"))
     }
+    async fn load_css_classes(&self) -> anyhow::Result<CssClassResults> {
+        Ok(CssClassResults {
+            count: 0,
+            results: vec![],
+        })
+    }
+    async fn load_css_class_definition(&self, _name: &str) -> anyhow::Result<Option<CssClass>> {
+        Ok(None)
+    }
+
     async fn get_page_list(
         &self,
         _offset: usize,

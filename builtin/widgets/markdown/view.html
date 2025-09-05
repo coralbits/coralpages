@@ -1,3 +1,4 @@
-<div id="{{data.id}}" class="markdown-content">
+<div id="{{data.id}}" class="markdown-content {{context.classes|join(' ')}}">
   {{data.text|default("") | markdown}}
+  {% for child in context.children %} {{child}} {% endfor %}
 </div>

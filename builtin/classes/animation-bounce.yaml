@@ -1,32 +1,43 @@
 css_classes:
-  - name: animation
-    description: Animation classes
-    classes:
-      - name: animation-bounce-1s-infinite
-        description: Bounce animation 1s infinite
-        css: |
-          .animation-bounce-1s-infinite {
-            animation: bounce-1s-infinite 1s infinite;
-          }
-          @keyframes bounce-1s-infinite {
-            0%, 100% {
-              transform: translateY(0);
-            }
-            50% {
-              transform: translateY(-10px);
-            }
-          }
-      - name: animation-bounce-1s-once
-        description: Bounce animation 1s once
-        css: |
-          .animation-bounce-1s-once {
-            animation: bounce-1s-once 1s once;
-          }
-          @keyframes bounce-1s-once {
-            0% {
-              transform: translateY(0);
-            }
-            100% {
-              transform: translateY(-10px);
-            }
-          }
+  - name: animation-bounce-1s-infinite
+    description: Bounce animation 1s infinite
+    css: |
+      .animation-bounce-1s-infinite {
+        animation: bounce-1s-infinite 1s infinite;
+      }
+      @keyframes bounce-1s-infinite {
+        0%, 100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+      }
+  - name: animation-bounce-1s-once
+    description: Bounce animation 1s once
+    css: |
+      .animation-bounce-1s-once {
+        animation: bounce-1s-once 1s once;
+      }
+      @keyframes bounce-1s-once {
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(-10px);
+        }
+      }
+  - name: animation-bounce-1s-once-on-hover
+    description: Bounce animation 1s once on hover
+    css: |
+      .animation-bounce-1s-once-on-hover:hover {
+        animation: bounce-1s-once-on-hover 1s once;
+      }
+      @keyframes bounce-1s-once-on-hover {
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(-10px);
+        }
+      }
