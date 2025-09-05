@@ -47,14 +47,16 @@ impl Api {
         Path(store): Path<String>,
         Path(path1): Path<String>,
         Path(path2): Path<String>,
+        Query(template): Query<Option<String>>,
+        Query(debug): Query<Option<bool>>,
     ) -> Result<PageRenderResponse, PoemError> {
         let realpath = format!("{}/{}", path1, path2);
         self.render(
             request,
             Path(store),
             Path(realpath),
-            Query(None),
-            Query(None),
+            Query(template),
+            Query(debug),
         )
         .await
     }
@@ -78,9 +80,6 @@ impl Api {
         } else {
             path.as_str()
         };
-
-        // FIXME. Remove any part of the path, keep just the last part
-        let realpath = realpath.split("/").last().unwrap();
 
         let pagename = format!("{}/{}", store, realpath);
 
