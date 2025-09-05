@@ -28,16 +28,12 @@ css_classes:
         }
       }
   - name: animation-bounce-1s-once-on-hover
-    description: Bounce animation 1s once on hover
+    description: Bounce animation once on hover
     css: |
-      .animation-bounce-1s-once-on-hover:hover {
-        animation: bounce-1s-once-on-hover 1s once;
+      .animation-bounce-1s-once-on-hover {
+        transition: transform 0.3s ease;
       }
-      @keyframes bounce-1s-once-on-hover {
-        0% {
-          transform: translateY(0);
-        }
-        100% {
-          transform: translateY(-10px);
-        }
+
+      .animation-bounce-1s-once-on-hover:hover {
+        transform: translateY(4px);
       }
