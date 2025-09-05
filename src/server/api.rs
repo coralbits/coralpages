@@ -364,6 +364,17 @@ impl Api {
         Ok(Json(Details::new("Page definition saved".to_string())))
     }
 
+    #[oai(path = "/page/:store/:path1/:path2", method = "put")]
+    async fn put_page_definition_with_path(
+        &self,
+        Path(store): Path<String>,
+        Path(path1): Path<String>,
+        Path(path2): Path<String>,
+    ) -> Result<Json<Details>, PoemError> {
+        let realpath = format!("{}/{}", path1, path2);
+        self.put_page_definition(Path(store), Path(realpath)).await
+    }
+
     #[oai(path = "/page/:store/:path", method = "put")]
     async fn put_page_definition(
         &self,
