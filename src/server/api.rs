@@ -5,6 +5,7 @@ use poem::web::Redirect;
 use poem::{get, handler};
 use poem_openapi::payload::Binary;
 use std::{collections::HashMap, sync::Arc};
+use tokio::sync::broadcast;
 use tracing::{error, info};
 
 use crate::page::types::ResultPageList;
@@ -457,6 +458,15 @@ async fn root_redirect() -> Redirect {
 }
 
 pub async fn start(listen: &str, renderer: PageRenderer) -> Result<()> {
+    let (_, shutdown_rx) = broadcast::channel(1);
+    start_with_shutdown(listen, renderer, shutdown_rx).await
+}
+
+pub async fn start_with_shutdown(
+    listen: &str, 
+    renderer: PageRenderer, 
+    mut shutdown_rx: broadcast::Receiver<()>
+) -> Result<()> {
     let api = Api::new(renderer)?;
     let api_service = OpenApiService::new(api, "Page Viewer", "0.1.0").server("/api/v1");
 
@@ -474,7 +484,17 @@ pub async fn start(listen: &str, renderer: PageRenderer) -> Result<()> {
         .with(cors);
 
     let listener = TcpListener::bind(listen);
-    Server::new(listener).run(app).await?;
+    let server = Server::new(listener);
+    
+    // Run the server until shutdown signal is received
+    tokio::select! {
+        result = server.run(app) => {
+            result?;
+        }
+        _ = shutdown_rx.recv() => {
+            info!("Shutdown signal received, stopping server...");
+        }
+    }
 
     Ok(())
 }

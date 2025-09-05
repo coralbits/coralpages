@@ -210,6 +210,15 @@ pub async fn get_debug() -> bool {
     config.debug
 }
 
+pub async fn reload_config() -> anyhow::Result<()> {
+    // Get the current config path from the global config
+    // For now, we'll assume the config was loaded from the default path
+    // In a real implementation, you might want to store the config path
+    let config_path = "config.yaml"; // This should be configurable
+    ConfigManager::reload_config_static(&CONFIG_MANAGER.config, config_path).await;
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
