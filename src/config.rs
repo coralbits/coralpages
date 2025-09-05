@@ -5,7 +5,7 @@ use tokio::sync::{RwLock, RwLockReadGuard};
 use notify::{RecursiveMode, Watcher};
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use tracing::{error, info};
+use tracing::{debug, error, info};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -148,12 +148,12 @@ impl ConfigManager {
                     }
                 };
 
-                info!("Event received: {:?}", event);
+                debug!("Event received: {:?}", event);
                 match event.kind {
                     notify::EventKind::Access(notify::event::AccessKind::Close(
                         notify::event::AccessMode::Write,
                     )) => {
-                        info!("Write close event detected, reloading config...");
+                        debug!("Write close event detected, reloading config...");
                         Self::reload_config_static(&config_manager, &path_string).await;
                     }
                     _ => {}
@@ -174,11 +174,11 @@ impl ConfigManager {
                 return;
             }
         };
-        info!("Waiting for write lock");
+        debug!("Waiting for write lock");
         let mut write_lock = config.write().await;
-        info!("Write lock acquired");
+        debug!("Write lock acquired");
         *write_lock = new_config;
-        info!("Config reloaded successfully from {}", path);
+        debug!("Config reloaded successfully from {}", path);
     }
 }
 
