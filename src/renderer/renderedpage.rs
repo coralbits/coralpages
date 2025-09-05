@@ -58,7 +58,22 @@ impl RenderedPage {
 
     pub fn render_full_html_page(&self) -> String {
         let css = self.get_css();
-        let html = format!("<!DOCTYPE html>\n<html>\n<head>\n<style>\n{}\n</style>\n</head>\n<body>\n{}\n</body>\n</html>", css, self.body);
+        let html = format!(
+            r#"
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+{}
+</style>
+</head>
+<body>
+{}
+</body>
+</html>"#,
+            css, self.body
+        );
         html
     }
 }
