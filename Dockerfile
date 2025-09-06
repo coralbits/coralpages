@@ -1,11 +1,13 @@
-FROM rust:1.89.0 as builder
+FROM rust:1.89.0 AS builder
 
 WORKDIR /app
 
-COPY . .
+COPY ./src/ /app/src/
+COPY ./Cargo.toml /app/Cargo.toml
+COPY ./Cargo.lock /app/Cargo.lock
 
-RUN cargo install --path .
-RUN cargo build
+# RUN cargo install --path .
+RUN cargo build --release
 
 FROM debian:trixie-slim
 
