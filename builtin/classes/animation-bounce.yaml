@@ -13,18 +13,32 @@ css_classes:
           transform: translateY(-10px);
         }
       }
-  - name: animation-bounce-1s-once
-    description: Bounce animation 1s once
+  - name: animation-bounce-1s-once-down
+    description: Bounce animation 1s once down
     css: |
-      .animation-bounce-1s-once {
-        animation: bounce-1s-once 1s once;
+      .animation-bounce-1s-once-down {
+        animation: bounce-1s-once-down 1s forwards;
       }
-      @keyframes bounce-1s-once {
+      @keyframes bounce-1s-once-down {
         0% {
-          transform: translateY(0);
+          transform: translateY(-10px);
         }
         100% {
-          transform: translateY(-10px);
+          transform: translateY(0);
+        }
+      }
+  - name: animation-bounce-1s-once-up
+    description: Bounce animation 1s once up
+    css: |
+      .animation-bounce-1s-once-up {
+        animation: bounce-1s-once-up 1s forwards;
+      }
+      @keyframes bounce-1s-once-up {
+        0% {
+          transform: translateY(10px);
+        }
+        100% {
+          transform: translateY(0);
         }
       }
   - name: animation-bounce-1s-once-on-hover
