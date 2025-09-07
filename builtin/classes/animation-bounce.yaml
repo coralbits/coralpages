@@ -1,6 +1,9 @@
 css_classes:
   - name: animation-bounce-1s-infinite
     description: Bounce animation 1s infinite
+    tags:
+      - animation
+      - bounce
     css: |
       .animation-bounce-1s-infinite {
         animation: bounce-1s-infinite 1s infinite;
@@ -15,6 +18,9 @@ css_classes:
       }
   - name: animation-bounce-1s-once-down
     description: Bounce animation 1s once down
+    tags:
+      - animation
+      - bounce
     css: |
       .animation-bounce-1s-once-down {
         animation: bounce-1s-once-down 1s forwards;
@@ -29,6 +35,9 @@ css_classes:
       }
   - name: animation-bounce-1s-once-up
     description: Bounce animation 1s once up
+    tags:
+      - animation
+      - bounce
     css: |
       .animation-bounce-1s-once-up {
         animation: bounce-1s-once-up 1s forwards;
@@ -50,4 +59,40 @@ css_classes:
 
       .animation-bounce-1s-once-on-hover:hover {
         transform: translateY(4px);
+      }
+  - name: animation-shine-10s-infinite
+    description: A diagonal shine line on the background every 10 seconds
+    tags:
+      - animation
+      - shine
+    css: |
+      .animation-shine-10s-infinite {
+        position: relative;
+        overflow: hidden;
+      }
+      .animation-shine-10s-infinite::after {
+        content: "";
+        position: absolute;
+        top: -100%;
+        left: -50%;
+        width: 30px;
+        height: 300%;
+        transform: rotate(45deg);
+        opacity: 0.5;
+        background: #fff;
+        animation: shine-10s-infinite 10s infinite;
+      }
+      @keyframes shine-10s-infinite {
+        0% {
+          left: -130%;
+          opacity: 0;
+        }
+        77% {
+          left: -130%;
+          opacity: 0;
+        }
+        100% {
+          left: 130%;
+          opacity: 0.6;
+        }
       }

@@ -1,6 +1,8 @@
 css_classes:
   - name: simple_card
     description: A simple card widget
+    tags:
+      - card
     css: |
       .simple_card {
         border: 1px solid #ccc;
@@ -9,6 +11,9 @@ css_classes:
       }
   - name: rainbow_card
     description: A rainbow card widget
+    tags:
+      - card
+      - colorful
     css: |
       .rainbow_card {
         border: 1px solid #ccc;

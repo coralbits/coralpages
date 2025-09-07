@@ -350,6 +350,7 @@ impl Store for FileStore {
                 .map(|c| CssClassResult {
                     name: format!("{}/{}", self.name, c.name.clone()),
                     description: c.description.clone(),
+                    tags: c.tags.clone(),
                 })
                 .collect(),
         };

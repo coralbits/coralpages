@@ -257,12 +257,15 @@ pub struct CssClass {
     pub name: String,
     pub description: String,
     pub css: String,
+    #[serde(default)]
+    pub tags: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct CssClassResult {
     pub name: String,
     pub description: String,
+    pub tags: Vec<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]

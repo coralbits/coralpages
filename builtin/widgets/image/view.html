@@ -7,7 +7,7 @@
 {% endif %}
 
 {% if data.caption %}
-<div class="image-container" id="{{data.id}}">
+<div class="image-container {{context.classes|join(' ')}}" id="{{data.id}}">
   <img
     class="content-image fit-{{data.fit}}"
     src="{{url}}"
@@ -19,7 +19,7 @@
 </div>
 {% else %}
 <img
-  class="content-image fit-{{data.fit}}"
+  class="content-image fit-{{data.fit}} {{context.classes|join(' ')}}"
   id="{{data.id}}"
   src="{{url}}"
   alt="{{data.alt or ''}}"
