@@ -5,11 +5,10 @@ use coralpages::{cache, config, utils, Page, PageRenderer, RestartManager};
 use minijinja::context;
 use std::fs;
 use std::time::Instant;
-use tokio::signal::unix::{signal, SignalKind};
+use tokio::signal::unix::SignalKind;
 use tracing::info;
 
 use coralpages::config::{get_config, load_config, watch_config};
-use coralpages::server::start;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -70,13 +69,13 @@ async fn main() -> Result<()> {
         info!("Rendered page file in {:?}", duration);
     } else if let Some(listen) = args.listen {
         // Start the server with restart capability
-        start_server_with_restart(&listen).await?;
+        start_server(&listen).await?;
     } else {
         let server = {
             let config = get_config().await;
             config.server.clone()
         };
-        start_server_with_restart(&format!("{}:{}", server.host, server.port)).await?;
+        start_server(&format!("{}:{}", server.host, server.port)).await?;
     }
 
     Ok(())
@@ -124,18 +123,6 @@ async fn render_from_store(pagename: &str) -> Result<()> {
 }
 
 async fn start_server(listen: &str) -> Result<()> {
-    let renderer = {
-        let config = get_config().await;
-        PageRenderer::new().with_stores(&config.stores).await?
-    };
-
-    info!("Starting server on http://{}", listen);
-    info!("OpenAPI docs: http://{}/docs", listen);
-    start(listen, renderer).await?;
-    Ok(())
-}
-
-async fn start_server_with_restart(listen: &str) -> Result<()> {
     let restart_manager = RestartManager::new(listen.to_string());
 
     // Set up signal handlers

@@ -6,7 +6,7 @@ use std::{
 
 use async_trait::async_trait;
 use serde::Deserialize;
-use tracing::{error, info, warn};
+use tracing::{error, info};
 
 use crate::{
     page::types::{Page, PageInfo, ResultPageList, Widget},

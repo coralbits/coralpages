@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use crate::{
     code::CodeStore,
-    config,
     page::types::{Element, MetaDefinition, Page, Widget},
     store::traits::Store,
 };
