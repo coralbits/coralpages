@@ -5,4 +5,4 @@ PORT=${PORT:-8006}
 HOST=${HOST:-0.0.0.0}
 ENV=${ENV:-production}
 
-./page-viewer --listen $HOST:$PORT
+./coralpages --listen $HOST:$PORT

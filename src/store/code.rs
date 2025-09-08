@@ -87,7 +87,7 @@ impl CodeStore {
                 let url_contents = client
                     .get(url)
                     .header(reqwest::header::CONTENT_TYPE, "application/json")
-                    .header(reqwest::header::USER_AGENT, "page-viewer")
+                    .header(reqwest::header::USER_AGENT, "coralpages")
                     .send()
                     .await?;
                 let body = url_contents.bytes().await?;

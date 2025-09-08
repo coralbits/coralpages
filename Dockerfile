@@ -13,11 +13,11 @@ FROM debian:trixie-slim
 
 WORKDIR /app
 
-COPY --from=builder /app/target/release/page-viewer /app/page-viewer
+COPY --from=builder /app/target/release/coralpages /app/coralpages
 COPY config.yaml /app/config.yaml
 COPY builtin /app/builtin
 COPY data /app/data
 
-RUN chmod +x /app/page-viewer
+RUN chmod +x /app/coralpages
 
-CMD ["/app/page-viewer"]
+CMD ["/app/coralpages"]

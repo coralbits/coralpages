@@ -1,15 +1,15 @@
 use anyhow::Result;
 use clap::Parser;
+use coralpages::traits::Store;
+use coralpages::{cache, config, utils, Page, PageRenderer, RestartManager};
 use minijinja::context;
-use page_viewer::traits::Store;
-use page_viewer::{cache, config, utils, Page, PageRenderer, RestartManager};
 use std::fs;
 use std::time::Instant;
 use tokio::signal::unix::{signal, SignalKind};
 use tracing::info;
 
-use page_viewer::config::{get_config, load_config, watch_config};
-use page_viewer::server::start;
+use coralpages::config::{get_config, load_config, watch_config};
+use coralpages::server::start;
 
 #[derive(Parser)]
 #[command(author, version, about, long_about = None)]
@@ -153,7 +153,7 @@ async fn start_server_with_restart(listen: &str) -> Result<()> {
             info!("OpenAPI docs: http://{}/docs", listen_addr);
 
             // Use the new start_with_shutdown function
-            page_viewer::server::start_with_shutdown(&listen_addr, renderer, shutdown_rx).await?;
+            coralpages::server::start_with_shutdown(&listen_addr, renderer, shutdown_rx).await?;
             Ok(())
         })
         .await?;
