@@ -14,13 +14,21 @@ pub struct DbStore {
 
 impl DbStore {
     pub async fn new(name: &str, url: &str) -> Result<Self> {
+        info!("Connecting to database at url={}", url);
+        // Create database file if it doesn't exist
+        if url.starts_with("sqlite://") {
+            let path = url.trim_start_matches("sqlite://");
+            if !std::path::Path::new(path).exists() {
+                debug!("Creating new SQLite database file at {}", path);
+                std::fs::File::create(path)?;
+            }
+        }
         let db = SqlitePool::connect(url).await?;
         let ret = Self {
             name: name.to_string(),
             db,
         };
 
-        info!("Connected to database at url={}", url);
         ret.init().await?;
 
         Ok(ret)

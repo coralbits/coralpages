@@ -30,7 +30,7 @@ debug: false
 stores:
   - name: default
     type: db
-    url: sqlite://./data/pe.db
+    url: sqlite://./data/default.db
     tags:
       - writable
       - pages
