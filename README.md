@@ -12,6 +12,12 @@ Currently I'm reimplementing the whole system in rust for performance reasons. T
 prototype in Python proved very useful, in rust its extremely usefull as the speed increase is
 incredible (10x in my tests, normally sub ms for a full page render).
 
+<div style="text-align: center;">
+  <a href="./.github/screenshot-01.png" target="_blank">
+    <img src="./.github/screenshot-01.png" width="500" alt="Screenshot of the page editor">
+  </a>
+</div>
+
 ## How to test
 
 The best way to test is via the page editor, which is available at https://github.com/coralbits/coralpages-editor/.
