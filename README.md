@@ -8,10 +8,6 @@ This is an API first page renderer. There is no editor. For that check out the
 The main idea is to be used as a microservice focused only in ease the edition (via the editor),
 and very fast specialized rendering of the HTML content.
 
-Currently I'm reimplementing the whole system in rust for performance reasons. The initial
-prototype in Python proved very useful, in rust its extremely usefull as the speed increase is
-incredible (10x in my tests, normally sub ms for a full page render).
-
 <div style="text-align: center;">
   <a href="./.github/screenshot-01.png" target="_blank">
     <img src="./.github/screenshot-01.png" width="500" alt="Screenshot of the page editor">
@@ -40,6 +36,7 @@ allow edit, add access to the whole GET/POST/PUT/DELETE API.
 - [ ] Easy to add new widgets to create a custom page personality.
 - [ ] Easy to add new stores to create a custom page backend.
 - [ ] HTTP backend, so it can add data to the context, or directly render elements.
+- [ ] Made in Rust, so it's fast. Very fast.
 
 ## TODO
 
