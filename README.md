@@ -3,7 +3,7 @@
 ## Overview
 
 This is an API first page renderer. There is no editor. For that check out the
-[page editor](https://github.com/coralbits/pe).
+[page editor](https://github.com/coralbits/coralpages-editor).
 
 The main idea is to be used as a microservice focused only in ease the edition (via the editor),
 and very fast specialized rendering of the HTML content.
