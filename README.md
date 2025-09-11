@@ -12,6 +12,22 @@ Currently I'm reimplementing the whole system in rust for performance reasons. T
 prototype in Python proved very useful, in rust its extremely usefull as the speed increase is
 incredible (10x in my tests, normally sub ms for a full page render).
 
+## How to test
+
+The best way to test is via the page editor, which is available at https://github.com/coralbits/coralpages-editor/.
+
+## How to use
+
+Coralpages is a microservice. Its not a end user facing product. You MUST use it from your
+frontend code, via its API.
+
+The most common way is to have the editor available somehwere in your infrastructure, and
+make your frontend render the pages.
+
+If unsure about security, the most sensible way is to only allow to access the rendered pages on
+your public frontend. On your private allow to post and put to the page API. And if want to
+allow edit, add access to the whole GET/POST/PUT/DELETE API.
+
 ## Features
 
 - [ ] Flexible store configuration support. Can have sveral stores, each with a diferent backend.
@@ -24,20 +40,6 @@ incredible (10x in my tests, normally sub ms for a full page render).
 - [ ] Permissions per store. So some JWT tags can be used to allow view or edit.
 - [ ] Draft support & History. Now only last edited page is stored in the stores.
 - [ ] Improve HTTP support for the rust implemetnation.
-
-## License
-
-Page Viewer is licensed under the AGPLv3 license.
-
-This basically means that any of your users, even on netowrk enviroments, have the
-right to get the source code of the software and any modification.
-
-If for any reason this is not acceptable to you or your company, it's possible to
-purchase a commercial license from Coralbits, with a fixed closed price of 100€ per
-release. This basically means that you can use the software with the only limitation
-is that relicensing, redistribution nor resale are allowed.
-
-If you need a commercial license, please contact us at info@coralbits.com.
 
 ## Terminology
 
@@ -80,3 +82,17 @@ But a very basic page would be, in JSON:
   ]
 }
 ```
+
+## License
+
+Page Viewer is licensed under the AGPLv3 license.
+
+This basically means that any of your users, even on netowrk enviroments, have the
+right to get the source code of the software and any modification.
+
+If for any reason this is not acceptable to you or your company, it's possible to
+purchase a commercial license from Coralbits, with a fixed closed price of 100€ per
+release. This basically means that you can use the software with the only limitation
+is that relicensing, redistribution nor resale are allowed.
+
+If you need a commercial license, please contact us at info@coralbits.com.
