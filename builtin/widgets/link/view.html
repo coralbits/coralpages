@@ -1,0 +1,10 @@
+<a 
+    href="{{data.url}}" 
+    class="{{context.classes|join(' ')}}" 
+    id="{{data.id}}" 
+    {% if data.target %}target="{{data.target}}"{% endif %}
+  >{{data.text}}
+{%- for child in context.children -%}
+{{child}}
+{%- endfor -%}
+</a>

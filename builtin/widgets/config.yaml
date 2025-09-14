@@ -40,7 +40,6 @@ widgets:
     description: A header widget
     icon: header
     html: header/view.html
-    css: header/style.css
     editor:
       - type: select
         label: Size
@@ -204,3 +203,20 @@ widgets:
         name: default_value
         label: Default Value
         description: Default value of the input
+  - name: link
+    description: A Link
+    icon: link
+    html: link/view.html
+    editor:
+      - type: text
+        label: Text
+        name: text
+        placeholder: Enter text, or add children to this widget
+      - type: text
+        label: URL
+        name: url
+        placeholder: Enter URL
+      - type: text
+        label: Target
+        name: target
+        placeholder: Enter target

@@ -1,0 +1,26 @@
+css_classes:
+  - name: text-no-decoration
+    description: Text no decoration
+    tags:
+      - text
+    css: |
+      .text-no-decoration {
+        text-decoration: none;
+      }
+  - name: text-transparent
+    description: Text transparent
+    tags:
+      - text
+    css: |
+      .text-transparent {
+        color: transparent;
+      }
+  - name: text-via-background
+    description: Text via background
+    tags:
+      - text
+    css: |
+      .text-via-background {
+        color: transparent;
+        background-clip: text;
+      }

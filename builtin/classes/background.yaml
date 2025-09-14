@@ -1,0 +1,83 @@
+css_classes:
+  - name: background-transparent
+    description: Background transparent
+    tags:
+      - background
+    css: |
+      .background-transparent {
+        background-color: transparent;
+      }
+  - name: background-blur-5px
+    description: Background blur 5px
+    tags:
+      - background
+    css: |
+      .background-blur-5px {
+        background-color: transparent;
+        backdrop-filter: blur(5px);
+      }
+  - name: background-blur-10px
+    description: Background blur 10px
+    tags:
+      - background
+    css: |
+      .background-blur-10px {
+        background-color: transparent;
+        backdrop-filter: blur(10px);
+      }
+  - name: background-dark-transparent-50
+    description: Background dark transparent 50%
+    tags:
+      - background
+    css: |
+      .background-dark-transparent-50 {
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+  - name: background-dark-transparent-70
+    description: Background dark transparent 70%
+    tags:
+      - background
+    css: |
+      .background-dark-transparent-70 {
+        background-color: rgba(0, 0, 0, 0.7);
+      }
+  - name: background-dark-transparent-90
+    description: Background dark transparent 90%
+    tags:
+      - background
+    css: |
+      .background-dark-transparent-90 {
+        background-color: rgba(0, 0, 0, 0.9);
+      }
+  - name: background-light-transparent-50
+    description: Background light transparent 50%
+    tags:
+      - background
+    css: |
+      .background-light-transparent-50 {
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+  - name: background-light-transparent-70
+    description: Background light transparent 70%
+    tags:
+      - background
+    css: |
+      .background-light-transparent-70 {
+        background-color: rgba(255, 255, 255, 0.7);
+      }
+  - name: background-light-transparent-90
+    description: Background light transparent 90%
+    tags:
+      - background
+    css: |
+      .background-light-transparent-90 {
+        background-color: rgba(255, 255, 255, 0.9);
+      }
+  - name: background-light-transparent-90
+    description: Background light transparent 90%
+    tags:
+      - background
+    css: |
+      .background-light-transparent-90 {
+        background-color: rgba(255, 255, 255, 0.9);
+      }

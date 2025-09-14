@@ -96,3 +96,15 @@ css_classes:
           opacity: 0.6;
         }
       }
+  - name: animation-card-grow-hover
+    description: A card grow animation on hover
+    tags:
+      - animation
+      - card
+    css: |
+      .animation-card-grow-hover {
+        transition: transform 0.3s ease;
+      }
+      .animation-card-grow-hover:hover {
+        transform: scale(1.05);
+      }
