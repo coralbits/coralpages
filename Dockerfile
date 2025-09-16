@@ -16,8 +16,8 @@ WORKDIR /app
 COPY --from=builder /app/target/release/coralpages /app/coralpages
 COPY config.yaml /app/config.yaml
 COPY builtin /app/builtin
-COPY data /app/data
 
+RUN mkdir -p /app/data
 RUN chmod +x /app/coralpages
 
 CMD ["/app/coralpages"]
