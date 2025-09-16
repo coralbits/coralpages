@@ -8,4 +8,7 @@ pub mod pdf;
 pub mod renderedpage;
 pub mod renderer;
 
+#[cfg(test)]
+mod tests;
+
 pub use renderer::*;
