@@ -44,8 +44,6 @@ children:
           # Nested components (if supported)
       ```
   children: []
-  style:
-    font-family: Bangers
   classes: []
 - id: ab8507ea-3b8f-44fb-ad0c-cf601918
   widget: builtin/markdown
@@ -99,7 +97,6 @@ children:
           padding: 30px
           margin: 0
       ```
-    title: Layout Components
   children: []
   style: {}
   classes: []
@@ -149,17 +146,5 @@ cache: []
 last_modified: null
 head:
   meta: null
-  link:
-  - href: https://fonts.googleapis.com
-    rel: preconnect
-  - href: https://fonts.gstatic.com
-    rel: preconnect
-  - href: https://fonts.googleapis.com/css2?family=Cardif
-    rel: stylesheet
-  - href: https://fonts.googleapis.com
-    rel: preconnect
-  - href: https://fonts.gstatic.com
-    rel: preconnect
-  - href: https://fonts.googleapis.com/css2?family=Bangers
-    rel: stylesheet
+  link: []
 css_variables: {}
