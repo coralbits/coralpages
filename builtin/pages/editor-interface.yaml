@@ -4,7 +4,7 @@ title: "Editor Interface"
 template: "pages/_default"
 
 children:
-  - type: builtin/markdown
+  - widget: builtin/markdown
     id: "visual-page-editor"
     data:
       title: "Visual Page Editor"
@@ -32,7 +32,7 @@ children:
         - **Style Panel**: CSS property editing
         - **Preview Pane**: Live preview of the page
         - **Component Library**: Available components sidebar
-  - type: builtin/markdown
+  - widget: builtin/markdown
     id: "getting-started-with-the-editor"
     data:
       title: "Getting Started with the Editor"
@@ -72,7 +72,7 @@ children:
         4. **Style**: Use the style panel to customize appearance
         5. **Preview**: See changes in real-time
         6. **Save**: Save your changes to the page
-  - type: builtin/markdown
+  - widget: builtin/markdown
     id: "component-editors"
     data:
       title: "Component Editors"
@@ -143,7 +143,7 @@ children:
         | [+ Add Menu Item]      |
         +------------------------+
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Style Editor"
       text: |
@@ -184,7 +184,7 @@ children:
         - **Mobile-First**: Design for mobile, enhance for desktop
         - **Media Queries**: Conditional styling for different screens
         - **Touch-Friendly**: Optimize for touch interfaces
-  - type: builtin/markdown
+  - widget: builtin/markdown
     id: "layout-management"
     data:
       title: "Layout Management"
@@ -226,7 +226,7 @@ children:
         - **Snap to Grid**: Align components to grid
         - **Distribute**: Evenly space multiple components
         - **Group/Ungroup**: Group related components
-  - type: builtin/markdown
+  - widget: builtin/markdown
     id: "preview-and-testing"
     data:
       title: "Preview and Testing"
@@ -266,7 +266,7 @@ children:
         - **CSS Export**: Export component styles
         - **JSON Export**: Export page data
         - **PDF Export**: Generate PDF version
-  - type: builtin/markdown
+  - widget: builtin/markdown
     id: "advanced-features"
     data:
       title: "Advanced Features"

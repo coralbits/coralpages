@@ -3,7 +3,7 @@ title: "Architecture"
 template: "pages/_default"
 
 children:
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "System Architecture Overview"
       text: |
@@ -46,7 +46,7 @@ children:
         │   Components    │    │   Components    │    │   Components    │
         └─────────────────┘    └─────────────────┘    └─────────────────┘
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Core Components"
       text: |
@@ -97,7 +97,7 @@ children:
         - Manage component health checks
         - Provide fallback mechanisms
         - Load balancing across component instances
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Component Architecture"
       text: |
@@ -165,7 +165,7 @@ children:
         - **JavaScript**: Returns client-side logic
         - **Validation**: Returns validation rules
         - **Preview**: Returns preview data
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Data Flow"
       text: |
@@ -246,7 +246,7 @@ children:
            │   Editor    │
            └─────────────┘
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Caching Strategy"
       text: |
@@ -307,7 +307,7 @@ children:
         - **Pre-render**: Render popular pages on startup
         - **Background**: Periodic re-rendering of cached pages
         - **Predictive**: Cache pages based on usage patterns
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Security Architecture"
       text: |
@@ -358,7 +358,7 @@ children:
         **TLS**: Secure communication channels
         **Secrets Management**: Secure handling of API keys and secrets
         **Audit Logging**: Track all system activities
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Scalability Design"
       text: |
@@ -425,7 +425,7 @@ children:
         - **Readiness Probes**: Check if service is ready to serve
         - **Component Health**: Check external component health
         - **Dependency Health**: Check database, cache, etc.
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Deployment Architecture"
       text: |

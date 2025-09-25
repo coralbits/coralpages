@@ -4,7 +4,7 @@ title: "Getting Started"
 template: "pages/_default"
 
 children:
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Quick Start Guide"
       text: |
@@ -48,7 +48,7 @@ children:
 
         ```yaml
         data:
-          - type: builtin/header
+          - widget: builtin/header
             data:
               text: "Hello World"
             style:
@@ -57,7 +57,7 @@ children:
               text-align: center
               padding: 20px
 
-          - type: builtin/text
+          - widget: builtin/text
             data:
               text: "Welcome to Coralbits Page Editor!"
             style:
@@ -79,14 +79,14 @@ children:
 
         ```yaml
         data:
-          - type: builtin/section
+          - widget: builtin/section
             data:
               title: "Main Content"
             style:
               max-width: 1200px
               margin: 0 auto
             children:
-              - type: builtin/text
+              - widget: builtin/text
                 data:
                   text: "Content goes here"
         ```

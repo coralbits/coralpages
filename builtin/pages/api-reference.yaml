@@ -7,7 +7,7 @@ cache:
   - last-modified
 
 children:
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       text: |
         The Coralbits Page Editor provides a RESTful API for page rendering, editing, and management.
@@ -47,7 +47,7 @@ children:
           "timestamp": "2024-01-01T00:00:00Z"
         }
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       text: |
         ## Render Page
@@ -131,7 +131,7 @@ children:
           ]
         }
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       text: |
         ## List Pages
@@ -170,7 +170,7 @@ children:
           "success": true,
           "data": {
             "name": "index",
-            "yaml": "data:\n  - type: builtin/header\n    data:\n      text: \"...\"",
+            "yaml": "data:\n  - widget: builtin/header\n    data:\n      text: \"...\"",
             "last_modified": "2024-01-01T00:00:00Z"
           }
         }
@@ -222,7 +222,7 @@ children:
           }
         }
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       text: |
         ## List Components
@@ -288,7 +288,7 @@ children:
           }
         }
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       text: |
         ## Get Editor Interface
@@ -375,7 +375,7 @@ children:
           }
         }
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       text: |
         ## Health Check
@@ -438,7 +438,7 @@ children:
           }
         }
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       text: |
         ## Common Error Codes

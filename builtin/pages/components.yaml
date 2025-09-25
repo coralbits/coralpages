@@ -1,134 +1,165 @@
-# Built-in Components Documentation
-
-title: "Components"
-template: "pages/_default"
-
+title: Components
+path: ''
+store: ''
+url: null
+template: pages/_default
 children:
-  - type: builtin/markdown
-    data:
-      title: "Component Overview"
-      text: |
-        The Coralbits Page Editor comes with a comprehensive set of built-in components that cover most common web page needs.
-        Each component is designed to be flexible, customizable, and easy to use.
+- id: d5107ece-9824-43e9-9b74-88975fdf
+  widget: builtin/markdown
+  data:
+    title: Component Overview
+    text: |
+      The Coralbits Page Editor comes with a comprehensive set of built-in components that cover most common web page needs.
+      Each component is designed to be flexible, customizable, and easy to use.
 
-        ## Component Categories
+      ## Component Categories
 
-        ### Layout Components
-        - **Section**: Container for organizing content
-        - **Header**: Page headers and navigation elements
+      ### Layout Components
+      - **Section**: Container for organizing content
+      - **Header**: Page headers and navigation elements
 
-        ### Content Components
-        - **Text**: Rich text content with formatting
-        - **Paragraph**: Simple text paragraphs
-        - **Markdown**: Markdown-formatted content
-        - **Image**: Image display with upload support
+      ### Content Components
+      - **Text**: Rich text content with formatting
+      - **Paragraph**: Simple text paragraphs
+      - **Markdown**: Markdown-formatted content
+      - **Image**: Image display with upload support
 
-        ### Navigation Components
-        - **Menu**: Navigation menus and links
+      ### Navigation Components
+      - **Menu**: Navigation menus and links
 
-        ### Interactive Components
-        - **Tag Cloud**: Interactive tag visualization
+      ### Interactive Components
+      - **Tag Cloud**: Interactive tag visualization
 
-        ## Component Structure
+      ## Component Structure
 
-        Every component follows this structure:
+      Every component follows this structure:
 
-        ```yaml
-        - type: builtin/component_name
-          data:
-            # Component-specific data
-          style:
-            # CSS styling properties
-          children:
-            # Nested components (if supported)
-        ```
-  - type: builtin/markdown
-    data:
-      title: "Layout Components"
-      text: |
-        ## Section Component
+      ```yaml
+      - widget: builtin/component_name
+        data:
+          # Component-specific data
+        style:
+          # CSS styling properties
+        children:
+          # Nested components (if supported)
+      ```
+  children: []
+  style:
+    font-family: Bangers
+  classes: []
+- id: ab8507ea-3b8f-44fb-ad0c-cf601918
+  widget: builtin/markdown
+  data:
+    text: |
+      ## Section Component
 
-        The section component is the primary container for organizing page content.
+      The section component is the primary container for organizing page content.
 
-        **Properties:**
-        - `title`: Section title (optional)
-        - `text`: Section description (optional)
-        - `children`: Nested components
+      **Properties:**
+      - `title`: Section title (optional)
+      - `text`: Section description (optional)
+      - `children`: Nested components
 
-        **Example:**
-        ```yaml
-        - type: builtin/section
-          data:
-            title: "About Us"
-            text: "Learn more about our company"
-          style:
-            max-width: 1200px
-            margin: 0 auto
-            padding: 20px
-            background: #f9f9f9
-            border-radius: 8px
-          children:
-            - type: builtin/text
-              data:
-                text: "Content goes here"
-        ```
+      **Example:**
+      ```yaml
+      - widget: builtin/section
+        data:
+          title: "About Us"
+          text: "Learn more about our company"
+        style:
+          max-width: 1200px
+          margin: 0 auto
+          padding: 20px
+          background: #f9f9f9
+          border-radius: 8px
+        children:
+          - widget: builtin/text
+            data:
+              text: "Content goes here"
+      ```
 
-        ## Header Component
+      ## Header Component
 
-        Used for page headers, titles, and navigation elements.
+      Used for page headers, titles, and navigation elements.
 
-        **Properties:**
-        - `text`: Header text content
+      **Properties:**
+      - `text`: Header text content
 
-        **Example:**
-        ```yaml
-        - type: builtin/header
-          data:
-            text: "Welcome to Our Website"
-          style:
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
-            color: white
-            font-size: 32px
-            font-weight: bold
-            text-align: center
-            padding: 30px
-            margin: 0
-        ```
-  - type: builtin/markdown
-    data:
-      title: "Content Components"
-      text: |
-        ## Text Component
+      **Example:**
+      ```yaml
+      - widget: builtin/header
+        data:
+          text: "Welcome to Our Website"
+        style:
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%)
+          color: white
+          font-size: 32px
+          font-weight: bold
+          text-align: center
+          padding: 30px
+          margin: 0
+      ```
+    title: Layout Components
+  children: []
+  style: {}
+  classes: []
+- id: id_5393f78a-3c29-4774-9e70-93582
+  widget: builtin/markdown
+  data:
+    title: Content Components
+    text: |
+      ## Text Component
 
-        Rich text component with formatting support.
+      Rich text component with formatting support.
 
-        **Properties:**
-        - `text`: Text content (supports HTML)
+      **Properties:**
+      - `text`: Text content (supports HTML)
 
-        **Example:**
-        ```yaml
-        - type: builtin/text
-          data:
-            text: "<h2>Rich Text Content</h2><p>This supports <strong>HTML formatting</strong> and <em>styling</em>.</p>"
-          style:
-            padding: 20px
-            line-height: 1.6
-            color: #333
-        ```
+      **Example:**
+      ```yaml
+      - widget: builtin/text
+        data:
+          text: "<h2>Rich Text Content</h2><p>This supports <strong>HTML formatting</strong> and <em>styling</em>.</p>"
+        style:
+          padding: 20px
+          line-height: 1.6
+          color: #333
+      ```
 
-        ## Paragraph Component
+      ## Paragraph Component
 
-        Simple paragraph text component.
+      Simple paragraph text component.
 
-        **Properties:**
-        - `text`: Paragraph text content
+      **Properties:**
+      - `text`: Paragraph text content
 
-        **Example:**
-        ```yaml
-        - type: builtin/paragraph
-          data:
-            text: "This is a simple paragraph of text."
-          style:
-            margin: 10px 0
-            line-height: 1.5
-        ```
+      **Example:**
+      ```yaml
+      - widget: builtin/paragraph
+        data:
+          text: "This is a simple paragraph of text."
+        style:
+          margin: 10px 0
+          line-height: 1.5
+      ```
+  children: []
+  style: {}
+  classes: []
+cache: []
+last_modified: null
+head:
+  meta: null
+  link:
+  - href: https://fonts.googleapis.com
+    rel: preconnect
+  - href: https://fonts.gstatic.com
+    rel: preconnect
+  - href: https://fonts.googleapis.com/css2?family=Cardif
+    rel: stylesheet
+  - href: https://fonts.googleapis.com
+    rel: preconnect
+  - href: https://fonts.gstatic.com
+    rel: preconnect
+  - href: https://fonts.googleapis.com/css2?family=Bangers
+    rel: stylesheet
+css_variables: {}

@@ -4,14 +4,14 @@ url: null
 template: pages/_default
 children:
   - id: 84fc9272-43e2-4f8c-aa9b-323c7cc5ad6e
-    type: builtin/markdown
+    widget: builtin/markdown
     data:
       text: "## Prerequisites\n\n- Rust 1.49\n\n## Installation\n\n```bash\n# Clone the repository\ngit clone https://github.com/coralbits/pv\ncd pv\n\n# Install dependencies using cargo \ncargo install\n```\n\n## Running the Development Server\n\n### Manual Server Start\n```bash\n# Start the development server\ncargo run\n```\n\n### Using the Run Script\n```bash\n# Run the server\n./run.sh\n```\n\nThe run script allows easy edit of parameters, like listening port or use another config.yaml file.\n\n\nThe server will start on `http://localhost:8006` by default.\n\nCheck the `config.yaml` file for many more options.\n"
       title: Development Environment Setup
     children: []
     style: {}
   - id: feac43e0-2612-4f16-a844-de9d18456204
-    type: builtin/markdown
+    widget: builtin/markdown
     data:
       text: |
         ## Creating Pages
@@ -26,7 +26,7 @@ children:
         # my-page.yaml
         title: Example page
         children:
-          - type: builtin/header
+          - widget: builtin/header
             data:
               text: "My New Page"
             style:
@@ -35,7 +35,7 @@ children:
               text-align: center
               padding: 20px
 
-          - type: builtin/text
+          - widget: builtin/text
             data:
               text: "Welcome to my new page!"
             style:
@@ -53,7 +53,7 @@ children:
     children: []
     style: {}
   - id: 6a50e5ef-0353-4bdb-9b4d-1531e41b04c3
-    type: builtin/markdown
+    widget: builtin/markdown
     data:
       text: |+
         ## Running Tests

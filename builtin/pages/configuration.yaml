@@ -4,7 +4,7 @@ title: "Configuration"
 template: "pages/_default"
 
 children:
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Configuration Overview"
       text: |
@@ -26,7 +26,7 @@ children:
         - **Hierarchical**: Settings can be overridden at different levels
         - **Environment-aware**: Different settings for development and production
         - **Extensible**: Easy to add new components and settings
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Main Configuration File"
       text: |
@@ -49,7 +49,7 @@ children:
             css: builtin/text/style.css
             editor:
               - id: text
-                type: rich-text
+                widget: rich-text
 
         # External components
         external:
@@ -92,7 +92,7 @@ children:
           css: http://auth-service:8080/api/login-form/css
           editor: http://auth-service:8080/api/login-form/editor
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Environment Variables"
       text: |
@@ -165,7 +165,7 @@ children:
         # Test mode
         export TEST_MODE=true
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Component Templates"
       text: |
@@ -233,7 +233,7 @@ children:
         - **Validation**: Client-side validation rules
         - **Live Preview**: Real-time preview of changes
         - **Style Controls**: Visual style editing
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Custom Components"
       text: |
@@ -342,7 +342,7 @@ children:
                 'css': get_custom_widget_editor_css()
             }
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Advanced Configuration"
       text: |
@@ -429,7 +429,7 @@ children:
             cache.delete(f"page:{page_name}")
             cache.delete(f"render:{page_name}")
         ```
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "Configuration Best Practices"
       text: |
@@ -493,12 +493,12 @@ children:
           level: INFO
           format: json
           handlers:
-            - type: builtin/file
+            - widget: builtin/file
               filename: logs/app.log
               max_bytes: 10485760
               backup_count: 5
 
-            - type: builtin/console
+            - widget: builtin/console
               level: DEBUG
         ```
 

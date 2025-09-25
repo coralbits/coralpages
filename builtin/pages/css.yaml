@@ -2,7 +2,7 @@ title: "Configuration"
 template: "pages/_default"
 
 children:
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       title: "CSS"
       text: |

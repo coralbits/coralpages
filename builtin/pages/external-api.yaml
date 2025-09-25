@@ -3,12 +3,12 @@ title: "API get example"
 template: "pages/_default"
 
 children:
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       text: |
         # next is data directly from an external API
 
-  - type: builtin/markdown
+  - widget: builtin/markdown
     data:
       text: |
         This data is sent to another server, which renders the component and then is included into the
