@@ -23,12 +23,19 @@ pub struct PageRenderHead {
     css: String,
     js: String,
     meta: Vec<PageRenderMeta>,
+    link: Vec<PageRenderLink>,
 }
 
 #[derive(Object)]
 pub struct PageRenderMeta {
     name: String,
     content: String,
+}
+
+#[derive(Object)]
+pub struct PageRenderLink {
+    href: String,
+    rel: String,
 }
 
 #[derive(Object)]
@@ -44,21 +51,39 @@ pub struct PageRenderResponseJson {
 
 impl PageRenderResponseJson {
     pub fn from_page_rendered(rendered: &RenderedPage) -> Self {
-        let meta = rendered
-            .meta
-            .iter()
-            .map(|m| PageRenderMeta {
-                name: m.name.clone(),
-                content: m.content.clone(),
-            })
-            .collect();
+        // let meta = rendered
+        //     .meta
+        //     .iter()
+        //     .map(|m| PageRenderMeta {
+        //         name: m.name.clone(),
+        //         content: m.content.clone(),
+        //     })
+        //     .collect();
+        let head = rendered.head.clone();
 
         Self {
             body: rendered.body.clone(),
             head: PageRenderHead {
                 css: rendered.get_css(),
                 js: "/** TODO **/".to_string(),
-                meta: meta,
+                meta: head
+                    .meta
+                    .unwrap_or_default()
+                    .iter()
+                    .map(|m| PageRenderMeta {
+                        name: m.name.clone(),
+                        content: m.content.clone(),
+                    })
+                    .collect(),
+                link: head
+                    .link
+                    .unwrap_or_default()
+                    .iter()
+                    .map(|l| PageRenderLink {
+                        href: l.href.clone(),
+                        rel: l.rel.clone(),
+                    })
+                    .collect(),
             },
             http: PageRenderHttp {
                 headers: HashMap::new(),

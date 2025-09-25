@@ -146,12 +146,14 @@ fn assert_html_structure(html: &str, expected_substring: &str) {
 
 fn assert_meta_tags(rendered: &RenderedPage, expected: &[MetaDefinition]) {
     assert_eq!(
-        rendered.meta.len(),
+        rendered.head.meta.as_ref().unwrap_or(&vec![]).len(),
         expected.len(),
         "Meta tag count mismatch"
     );
     for (i, expected_meta) in expected.iter().enumerate() {
-        let actual_meta = &rendered.meta[i];
+        let default_meta = vec![];
+        let meta = rendered.head.meta.as_ref().unwrap_or(&default_meta);
+        let actual_meta = &meta[i];
         assert_eq!(actual_meta.name, expected_meta.name);
         assert_eq!(actual_meta.content, expected_meta.content);
     }

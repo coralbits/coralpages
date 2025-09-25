@@ -200,6 +200,15 @@ pub struct PageHead {
     pub link: Option<Vec<LinkDefinition>>,
 }
 
+impl PageHead {
+    pub fn new() -> Self {
+        Self {
+            meta: None,
+            link: None,
+        }
+    }
+}
+
 impl Page {
     pub fn new() -> Self {
         Self {

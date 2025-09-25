@@ -8,7 +8,7 @@ use std::collections::HashMap;
 
 use crate::{
     code::CodeStore,
-    page::types::{Element, MetaDefinition, Page, Widget},
+    page::types::{Element, Page, PageHead, Widget},
     store::traits::Store,
 };
 
@@ -23,7 +23,7 @@ pub struct RenderedPage {
     pub body: String,
     pub headers: HashMap<String, String>,
     pub response_code: u16,
-    pub meta: Vec<MetaDefinition>,
+    pub head: PageHead,
     pub css_variables: HashMap<String, String>,
     pub errors: Vec<anyhow::Error>,
     pub elapsed: std::time::Instant,
@@ -38,7 +38,7 @@ impl RenderedPage {
             body: String::new(),
             headers: HashMap::new(),
             response_code: 200,
-            meta: Vec::new(),
+            head: PageHead::new(),
             css_variables: HashMap::new(),
             errors: Vec::new(),
             elapsed: std::time::Instant::now(),
@@ -63,23 +63,47 @@ impl RenderedPage {
         format!("{}", css_variables)
     }
 
+    pub fn get_head(&self) -> String {
+        let mut head = String::new();
+        head.push_str("<style> body { margin: 0; padding: 0; }");
+        head.push_str(&self.get_css());
+        head.push_str("</style>");
+        if let Some(metas) = &self.head.meta {
+            for meta in metas {
+                head.push_str(&format!(
+                    "<meta name=\"{}\" content=\"{}\">",
+                    meta.name, meta.content
+                ));
+            }
+        }
+
+        if let Some(links) = &self.head.link {
+            for link in links {
+                head.push_str(&format!(
+                    "<link rel=\"{}\" href=\"{}\">",
+                    link.rel, link.href
+                ));
+            }
+        }
+
+        head
+    }
+
     pub fn render_full_html_page(&self) -> String {
-        let css = self.get_css();
+        let head = self.get_head();
         let html = format!(
             r#"
 <!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
 {}
-</style>
 </head>
 <body>
 {}
 </body>
 </html>"#,
-            css, self.body
+            head, self.body
         );
         html
     }
@@ -127,7 +151,10 @@ impl<'a> RenderedingPageData<'a> {
         // add the meta
         if let Some(head) = &self.page.head {
             if let Some(meta) = &head.meta {
-                self.rendered_page.meta.extend(meta.clone());
+                self.rendered_page.head.meta = Some(meta.clone());
+            }
+            if let Some(link) = &head.link {
+                self.rendered_page.head.link = Some(link.clone());
             }
         }
 
