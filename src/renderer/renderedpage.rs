@@ -125,7 +125,11 @@ impl<'a> RenderedingPageData<'a> {
             self.rendered_page.path
         );
         // add the meta
-        self.rendered_page.meta.extend(self.page.meta.clone());
+        if let Some(head) = &self.page.head {
+            if let Some(meta) = &head.meta {
+                self.rendered_page.meta.extend(meta.clone());
+            }
+        }
 
         self.rendered_page.body = rendered_body;
 

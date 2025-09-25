@@ -13,7 +13,7 @@ use crate::{
     page::types::{CssClass, Element, MetaDefinition, Page, Widget},
     store::{factory::StoreFactory, traits::Store},
     utils::setup_logging,
-    PageRenderer,
+    PageHead, PageRenderer,
 };
 use ctor::ctor;
 
@@ -28,99 +28,7 @@ fn setup_logging_() {
 fn parse_page_from_yaml(yaml: &str) -> anyhow::Result<Page> {
     // For now, implement basic YAML parsing or use serde_yaml
     // This is a placeholder implementation
-    let parsed: serde_yaml::Value = serde_yaml::from_str(yaml)?;
-
-    let mut page = Page::new();
-
-    if let Some(title) = parsed.get("title").and_then(|v| v.as_str()) {
-        page = page.with_title(title.to_string());
-    }
-
-    if let Some(path) = parsed.get("path").and_then(|v| v.as_str()) {
-        page = page.with_path(path.to_string());
-    }
-
-    if let Some(children) = parsed.get("children").and_then(|v| v.as_sequence()) {
-        let mut elements = Vec::new();
-        for child in children {
-            if let Ok(element) = parse_element_from_yaml_value(child) {
-                elements.push(element);
-            }
-        }
-        page = page.with_children(elements);
-    }
-
-    if let Some(meta) = parsed.get("meta").and_then(|v| v.as_sequence()) {
-        let mut meta_defs = Vec::new();
-        for meta_item in meta {
-            if let Some(name) = meta_item.get("name").and_then(|v| v.as_str()) {
-                if let Some(content) = meta_item.get("content").and_then(|v| v.as_str()) {
-                    meta_defs.push(MetaDefinition {
-                        name: name.to_string(),
-                        content: content.to_string(),
-                    });
-                }
-            }
-        }
-        page = page.with_meta(meta_defs);
-    }
-
-    Ok(page)
-}
-
-fn parse_element_from_yaml_value(yaml: &serde_yaml::Value) -> anyhow::Result<Element> {
-    let widget = yaml
-        .get("widget")
-        .and_then(|v| v.as_str())
-        .ok_or_else(|| anyhow::anyhow!("Widget field required"))?;
-
-    let id = yaml
-        .get("id")
-        .and_then(|v| v.as_str())
-        .unwrap_or("")
-        .to_string();
-
-    let mut data = HashMap::new();
-    if let Some(data_obj) = yaml.get("data").and_then(|v| v.as_mapping()) {
-        for (k, v) in data_obj {
-            if let (Some(key), Some(value)) = (k.as_str(), v.as_str()) {
-                data.insert(key.to_string(), value.to_string());
-            }
-        }
-    }
-
-    let mut element = Element::new(widget.to_string(), data, id);
-
-    if let Some(classes) = yaml.get("classes").and_then(|v| v.as_sequence()) {
-        let class_list: Vec<String> = classes
-            .iter()
-            .filter_map(|v| v.as_str())
-            .map(|s| s.to_string())
-            .collect();
-        element = element.with_classes(class_list);
-    }
-
-    if let Some(style) = yaml.get("style").and_then(|v| v.as_mapping()) {
-        let mut style_map = HashMap::new();
-        for (k, v) in style {
-            if let (Some(key), Some(value)) = (k.as_str(), v.as_str()) {
-                style_map.insert(key.to_string(), value.to_string());
-            }
-        }
-        element = element.with_style(style_map);
-    }
-
-    if let Some(children) = yaml.get("children").and_then(|v| v.as_sequence()) {
-        let mut child_elements = Vec::new();
-        for child in children {
-            if let Ok(child_element) = parse_element_from_yaml_value(child) {
-                child_elements.push(child_element);
-            }
-        }
-        element = element.with_children(child_elements);
-    }
-
-    Ok(element)
+    return Ok(serde_yaml::from_str::<Page>(yaml)?);
 }
 
 fn create_test_widget(name: &str, html: &str, css: &str) -> Widget {
@@ -464,7 +372,10 @@ async fn test_meta_data_handling() {
     let page = Page::new()
         .with_title("Test Page".to_string())
         .with_path("/test".to_string())
-        .with_meta(meta_defs.clone())
+        .with_head(PageHead {
+            meta: Some(meta_defs.clone()),
+            link: Some(vec![]),
+        })
         .with_children(vec![Element::new(
             "test/text".to_string(),
             HashMap::from([("text".to_string(), "Hello".to_string())]),
@@ -739,9 +650,10 @@ async fn test_yaml_page_parsing() {
     let yaml_content = r#"
 title: "YAML Test Page"
 path: "/yaml-test"
-meta:
-  - name: "description"
-    content: "A test page parsed from YAML"
+head:
+    meta:
+    - name: "description"
+      content: "A test page parsed from YAML"
 children:
   - widget: "test/text"
     id: "yaml-text"
@@ -756,8 +668,11 @@ children:
 
     assert_eq!(page.title, "YAML Test Page");
     assert_eq!(page.path, "/yaml-test");
-    assert_eq!(page.meta.len(), 1);
-    assert_eq!(page.meta[0].name, "description");
+    assert_eq!(page.head.as_ref().unwrap().meta.as_ref().unwrap().len(), 1);
+    assert_eq!(
+        page.head.as_ref().unwrap().meta.as_ref().unwrap()[0].name,
+        "description"
+    );
     assert_eq!(page.children.len(), 1);
 
     let element = &page.children[0];

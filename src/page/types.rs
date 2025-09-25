@@ -98,14 +98,18 @@ pub struct MetaDefinition {
     pub content: String,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
+pub struct LinkDefinition {
+    pub href: String,
+    pub rel: String,
+}
 /// Each widget use in a page, with content, and maybe more children
 #[derive(Debug, Clone, Serialize, Deserialize, Object)]
 pub struct Element {
     #[serde(default)]
     #[oai(default)]
     pub id: String,
-    #[serde(rename = "type")]
-    #[oai(default, rename = "type")]
+    #[oai(default)]
     pub widget: String,
     #[serde(default)]
     #[oai(default)]
@@ -185,9 +189,15 @@ pub struct Page {
     pub cache: Vec<String>,
     pub last_modified: Option<String>,
     #[serde(default)]
-    pub meta: Vec<MetaDefinition>,
+    pub head: Option<PageHead>,
     #[serde(default)]
     pub css_variables: std::collections::HashMap<String, String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, Object)]
+pub struct PageHead {
+    pub meta: Option<Vec<MetaDefinition>>,
+    pub link: Option<Vec<LinkDefinition>>,
 }
 
 impl Page {
@@ -201,7 +211,7 @@ impl Page {
             children: Vec::new(),
             cache: Vec::new(),
             last_modified: None,
-            meta: Vec::new(),
+            head: None,
             css_variables: std::collections::HashMap::new(),
         }
     }
@@ -231,8 +241,8 @@ impl Page {
         self
     }
 
-    pub fn with_meta(mut self, meta: Vec<MetaDefinition>) -> Self {
-        self.meta = meta;
+    pub fn with_head(mut self, head: PageHead) -> Self {
+        self.head = Some(head);
         self
     }
 

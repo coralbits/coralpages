@@ -6,7 +6,10 @@
 
 #[cfg(test)]
 mod tests {
-    use crate::page::types::{Element, MetaDefinition, Page};
+    use crate::{
+        page::types::{Element, MetaDefinition, Page},
+        PageHead,
+    };
     use std::collections::HashMap;
 
     #[test]
@@ -22,7 +25,7 @@ mod tests {
         assert!(page.children.is_empty());
         assert!(page.cache.is_empty());
         assert!(page.last_modified.is_none());
-        assert!(page.meta.is_empty());
+        assert!(page.head.is_none());
         assert!(page.css_variables.is_empty());
     }
 
@@ -33,15 +36,21 @@ mod tests {
             .with_path("/test".to_string())
             .with_url("https://example.com/test".to_string())
             .with_template("default".to_string())
-            .with_meta(vec![MetaDefinition {
-                name: "description".to_string(),
-                content: "A test page".to_string(),
-            }]);
+            .with_head(PageHead {
+                meta: Some(vec![MetaDefinition {
+                    name: "description".to_string(),
+                    content: "A test page".to_string(),
+                }]),
+                link: Some(vec![]),
+            });
 
         assert_eq!(page.url, Some("https://example.com/test".to_string()));
         assert_eq!(page.template, Some("default".to_string()));
-        assert_eq!(page.meta.len(), 1);
-        assert_eq!(page.meta[0].name, "description");
+        assert_eq!(page.head.as_ref().unwrap().meta.as_ref().unwrap().len(), 1);
+        assert_eq!(
+            page.head.as_ref().unwrap().meta.as_ref().unwrap()[0].name,
+            "description"
+        );
     }
 
     #[test]
@@ -110,7 +119,10 @@ mod tests {
             "path": "/test",
             "url": "https://example.com/test",
             "template": "default",
-            "meta": [{"name": "description", "content": "A test page"}]
+            "head": {
+                "meta": [{"name": "description", "content": "A test page"}],
+                "link": [{"href": "https://example.com/test", "rel": "canonical"}]
+            }
         }
         "#;
         let page: Page = serde_json::from_str(page_json).unwrap();
@@ -118,9 +130,20 @@ mod tests {
         assert_eq!(page.path, "/test");
         assert_eq!(page.url, Some("https://example.com/test".to_string()));
         assert_eq!(page.template, Some("default".to_string()));
-        assert_eq!(page.meta.len(), 1);
-        assert_eq!(page.meta[0].name, "description");
-
+        assert_eq!(page.head.as_ref().unwrap().meta.as_ref().unwrap().len(), 1);
+        assert_eq!(
+            page.head.as_ref().unwrap().meta.as_ref().unwrap()[0].name,
+            "description"
+        );
+        assert_eq!(page.head.as_ref().unwrap().link.as_ref().unwrap().len(), 1);
+        assert_eq!(
+            page.head.as_ref().unwrap().link.as_ref().unwrap()[0].href,
+            "https://example.com/test"
+        );
+        assert_eq!(
+            page.head.as_ref().unwrap().link.as_ref().unwrap()[0].rel,
+            "canonical"
+        );
         println!("Page: {:?}", page);
         println!("Page JSON: {}", serde_yaml::to_string(&page).unwrap());
     }
