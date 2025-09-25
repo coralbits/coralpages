@@ -59,13 +59,14 @@ impl RenderedPage {
             .collect::<Vec<String>>();
         css_variables.sort_by(|a, b| a.cmp(b));
         let css_variables = css_variables.join("\n");
+        let base_css = "body { margin: 0; padding: 0; background: white; color: black; }";
 
-        format!("{}", css_variables)
+        format!("{}{}", css_variables, base_css)
     }
 
     pub fn get_head(&self) -> String {
         let mut head = String::new();
-        head.push_str("<style> body { margin: 0; padding: 0; }");
+        head.push_str("<style>");
         head.push_str(&self.get_css());
         head.push_str("</style>");
         if let Some(metas) = &self.head.meta {

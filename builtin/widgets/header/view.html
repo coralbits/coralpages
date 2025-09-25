@@ -1,13 +1,25 @@
-{% set size = data.size | default('medium') %} {% if size == 'large' %}
+{% set size = data.size | default('medium') %} {% if size == "default" %}
 <h1 class="page-header {{context.classes|join(' ')}}" id="{{data.id}}">
   {{data.text}}
 </h1>
+{% elif size == 'massive' %}
+<h1 class="page-header-massive {{context.classes|join(' ')}}" id="{{data.id}}">
+  {{data.text}}
+</h1>
+{% elif size == 'huge' %}
+<h1 class="page-header-huge {{context.classes|join(' ')}}" id="{{data.id}}">
+  {{data.text}}
+</h1>
+{% elif size == 'large' %}
+<h1 class="page-header-large {{context.classes|join(' ')}}" id="{{data.id}}">
+  {{data.text}}
+</h1>
 {% elif size == 'medium' %}
-<h2 class="page-header {{context.classes|join(' ')}}" id="{{data.id}}">
+<h2 class="page-header-medium {{context.classes|join(' ')}}" id="{{data.id}}">
   {{data.text}}
 </h2>
 {% elif size == 'small' %}
-<h3 class="page-header {{context.classes|join(' ')}}" id="{{data.id}}">
+<h3 class="page-header-small {{context.classes|join(' ')}}" id="{{data.id}}">
   {{data.text}}
 </h3>
 {% endif %} {% for child in context.children %} {{child}} {% endfor %}

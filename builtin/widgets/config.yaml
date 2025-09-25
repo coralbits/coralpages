@@ -40,11 +40,18 @@ widgets:
     description: A header widget
     icon: header
     html: header/view.html
+    css: header/style.css
     editor:
       - type: select
         label: Size
         name: size
         options:
+          - label: Default
+            value: default
+          - label: Massive
+            value: massive
+          - label: Huge
+            value: huge
           - label: Large
             value: large
           - label: Medium
