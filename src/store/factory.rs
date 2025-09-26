@@ -160,7 +160,7 @@ impl Store for StoreFactory {
             }
             let store_result = store.get_page_list(offset, limit, filter).await?;
             // Update offset and limit
-            offset = result.count.saturating_sub(offset); // limits to minimum 0
+            offset = offset.saturating_sub(result.results.len()); // limits to minimum 0
             let ret_count = store_result.results.len();
             limit = limit.saturating_sub(ret_count);
             // add to results
