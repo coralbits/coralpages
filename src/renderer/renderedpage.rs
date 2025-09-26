@@ -320,12 +320,13 @@ impl<'a> RenderedingPageData<'a> {
 
         // If the element has an id, add the CSS to the rendered page
         if !element.id.is_empty() && !element.style.is_empty() {
-            let css = element
+            let mut css = element
                 .style
                 .iter()
                 .map(|(k, v)| format!("{}: {};", k, v))
-                .collect::<Vec<String>>()
-                .join("\n");
+                .collect::<Vec<String>>();
+            css.sort_by(|a, b| b.cmp(a));
+            let css = css.join("\n");
 
             self.rendered_page
                 .css_variables
