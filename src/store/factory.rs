@@ -13,7 +13,7 @@ use crate::{
     file::FileStore,
     page::types::{Page, ResultPageList, Widget},
     store::{code::CodeStore, db::DbStore, traits::Store},
-    CssClass, CssClassResults, StoreConfig, WidgetResults,
+    CssClass, CssClassResults, StoreConfig, StoreError, WidgetResults,
 };
 
 pub struct StoreFactory {
@@ -47,7 +47,10 @@ impl StoreFactory {
     fn split_path(&self, path: &str) -> Result<(String, String), anyhow::Error> {
         let parts: Vec<&str> = path.splitn(2, '/').collect();
         if parts.len() < 2 {
-            return Err(anyhow::anyhow!("Invalid path={}", path));
+            return Err(StoreError::InvalidPath {
+                path: path.to_string(),
+            }
+            .into());
         }
         Ok((parts[0].to_string(), parts[1].to_string()))
     }
@@ -80,12 +83,12 @@ impl Store for StoreFactory {
 
     async fn load_widget_definition(&self, path: &str) -> anyhow::Result<Option<Widget>> {
         // info!("Loading widget definition, path={}", path);
-        let (store, subpath) = self.split_path(path)?;
-        let store = self.get_store(&store);
+        let (store_name, subpath) = self.split_path(path)?;
+        let store = self.get_store(&store_name);
         if let Some(store) = store {
             store.load_widget_definition(&subpath).await
         } else {
-            Err(anyhow::anyhow!("Store for widget not found, path={}", path))
+            Err(StoreError::StoreNotFound { store: store_name }.into())
         }
     }
 
@@ -104,35 +107,29 @@ impl Store for StoreFactory {
                 }
             }
         }
-        Err(anyhow::anyhow!(
-            "Page not found in any store, path={}",
-            path
-        ))
+        Err(StoreError::PageNotFound {
+            path: path.to_string(),
+        }
+        .into())
     }
 
     async fn save_page_definition(&self, path: &str, page: &Page) -> anyhow::Result<()> {
-        let (store, subpath) = self.split_path(path)?;
-        let store = self.get_store(&store);
+        let (store_name, subpath) = self.split_path(path)?;
+        let store = self.get_store(&store_name);
         if let Some(store) = store {
             store.save_page_definition(&subpath, page).await
         } else {
-            Err(anyhow::anyhow!(
-                "Store for page save not found, path={}",
-                path
-            ))
+            Err(StoreError::StoreNotFound { store: store_name }.into())
         }
     }
 
     async fn delete_page_definition(&self, path: &str) -> anyhow::Result<bool> {
-        let (store, subpath) = self.split_path(path)?;
-        let store = self.get_store(&store);
+        let (store_name, subpath) = self.split_path(path)?;
+        let store = self.get_store(&store_name);
         if let Some(store) = store {
             store.delete_page_definition(&subpath).await
         } else {
-            Err(anyhow::anyhow!(
-                "Store for page delete not found, path={}",
-                path
-            ))
+            Err(StoreError::StoreNotFound { store: store_name }.into())
         }
     }
 
@@ -213,15 +210,12 @@ impl Store for StoreFactory {
     }
 
     async fn load_css_class_definition(&self, name: &str) -> anyhow::Result<Option<CssClass>> {
-        let (store, subpath) = self.split_path(name)?;
-        let store = self.get_store(&store);
+        let (store_name, subpath) = self.split_path(name)?;
+        let store = self.get_store(&store_name);
         if let Some(store) = store {
             store.load_css_class_definition(&subpath).await
         } else {
-            Err(anyhow::anyhow!(
-                "Store for CSS class definition not found, name={}",
-                name
-            ))
+            Err(StoreError::StoreNotFound { store: store_name }.into())
         }
     }
 }

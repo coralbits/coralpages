@@ -21,6 +21,7 @@ use crate::{
     renderedpage::RenderedPage,
     renderer::pdf::render_pdf,
     renderresponse::{Details, PageRenderResponseJson},
+    ErrorResponse, StoreError,
 };
 use crate::{
     CssClass, CssClassResults, IdName, Page, PageRenderer, StoreListResults, WidgetResults,
@@ -47,6 +48,18 @@ impl Api {
         Ok(Self {
             renderer: Arc::new(renderer),
         })
+    }
+
+    fn store_error_to_poem_error(&self, store_error: &StoreError) -> PoemError {
+        let error_response = ErrorResponse::from_store_error(store_error);
+        let status_code = poem::http::StatusCode::from_u16(error_response.status)
+            .unwrap_or(poem::http::StatusCode::INTERNAL_SERVER_ERROR);
+
+        PoemError::from_string(
+            serde_json::to_string(&error_response)
+                .unwrap_or_else(|_| error_response.details.clone()),
+            status_code,
+        )
     }
 
     #[oai(path = "/render/:store/:path1/:path2", method = "get")]
@@ -99,11 +112,35 @@ impl Api {
             .load_page_definition(&pagename)
             .await
             .map_err(|e| {
-                PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+                // Check if it's a StoreError and return structured JSON error
+                if let Some(store_error) = e.downcast_ref::<StoreError>() {
+                    self.store_error_to_poem_error(store_error)
+                } else {
+                    // For other errors, create a generic internal error response
+                    let error_response = ErrorResponse {
+                        details: e.to_string(),
+                        code: "INTERNAL_ERROR".to_string(),
+                        status: 500,
+                        path: None,
+                        store: None,
+                    };
+                    PoemError::from_string(
+                        serde_json::to_string(&error_response).unwrap_or_else(|_| e.to_string()),
+                        poem::http::StatusCode::INTERNAL_SERVER_ERROR,
+                    )
+                }
             })?
             .ok_or_else(|| {
+                let error_response = ErrorResponse {
+                    details: format!("Page '{}' not found", pagename),
+                    code: "PAGE_NOT_FOUND".to_string(),
+                    status: 404,
+                    path: Some(pagename.clone()),
+                    store: None,
+                };
                 PoemError::from_string(
-                    format!("Page '{}' not found", pagename),
+                    serde_json::to_string(&error_response)
+                        .unwrap_or_else(|_| format!("Page '{}' not found", pagename)),
                     poem::http::StatusCode::NOT_FOUND,
                 )
             })?;
@@ -304,11 +341,35 @@ impl Api {
         };
 
         let page = store.load_page_definition(&path).await.map_err(|e| {
-            PoemError::from_string(e.to_string(), poem::http::StatusCode::INTERNAL_SERVER_ERROR)
+            // Check if it's a StoreError and return structured JSON error
+            if let Some(store_error) = e.downcast_ref::<StoreError>() {
+                self.store_error_to_poem_error(store_error)
+            } else {
+                // For other errors, create a generic internal error response
+                let error_response = ErrorResponse {
+                    details: e.to_string(),
+                    code: "INTERNAL_ERROR".to_string(),
+                    status: 500,
+                    path: None,
+                    store: None,
+                };
+                PoemError::from_string(
+                    serde_json::to_string(&error_response).unwrap_or_else(|_| e.to_string()),
+                    poem::http::StatusCode::INTERNAL_SERVER_ERROR,
+                )
+            }
         })?;
         let page = page.ok_or_else(|| {
+            let error_response = ErrorResponse {
+                details: format!("Page '{}' not found", path),
+                code: "PAGE_NOT_FOUND".to_string(),
+                status: 404,
+                path: Some(path.clone()),
+                store: None,
+            };
             PoemError::from_string(
-                format!("Page '{}' not found", path),
+                serde_json::to_string(&error_response)
+                    .unwrap_or_else(|_| format!("Page '{}' not found", path)),
                 poem::http::StatusCode::NOT_FOUND,
             )
         })?;
